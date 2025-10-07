@@ -1,0 +1,221 @@
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import api from '@/utils/api';
+
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load token from localStorage on mount
+  useEffect(() => {
+    const loadAuth = async () => {
+      try {
+        const storedToken = localStorage.getItem('authToken');
+        const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
+        
+        if (storedToken) {
+          setToken(storedToken);
+          
+          if (isDemoMode) {
+            // Demo mode - use fake user data
+            const demoUser = {
+              id: 'demo-user',
+              name: 'Demo User',
+              email: 'demo@crm.com',
+              avatar: null,
+              role: 'user',
+              isDemo: true
+            };
+            setUser(demoUser);
+            setIsAuthenticated(true);
+          } else {
+            // Real mode - fetch user data from API
+            const response = await api.get('/auth/me');
+            setUser(response.data);
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        // If token is invalid, clear it
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('isDemoMode');
+        setToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAuth();
+  }, []);
+
+  // Login method
+  const login = useCallback(async (email, password) => {
+    // Check for demo credentials first
+    const demoCredentials = [
+      { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
+      { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
+      { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' }
+    ];
+
+    const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
+    
+    if (demoUser) {
+      // Demo login
+      const demoToken = 'demo-token-' + Date.now();
+      const userData = {
+        id: 'demo-user-' + demoUser.role,
+        name: demoUser.name,
+        email: demoUser.email,
+        avatar: null,
+        role: demoUser.role,
+        isDemo: true
+      };
+      
+      // Store demo token and flag
+      localStorage.setItem('authToken', demoToken);
+      localStorage.setItem('isDemoMode', 'true');
+      
+      // Update state
+      setToken(demoToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true };
+    }
+
+    // Real API login
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { token: authToken, user: userData } = response.data;
+      
+      // Store token in localStorage
+      localStorage.setItem('authToken', authToken);
+      
+      // Update state
+      setToken(authToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Login failed. Please try again.';
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Demo login method
+  const loginAsDemo = useCallback(() => {
+    const demoUser = {
+      id: 'demo-user',
+      name: 'Demo User',
+      email: 'demo@crm.com',
+      avatar: null,
+      role: 'user',
+      isDemo: true
+    };
+    
+    const demoToken = 'demo-token-' + Date.now();
+    
+    // Store demo token
+    localStorage.setItem('authToken', demoToken);
+    localStorage.setItem('isDemoMode', 'true');
+    
+    // Update state
+    setToken(demoToken);
+    setUser(demoUser);
+    setIsAuthenticated(true);
+    
+    return { success: true };
+  }, []);
+
+  // Register method
+  const register = useCallback(async (name, email, password) => {
+    try {
+      const response = await api.post('/auth/register', { name, email, password });
+      const { token: authToken, user: userData } = response.data;
+      
+      // Store token in localStorage
+      localStorage.setItem('authToken', authToken);
+      
+      // Update state
+      setToken(authToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed. Please try again.';
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Logout method
+  const logout = useCallback(async () => {
+    const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
+    
+    try {
+      // Only call API if not in demo mode
+      if (!isDemoMode) {
+        await api.post('/auth/logout');
+      }
+    } catch (error) {
+      // Continue with logout even if API call fails
+      console.error('Logout API call failed:', error);
+    } finally {
+      // Clear token from localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('isDemoMode');
+      
+      // Clear state
+      setToken(null);
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  // Update user method
+  const updateUser = useCallback(async (userData) => {
+    try {
+      const response = await api.put('/users/me', userData);
+      setUser(response.data);
+      
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to update user.';
+      return { success: false, error: message };
+    }
+  }, []);
+
+  const value = {
+    user,
+    token,
+    isAuthenticated,
+    isLoading,
+    login,
+    register,
+    logout,
+    updateUser,
+    loginAsDemo,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
+};
