@@ -9,6 +9,8 @@ const pageTitles = {
   '/app/dashboard': 'Dashboard',
   '/app/contacts': 'Contacts',
   '/app/deals': 'Deals',
+  '/app/companies': 'Companies',
+  '/app/calendar': 'Calendar',
   '/app/settings': 'Settings',
 };
 

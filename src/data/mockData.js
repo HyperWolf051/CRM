@@ -69,7 +69,10 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-02-15',
     createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-28T14:45:00Z'
+    updatedAt: '2024-01-28T14:45:00Z',
+    notes: 'Client is interested in our premium package. Waiting for final approval from their board.',
+    source: 'Website',
+    assignedTo: 'Sales Rep 1'
   },
   {
     id: '2',
@@ -82,7 +85,10 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-02-28',
     createdAt: '2024-01-18T09:15:00Z',
-    updatedAt: '2024-01-29T16:20:00Z'
+    updatedAt: '2024-01-29T16:20:00Z',
+    notes: 'Technical requirements finalized. Negotiating pricing and timeline.',
+    source: 'Referral',
+    assignedTo: 'Sales Rep 2'
   },
   {
     id: '3',
@@ -95,7 +101,10 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-03-10',
     createdAt: '2024-01-20T11:00:00Z',
-    updatedAt: '2024-01-30T13:30:00Z'
+    updatedAt: '2024-01-30T13:30:00Z',
+    notes: 'Initial requirements gathering completed. Preparing detailed proposal.',
+    source: 'Cold Call',
+    assignedTo: 'Sales Rep 1'
   },
   {
     id: '4',
@@ -108,7 +117,10 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-01-30',
     createdAt: '2024-01-12T08:45:00Z',
-    updatedAt: '2024-01-30T10:15:00Z'
+    updatedAt: '2024-01-30T10:15:00Z',
+    notes: 'Contract signed and project initiated. Payment received.',
+    source: 'LinkedIn',
+    assignedTo: 'Sales Rep 3'
   },
   {
     id: '5',
@@ -121,7 +133,10 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-04-15',
     createdAt: '2024-01-25T14:20:00Z',
-    updatedAt: '2024-01-30T09:40:00Z'
+    updatedAt: '2024-01-30T09:40:00Z',
+    notes: 'Initial contact made. Scheduling discovery call to understand requirements.',
+    source: 'Trade Show',
+    assignedTo: 'Sales Rep 2'
   },
   {
     id: '6',
@@ -134,7 +149,42 @@ export const mockDeals = [
     contactAvatar: null,
     expectedCloseDate: '2024-01-25',
     createdAt: '2024-01-10T12:00:00Z',
-    updatedAt: '2024-01-25T15:30:00Z'
+    updatedAt: '2024-01-25T15:30:00Z',
+    notes: 'Client decided to go with a different vendor due to budget constraints.',
+    source: 'Website',
+    assignedTo: 'Sales Rep 1'
+  },
+  {
+    id: '7',
+    name: 'Data Analytics Platform',
+    value: 180000,
+    stage: 'qualified',
+    probability: 70,
+    contactId: '2',
+    contactName: 'Sarah Johnson',
+    contactAvatar: null,
+    expectedCloseDate: '2024-03-20',
+    createdAt: '2024-01-28T14:30:00Z',
+    updatedAt: '2024-01-30T11:15:00Z',
+    notes: 'Demo completed successfully. Client impressed with our analytics capabilities.',
+    source: 'Referral',
+    assignedTo: 'Sales Rep 3'
+  },
+  {
+    id: '8',
+    name: 'CRM Implementation',
+    value: 95000,
+    stage: 'proposal',
+    probability: 65,
+    contactId: '3',
+    contactName: 'Michael Chen',
+    contactAvatar: null,
+    expectedCloseDate: '2024-03-05',
+    createdAt: '2024-01-22T09:45:00Z',
+    updatedAt: '2024-01-30T16:30:00Z',
+    notes: 'Proposal submitted. Waiting for client feedback on customization requirements.',
+    source: 'Cold Email',
+    assignedTo: 'Sales Rep 1'
   }
 ];
 

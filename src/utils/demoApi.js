@@ -181,7 +181,18 @@ const demoApiHandlers = {
   'GET /dashboard/metrics': async () => {
     await simulateApiDelay(400);
     return {
-      data: mockDashboardStats
+      data: {
+        ...mockDashboardStats,
+        // Additional metrics for enhanced dashboard
+        pipelineValue: mockDeals.filter(d => !['closed_won', 'closed_lost'].includes(d.stage))
+          .reduce((sum, deal) => sum + deal.value, 0),
+        avgDealSize: mockDeals.length ? mockDeals.reduce((sum, deal) => sum + deal.value, 0) / mockDeals.length : 0,
+        conversionRate: mockDeals.length ? 
+          (mockDeals.filter(d => d.stage === 'closed_won').length / mockDeals.length) * 100 : 0,
+        activitiesThisWeek: 24,
+        upcomingTasks: 8,
+        overdueItems: 3
+      }
     };
   },
 
@@ -197,6 +208,57 @@ const demoApiHandlers = {
         role: 'user',
         isDemo: true,
         ...data
+      }
+    };
+  },
+
+  // Calendar endpoints
+  'GET /calendar/events': async () => {
+    await simulateApiDelay(400);
+    return {
+      data: [
+        {
+          id: '1',
+          title: 'Sales Call with TechCorp',
+          type: 'call',
+          date: '2024-02-15',
+          time: '10:00',
+          duration: 60,
+          attendees: ['John Smith'],
+          companyName: 'TechCorp Inc.',
+          dealName: 'Enterprise Software License',
+          location: 'Phone Call',
+          description: 'Discuss pricing and implementation timeline',
+          status: 'scheduled',
+          priority: 'high'
+        },
+        {
+          id: '2',
+          title: 'Product Demo - Cloud Migration',
+          type: 'meeting',
+          date: '2024-02-16',
+          time: '14:30',
+          duration: 90,
+          attendees: ['Sarah Johnson', 'Mike Wilson'],
+          companyName: 'Innovate Solutions',
+          dealName: 'Cloud Migration Project',
+          location: 'Conference Room A',
+          description: 'Demonstrate our cloud migration capabilities',
+          status: 'scheduled',
+          priority: 'high'
+        }
+      ]
+    };
+  },
+
+  'POST /calendar/events': async (data) => {
+    await simulateApiDelay(400);
+    return {
+      data: {
+        id: Date.now().toString(),
+        ...data,
+        status: 'scheduled',
+        createdAt: new Date().toISOString()
       }
     };
   },

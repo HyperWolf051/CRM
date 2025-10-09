@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Lock, Bell } from 'lucide-react';
+import { User, Lock, Bell, Moon, Sun, Palette } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -13,6 +13,7 @@ import api from '@/utils/api';
 const Settings = () => {
   const { user, updateUser } = useAuth();
   const { showToast } = useToast();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // User Information form state
   const [userForm, setUserForm] = useState({
@@ -414,13 +415,25 @@ const Settings = () => {
 
           {/* Appearance Settings */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-4">Appearance</h3>
-            <Toggle
-              checked={preferences.darkMode}
-              onChange={(value) => handlePreferenceChange('darkMode', value)}
-              label="Dark Mode"
-              description="Use dark theme throughout the application"
-            />
+            <h3 className="text-base font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              Appearance
+            </h3>
+            <div className="space-y-4">
+              <Toggle
+                checked={isDarkMode}
+                onChange={setIsDarkMode}
+                label="Dark Mode"
+                description="Use dark theme throughout the application (Coming Soon)"
+                icon={isDarkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              />
+              <Toggle
+                checked={preferences.darkMode}
+                onChange={(value) => handlePreferenceChange('darkMode', value)}
+                label="Auto Dark Mode"
+                description="Automatically switch based on system preference (Coming Soon)"
+              />
+            </div>
           </div>
 
           {/* Save Button */}

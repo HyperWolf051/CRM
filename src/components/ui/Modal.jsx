@@ -83,56 +83,57 @@ const Modal = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
       {...props}
     >
-      {/* Backdrop */}
+      {/* Modern Blur Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="absolute inset-0 bg-black/20 backdrop-blur-md transition-all duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
       
-      {/* Modal */}
+      {/* Enhanced Modal */}
       <div 
         ref={modalRef}
         className={`
-          relative bg-white rounded-lg shadow-xl 
-          max-w-lg w-full max-h-[90vh] overflow-hidden
-          animate-slide-up
-          ${className}
+          relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20
+          w-full max-h-[85vh] overflow-hidden
+          animate-scale-in transform-gpu
+          ${className || 'max-w-2xl'}
         `}
+        style={{
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+        }}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
       >
-        {/* Header */}
+        {/* Enhanced Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h2 id="modal-title" className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+            <h2 id="modal-title" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
+              className="text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-2 hover:bg-gray-100/50"
               aria-label="Close modal"
             >
-              <X size={20} aria-hidden="true" />
+              <X size={24} aria-hidden="true" />
             </button>
           </div>
         )}
         
-        {/* Content */}
-        <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+        {/* Enhanced Content */}
+        <div className="px-8 py-6 overflow-y-auto max-h-[calc(85vh-140px)] bg-white/50">
           {children}
         </div>
         
-        {/* Footer */}
+        {/* Enhanced Footer */}
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="px-8 py-6 border-t border-gray-200/50 bg-gradient-to-r from-gray-50/50 to-blue-50/50">
             {footer}
           </div>
         )}
       </div>
-      
-
     </div>
   );
 };

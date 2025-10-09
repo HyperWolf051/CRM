@@ -22,7 +22,7 @@ const Input = forwardRef(({
       {label && (
         <label 
           htmlFor={inputId} 
-          className="block text-sm font-medium text-gray-700 mb-1.5"
+          className="block text-sm font-semibold text-gray-800 mb-2"
         >
           {label}
         </label>
@@ -45,13 +45,14 @@ const Input = forwardRef(({
           aria-describedby={errorId}
           aria-invalid={error ? 'true' : 'false'}
           className={`
-            w-full px-4 py-2 border rounded-md text-base
-            transition-all duration-150 transform
-            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01]
-            hover:border-gray-400 hover:shadow-sm
+            w-full px-4 py-3 border rounded-xl text-base bg-white/70 backdrop-blur-sm
+            transition-all duration-200 transform
+            focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg
+            hover:border-gray-400 hover:shadow-md hover:bg-white/90
             disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+            placeholder:text-gray-400
             ${icon ? 'pl-10' : ''}
-            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'}
+            ${error ? 'border-red-500 focus:ring-red-500/50 bg-red-50/50' : 'border-gray-300'}
           `}
           {...props}
         />

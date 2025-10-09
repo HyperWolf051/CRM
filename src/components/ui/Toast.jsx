@@ -25,6 +25,12 @@ const Toast = ({ id, type = 'info', message, duration = 5000, onClose }) => {
       text: 'text-red-800',
       icon: <AlertCircle className="w-5 h-5 text-red-500" />,
     },
+    warning: {
+      bg: 'bg-yellow-50',
+      border: 'border-yellow-200',
+      text: 'text-yellow-800',
+      icon: <AlertCircle className="w-5 h-5 text-yellow-500" />,
+    },
     info: {
       bg: 'bg-blue-50',
       border: 'border-blue-200',
