@@ -15,10 +15,13 @@ export function useDeals() {
       setLoading(true);
       setError(null);
       const response = await api.get('/deals');
-      setDeals(response.data);
+      // Handle both direct array and API response format
+      const dealsData = response.data?.data || response.data || [];
+      setDeals(Array.isArray(dealsData) ? dealsData : []);
     } catch (err) {
       const errorMessage = err.userMessage || err.message || 'Failed to fetch deals';
       setError(errorMessage);
+      setDeals([]); // Set empty array on error
       handleError(err, { defaultMessage: 'Failed to load deals' });
     } finally {
       setLoading(false);
@@ -35,7 +38,7 @@ export function useDeals() {
           enableRetry: true
         }
       );
-      const newDeal = response.data;
+      const newDeal = response.data?.data || response.data;
       setDeals(prev => [...prev, newDeal]);
       return newDeal;
     } catch (err) {
@@ -53,9 +56,9 @@ export function useDeals() {
           enableRetry: true
         }
       );
-      const updatedDeal = response.data;
+      const updatedDeal = response.data?.data || response.data;
       setDeals(prev => prev.map(deal => 
-        deal.id === dealId ? updatedDeal : deal
+        deal._id === dealId ? updatedDeal : deal
       ));
       return updatedDeal;
     } catch (err) {
@@ -67,21 +70,21 @@ export function useDeals() {
     try {
       // Optimistically update the UI
       setDeals(prev => prev.map(deal => 
-        deal.id === dealId ? { ...deal, stage: newStage } : deal
+        deal._id === dealId ? { ...deal, stage: newStage } : deal
       ));
 
       const response = await executeWithErrorHandling(
-        () => api.patch(`/deals/${dealId}/stage`, { stage: newStage }),
+        () => api.put(`/deals/${dealId}/stage`, { stage: newStage }),
         {
           errorMessage: 'Failed to update deal stage',
           enableRetry: true
         }
       );
-      const updatedDeal = response.data;
+      const updatedDeal = response.data?.data || response.data;
       
       // Update with server response
       setDeals(prev => prev.map(deal => 
-        deal.id === dealId ? updatedDeal : deal
+        deal._id === dealId ? updatedDeal : deal
       ));
       
       return updatedDeal;
@@ -102,7 +105,7 @@ export function useDeals() {
           enableRetry: true
         }
       );
-      setDeals(prev => prev.filter(deal => deal.id !== dealId));
+      setDeals(prev => prev.filter(deal => deal._id !== dealId));
     } catch (err) {
       throw err;
     }
