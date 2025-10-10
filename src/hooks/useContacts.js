@@ -14,10 +14,13 @@ const useContacts = () => {
       setLoading(true);
       setError(null);
       const response = await api.get('/contacts');
-      setContacts(response.data);
+      // Handle both direct array and API response format
+      const contactsData = response.data?.data || response.data || [];
+      setContacts(Array.isArray(contactsData) ? contactsData : []);
     } catch (err) {
       const errorMessage = err.userMessage || err.message || 'Failed to fetch contacts';
       setError(errorMessage);
+      setContacts([]); // Set empty array on error
       handleError(err, { defaultMessage: 'Failed to load contacts' });
     } finally {
       setLoading(false);
@@ -35,7 +38,7 @@ const useContacts = () => {
           enableRetry: true
         }
       );
-      const newContact = response.data;
+      const newContact = response.data?.data || response.data;
       
       // Add to local state
       setContacts(prev => [newContact, ...prev]);
@@ -57,12 +60,12 @@ const useContacts = () => {
           enableRetry: true
         }
       );
-      const updatedContact = response.data;
+      const updatedContact = response.data?.data || response.data;
       
       // Update local state
       setContacts(prev => 
         prev.map(contact => 
-          contact.id === contactId ? updatedContact : contact
+          contact._id === contactId ? updatedContact : contact
         )
       );
       
@@ -85,7 +88,7 @@ const useContacts = () => {
       );
       
       // Remove from local state
-      setContacts(prev => prev.filter(contact => contact.id !== contactId));
+      setContacts(prev => prev.filter(contact => contact._id !== contactId));
       
       return { success: true };
     } catch (err) {
@@ -97,7 +100,8 @@ const useContacts = () => {
   const getContact = useCallback(async (contactId) => {
     try {
       const response = await api.get(`/contacts/${contactId}`);
-      return { success: true, data: response.data };
+      const contactData = response.data?.data || response.data;
+      return { success: true, data: contactData };
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to fetch contact';
       console.error('Contact fetch error:', err);
@@ -113,10 +117,12 @@ const useContacts = () => {
       const response = await api.get('/contacts', {
         params: { search: query }
       });
-      setContacts(response.data);
+      const contactsData = response.data?.data || response.data || [];
+      setContacts(Array.isArray(contactsData) ? contactsData : []);
     } catch (err) {
       const errorMessage = err.userMessage || err.message || 'Failed to search contacts';
       setError(errorMessage);
+      setContacts([]); // Set empty array on error
       handleError(err, { defaultMessage: 'Failed to search contacts' });
     } finally {
       setLoading(false);

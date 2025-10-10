@@ -17,6 +17,9 @@ const Deals = lazy(() => import('@/pages/Deals'));
 const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Team = lazy(() => import('@/pages/Team'));
+const Candidates = lazy(() => import('@/pages/Candidates'));
+const BackendTestPage = lazy(() => import('@/pages/BackendTestPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -58,6 +61,9 @@ function App() {
                   <Route path="/register" element={<Register />} />
                 </Route>
                 
+                {/* Test route */}
+                <Route path="/test-backend" element={<BackendTestPage />} />
+                
                 {/* Protected app routes */}
                 <Route path="/app" element={
                   <ProtectedRoute>
@@ -65,6 +71,7 @@ function App() {
                   </ProtectedRoute>
                 }>
                   <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="candidates" element={<Candidates />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />
@@ -76,7 +83,7 @@ function App() {
                   <Route path="documents" element={<ComingSoon title="Documents" description="Document storage and management" />} />
                   <Route path="goals" element={<ComingSoon title="Goals" description="Set and track your business goals" />} />
                   <Route path="projects" element={<ComingSoon title="Projects" description="Project management and collaboration" />} />
-                  <Route path="team" element={<ComingSoon title="Team" description="Team management and collaboration tools" />} />
+                  <Route path="team" element={<Team />} />
                   <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
