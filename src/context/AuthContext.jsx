@@ -55,55 +55,54 @@ export const AuthProvider = ({ children }) => {
 
   // Login method
   const login = useCallback(async (email, password) => {
-    // Real API login first
+    // Check for demo credentials first
+    const demoCredentials = [
+      { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
+      { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
+      { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' }
+    ];
+
+    const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
+    
+    if (demoUser) {
+      // Demo login
+      const demoToken = 'demo-token-' + Date.now();
+      const userData = {
+        id: 'demo-user-' + demoUser.role,
+        name: demoUser.name,
+        email: demoUser.email,
+        avatar: null,
+        role: demoUser.role,
+        isDemo: true
+      };
+      
+      // Store demo token and flag
+      localStorage.setItem('authToken', demoToken);
+      localStorage.setItem('isDemoMode', 'true');
+      
+      // Update state
+      setToken(demoToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true };
+    }
+
+    // Real API login
     try {
       const response = await api.post('/auth/login', { email, password });
       const { token: authToken, user: userData } = response.data;
       
       // Store token in localStorage
       localStorage.setItem('authToken', authToken);
-      localStorage.removeItem('isDemoMode'); // Clear demo mode
       
       // Update state
       setToken(authToken);
       setUser(userData);
       setIsAuthenticated(true);
       
-      return { success: true, user: userData };
+      return { success: true };
     } catch (error) {
-      // If API fails, check for demo credentials
-      const demoCredentials = [
-        { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
-        { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
-        { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' }
-      ];
-
-      const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
-      
-      if (demoUser) {
-        // Demo login
-        const demoToken = 'demo-token-' + Date.now();
-        const userData = {
-          id: 'demo-user-' + demoUser.role,
-          name: demoUser.name,
-          email: demoUser.email,
-          avatar: null,
-          role: demoUser.role,
-          isDemo: true
-        };
-        
-        // Store demo token and flag
-        localStorage.setItem('authToken', demoToken);
-        localStorage.setItem('isDemoMode', 'true');
-        
-        // Update state
-        setToken(demoToken);
-        setUser(userData);
-        setIsAuthenticated(true);
-        
-        return { success: true, user: userData };
-      }
-
       const message = error.response?.data?.message || 'Login failed. Please try again.';
       return { success: false, error: message };
     }

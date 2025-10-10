@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import CollapsibleSidebar from '@/components/CollapsibleSidebar';
+import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Topbar';
 import PageTransition from '@/components/PageTransition';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
@@ -7,12 +7,10 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
 // Map routes to page titles
 const pageTitles = {
   '/app/dashboard': 'Dashboard',
-  '/app/candidates': 'Candidates',
   '/app/contacts': 'Contacts',
-  '/app/deals': 'Jobs',
-  '/app/companies': 'Clients',
+  '/app/deals': 'Deals',
+  '/app/companies': 'Companies',
   '/app/calendar': 'Calendar',
-  '/app/analytics': 'Reports',
   '/app/settings': 'Settings',
 };
 
@@ -30,9 +28,6 @@ export default function DashboardLayout() {
     // Check for dynamic routes (e.g., /app/contacts/123)
     if (location.pathname.startsWith('/app/contacts/')) {
       return 'Contact Details';
-    }
-    if (location.pathname.startsWith('/app/candidates/')) {
-      return 'Candidate Details';
     }
     
     // Default fallback
@@ -66,7 +61,7 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <CollapsibleSidebar />
+      <Sidebar />
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
