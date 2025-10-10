@@ -68,13 +68,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       if (result.success) {
         showToast('success', 'Login successful! Welcome back.');
-        
-        // Check if admin user and redirect to team page
-        if (result.user && result.user.role === 'admin' && formData.email === 'admin@crm.com') {
-          navigate('/app/team');
-        } else {
-          navigate('/app/dashboard');
-        }
+        navigate('/app/dashboard');
       } else {
         showToast('error', result.error);
       }
@@ -222,10 +216,10 @@ const Login = () => {
           disabled={isSubmitting}
           className={`
             w-full py-3 px-4 rounded-lg font-semibold text-white text-sm
-            btn-slide-primary
+            bg-blue-600 hover:bg-blue-700 transition-all duration-200
             ${isSubmitting
               ? 'opacity-60 cursor-not-allowed'
-              : 'active:transform active:scale-[0.98]'
+              : 'hover:shadow-lg active:transform active:scale-[0.98]'
             }
             focus:outline-none focus:ring-4 focus:ring-blue-500/25
           `}

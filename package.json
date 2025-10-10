@@ -9,16 +9,7 @@
     "build:analyze": "set ANALYZE=true && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run",
-    "backend:install": "cd backend && npm install",
-    "backend:dev": "cd backend && npm run dev",
-    "backend:seed": "cd backend && npm run seed",
-    "backend:start": "cd backend && npm start",
-    "dev:full": "concurrently \"npm run backend:dev\" \"npm run dev\"",
-    "setup": "node setup.js",
-    "start": "node start.js",
-    "start-crm": "node start-crm.js",
-    "fix": "node fix-issues.js"
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -39,7 +30,6 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.21",
-    "concurrently": "^8.2.2",
     "jsdom": "^23.2.0",
     "postcss": "^8.5.6",
     "rollup-plugin-visualizer": "^6.0.4",

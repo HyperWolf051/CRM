@@ -24,7 +24,7 @@ export const useApiError = () => {
 
     // Use enhanced error message from API interceptor or fallback to default
     const message = error.userMessage || error.message || defaultMessage;
-
+    
     // Show error toast
     showToast('error', message);
 
@@ -74,7 +74,7 @@ export const useApiError = () => {
       }
 
       // Execute API call with or without retry
-      const result = enableRetry
+      const result = enableRetry 
         ? await withRetry(apiCall, maxRetries)
         : await apiCall();
 
