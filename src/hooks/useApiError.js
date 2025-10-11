@@ -1,119 +1,89 @@
+import { useCallback } from 'react';
 import { useToast } from '@/context/ToastContext';
-import { withRetry, waitForOnline } from '@/utils/api';
 
 /**
- * Custom hook for handling API errors with user-friendly toast notifications
+ * Custom hook for handling API errors and network status
+ * Provides utilities for showing network-related notifications
  */
 export const useApiError = () => {
   const { showToast } = useToast();
 
   /**
-   * Handle API error and show appropriate toast
-   * @param {Error} error - The error object from API call
-   * @param {Object} options - Configuration options
-   * @param {string} options.defaultMessage - Default message if no specific message available
-   * @param {boolean} options.showRetry - Whether to show retry option
-   * @param {Function} options.onRetry - Callback function for retry action
+   * Show notification when user goes offline
    */
-  const handleError = (error, options = {}) => {
-    const {
-      defaultMessage = 'An error occurred',
-      showRetry = false,
-      onRetry = null
-    } = options;
+  const showOfflineNotification = useCallback(() => {
+    showToast({
+      type: 'warning',
+      title: 'Connection Lost',
+      message: 'You are currently offline. Some features may not work properly.',
+      duration: 5000
+    });
+  }, [showToast]);
 
-    // Use enhanced error message from API interceptor or fallback to default
-    const message = error.userMessage || error.message || defaultMessage;
+  /**
+   * Show notification when user comes back online
+   */
+  const showOnlineNotification = useCallback(() => {
+    showToast({
+      type: 'success',
+      title: 'Connection Restored',
+      message: 'You are back online. All features are now available.',
+      duration: 3000
+    });
+  }, [showToast]);
 
-    // Show error toast
-    showToast('error', message);
-
-    // Log error for debugging
-    console.error('API Error:', error);
-
-    // Show retry option for retryable errors
-    if (showRetry && error.canRetry && onRetry) {
-      // You could implement a retry button in the toast here
-      // For now, we'll just log that retry is available
-      console.log('Retry available for this error');
+  /**
+   * Handle API errors with appropriate notifications
+   * @param {Error} error - The error object
+   * @param {string} context - Context where the error occurred
+   */
+  const handleApiError = useCallback((error, context = 'API') => {
+    console.error(`${context} Error:`, error);
+    
+    // Check if it's a network error
+    if (!navigator.onLine) {
+      showOfflineNotification();
+      return;
     }
-  };
 
-  /**
-   * Execute an API call with automatic error handling and toast notifications
-   * @param {Function} apiCall - The API call function
-   * @param {Object} options - Configuration options
-   * @param {string} options.loadingMessage - Message to show while loading
-   * @param {string} options.successMessage - Message to show on success
-   * @param {string} options.errorMessage - Custom error message
-   * @param {boolean} options.showRetry - Whether to show retry option
-   * @param {boolean} options.enableRetry - Whether to automatically retry failed requests
-   * @param {number} options.maxRetries - Maximum number of retry attempts
-   */
-  const executeWithErrorHandling = async (apiCall, options = {}) => {
-    const {
-      loadingMessage,
-      successMessage,
-      errorMessage,
-      showRetry = false,
-      enableRetry = false,
-      maxRetries = 2
-    } = options;
-
-    try {
-      // Show loading message if provided
-      if (loadingMessage) {
-        showToast('info', loadingMessage);
+    // Handle different types of errors
+    let message = 'An unexpected error occurred. Please try again.';
+    
+    if (error.response) {
+      // Server responded with error status
+      const status = error.response.status;
+      switch (status) {
+        case 401:
+          message = 'Authentication required. Please log in again.';
+          break;
+        case 403:
+          message = 'You do not have permission to perform this action.';
+          break;
+        case 404:
+          message = 'The requested resource was not found.';
+          break;
+        case 500:
+          message = 'Server error. Please try again later.';
+          break;
+        default:
+          message = error.response.data?.message || message;
       }
-
-      // Wait for online status if offline
-      if (!navigator.onLine) {
-        showToast('info', 'Waiting for internet connection...');
-        await waitForOnline();
-        showToast('success', 'Connection restored!');
-      }
-
-      // Execute API call with or without retry
-      const result = enableRetry
-        ? await withRetry(apiCall, maxRetries)
-        : await apiCall();
-
-      // Show success message if provided
-      if (successMessage) {
-        showToast('success', successMessage);
-      }
-
-      return result;
-    } catch (error) {
-      handleError(error, {
-        defaultMessage: errorMessage,
-        showRetry,
-        onRetry: enableRetry ? () => executeWithErrorHandling(apiCall, options) : null
-      });
-      throw error; // Re-throw so calling code can handle it if needed
+    } else if (error.request) {
+      // Network error
+      message = 'Network error. Please check your connection and try again.';
     }
-  };
 
-  /**
-   * Show offline notification
-   */
-  const showOfflineNotification = () => {
-    showToast('error', 'You are currently offline. Some features may not work properly.');
-  };
-
-  /**
-   * Show online notification
-   */
-  const showOnlineNotification = () => {
-    showToast('success', 'Connection restored! You are back online.');
-  };
+    showToast({
+      type: 'error',
+      title: `${context} Error`,
+      message,
+      duration: 5000
+    });
+  }, [showToast, showOfflineNotification]);
 
   return {
-    handleError,
-    executeWithErrorHandling,
     showOfflineNotification,
-    showOnlineNotification
+    showOnlineNotification,
+    handleApiError
   };
 };
-
-export default useApiError;

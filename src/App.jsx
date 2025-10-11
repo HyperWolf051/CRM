@@ -16,10 +16,10 @@ const ContactDetails = lazy(() => import('@/pages/ContactDetails'));
 const Deals = lazy(() => import('@/pages/Deals'));
 const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
+const Tasks = lazy(() => import('@/pages/Tasks'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Team = lazy(() => import('@/pages/Team'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
-const BackendTestPage = lazy(() => import('@/pages/BackendTestPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -61,9 +61,6 @@ function App() {
                   <Route path="/register" element={<Register />} />
                 </Route>
                 
-                {/* Test route */}
-                <Route path="/test-backend" element={<BackendTestPage />} />
-                
                 {/* Protected app routes */}
                 <Route path="/app" element={
                   <ProtectedRoute>
@@ -77,6 +74,7 @@ function App() {
                   <Route path="deals" element={<Deals />} />
                   <Route path="companies" element={<Companies />} />
                   <Route path="calendar" element={<Calendar />} />
+                  <Route path="tasks" element={<Tasks />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Advanced reporting and business insights" />} />
                   <Route path="email" element={<ComingSoon title="Email" description="Integrated email management system" />} />
                   <Route path="calls" element={<ComingSoon title="Calls" description="Call tracking and management" />} />

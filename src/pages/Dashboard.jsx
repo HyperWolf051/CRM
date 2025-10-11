@@ -57,7 +57,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-            Hello, {metrics?.user?.name || 'User'} 👋
+            Hello, {metrics?.user?.name || 'User'} 
           </h1>
           <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your business today.</p>
         </div>
@@ -292,7 +292,10 @@ const Dashboard = () => {
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-900">Calendar</h2>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              <button 
+                onClick={() => navigate('/app/calendar')}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:bg-blue-50 px-2 py-1 rounded-lg transition-all duration-200"
+              >
                 View Full
               </button>
             </div>

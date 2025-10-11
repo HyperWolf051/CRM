@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api from '@/utils/api';
 
 const AuthContext = createContext(null);
 
@@ -14,34 +13,22 @@ export const AuthProvider = ({ children }) => {
     const loadAuth = async () => {
       try {
         const storedToken = localStorage.getItem('authToken');
-        const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
         
         if (storedToken) {
           setToken(storedToken);
           
-          if (isDemoMode) {
-            // Demo mode - use fake user data
-            const demoUser = {
-              id: 'demo-user',
-              name: 'Demo User',
-              email: 'demo@crm.com',
-              avatar: null,
-              role: 'user',
-              isDemo: true
-            };
-            setUser(demoUser);
-            setIsAuthenticated(true);
-          } else {
-            // Real mode - fetch user data from API
-            const response = await api.get('/auth/me');
-            setUser(response.data);
+          // Use stored user data
+          const storedUser = localStorage.getItem('userData');
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
             setIsAuthenticated(true);
           }
         }
       } catch (error) {
         // If token is invalid, clear it
         localStorage.removeItem('authToken');
-        localStorage.removeItem('isDemoMode');
+        localStorage.removeItem('userData');
         setToken(null);
         setUser(null);
         setIsAuthenticated(false);
@@ -55,58 +42,41 @@ export const AuthProvider = ({ children }) => {
 
   // Login method
   const login = useCallback(async (email, password) => {
-    // Real API login first
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      const { token: authToken, user: userData } = response.data;
+    // Check for demo credentials
+    const demoCredentials = [
+      { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
+      { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
+      { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' },
+      { email: 'john@crm.com', password: 'john123', name: 'John Doe', role: 'user' }
+    ];
+
+    const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
+    
+    if (demoUser) {
+      // Demo login
+      const demoToken = 'demo-token-' + Date.now();
+      const userData = {
+        id: 'demo-user-' + demoUser.role,
+        name: demoUser.name,
+        email: demoUser.email,
+        avatar: null,
+        role: demoUser.role,
+        isDemo: true
+      };
       
-      // Store token in localStorage
-      localStorage.setItem('authToken', authToken);
-      localStorage.removeItem('isDemoMode'); // Clear demo mode
+      // Store demo token and user data
+      localStorage.setItem('authToken', demoToken);
+      localStorage.setItem('userData', JSON.stringify(userData));
       
       // Update state
-      setToken(authToken);
+      setToken(demoToken);
       setUser(userData);
       setIsAuthenticated(true);
       
       return { success: true, user: userData };
-    } catch (error) {
-      // If API fails, check for demo credentials
-      const demoCredentials = [
-        { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
-        { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
-        { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' }
-      ];
-
-      const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
-      
-      if (demoUser) {
-        // Demo login
-        const demoToken = 'demo-token-' + Date.now();
-        const userData = {
-          id: 'demo-user-' + demoUser.role,
-          name: demoUser.name,
-          email: demoUser.email,
-          avatar: null,
-          role: demoUser.role,
-          isDemo: true
-        };
-        
-        // Store demo token and flag
-        localStorage.setItem('authToken', demoToken);
-        localStorage.setItem('isDemoMode', 'true');
-        
-        // Update state
-        setToken(demoToken);
-        setUser(userData);
-        setIsAuthenticated(true);
-        
-        return { success: true, user: userData };
-      }
-
-      const message = error.response?.data?.message || 'Login failed. Please try again.';
-      return { success: false, error: message };
     }
+
+    return { success: false, error: 'Invalid credentials. Please use demo accounts.' };
   }, []);
 
   // Demo login method
@@ -122,9 +92,9 @@ export const AuthProvider = ({ children }) => {
     
     const demoToken = 'demo-token-' + Date.now();
     
-    // Store demo token
+    // Store demo token and user data
     localStorage.setItem('authToken', demoToken);
-    localStorage.setItem('isDemoMode', 'true');
+    localStorage.setItem('userData', JSON.stringify(demoUser));
     
     // Update state
     setToken(demoToken);
@@ -136,61 +106,51 @@ export const AuthProvider = ({ children }) => {
 
   // Register method
   const register = useCallback(async (name, email, password) => {
-    try {
-      const response = await api.post('/auth/register', { name, email, password });
-      const { token: authToken, user: userData } = response.data;
-      
-      // Store token in localStorage
-      localStorage.setItem('authToken', authToken);
-      
-      // Update state
-      setToken(authToken);
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed. Please try again.';
-      return { success: false, error: message };
-    }
+    // Simple demo registration
+    const userData = {
+      id: 'user-' + Date.now(),
+      name,
+      email,
+      avatar: null,
+      role: 'user',
+      isDemo: true
+    };
+    
+    const authToken = 'token-' + Date.now();
+    
+    // Store token and user data
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('userData', JSON.stringify(userData));
+    
+    // Update state
+    setToken(authToken);
+    setUser(userData);
+    setIsAuthenticated(true);
+    
+    return { success: true };
   }, []);
 
   // Logout method
   const logout = useCallback(async () => {
-    const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
+    // Clear token from localStorage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
     
-    try {
-      // Only call API if not in demo mode
-      if (!isDemoMode) {
-        await api.post('/auth/logout');
-      }
-    } catch (error) {
-      // Continue with logout even if API call fails
-      console.error('Logout API call failed:', error);
-    } finally {
-      // Clear token from localStorage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('isDemoMode');
-      
-      // Clear state
-      setToken(null);
-      setUser(null);
-      setIsAuthenticated(false);
-    }
+    // Clear state
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
   }, []);
 
   // Update user method
   const updateUser = useCallback(async (userData) => {
-    try {
-      const response = await api.put('/users/me', userData);
-      setUser(response.data);
-      
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update user.';
-      return { success: false, error: message };
-    }
-  }, []);
+    // Update user data in localStorage and state
+    const updatedUser = { ...user, ...userData };
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    
+    return { success: true };
+  }, [user]);
 
   const value = {
     user,

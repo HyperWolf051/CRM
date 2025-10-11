@@ -11,7 +11,8 @@ import {
   BarChart3,
   UserCheck,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CheckSquare
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -33,6 +34,18 @@ const navigationItems = [
     href: '/app/deals',
     icon: TrendingUp,
     color: 'from-purple-500 to-purple-600'
+  },
+  {
+    name: 'Calendar',
+    href: '/app/calendar',
+    icon: Calendar,
+    color: 'from-pink-500 to-rose-600'
+  },
+  {
+    name: 'Tasks',
+    href: '/app/tasks',
+    icon: CheckSquare,
+    color: 'from-cyan-500 to-blue-600'
   },
   {
     name: 'Clients',
@@ -77,8 +90,8 @@ export default function CollapsibleSidebar() {
   return (
     <div 
       className={`
-        ${isExpanded ? 'w-64' : 'w-16'} 
-        bg-white/90 backdrop-blur-xl border-r border-slate-200/50 
+        ${isExpanded ? 'w-64' : 'w-20'} 
+        bg-white/95 backdrop-blur-xl border-r border-slate-200/50 
         flex flex-col h-full shadow-xl 
         transition-all duration-500 ease-out
         relative z-10 overflow-hidden
@@ -152,23 +165,31 @@ export default function CollapsibleSidebar() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`
                   group flex items-center px-3 py-3 rounded-xl text-sm font-medium 
-                  transition-all duration-200 transform hover:scale-[1.02]
+                  transition-all duration-300 transform hover:scale-[1.05]
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+                  relative overflow-hidden
                   ${isActive 
-                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 shadow-md border border-blue-200/50' 
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 shadow-lg border border-blue-200/50' 
+                    : 'text-slate-600 hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50 hover:text-slate-900 hover:shadow-md'
                   }
                 `}
                 title={!isExpanded ? item.name : ''}
               >
                 <div className={`
-                  w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300
+                  w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                  relative overflow-hidden group-hover:scale-110
                   ${isActive 
                     ? `bg-gradient-to-r ${item.color} shadow-lg` 
-                    : 'bg-slate-100 group-hover:bg-slate-200'
+                    : 'bg-slate-100 group-hover:bg-gradient-to-r group-hover:from-slate-200 group-hover:to-blue-100'
                   }
                 `}>
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-600'}`} aria-hidden="true" />
+                  <Icon className={`w-5 h-5 transition-all duration-300 ${
+                    isActive 
+                      ? 'text-white' 
+                      : 'text-slate-600 group-hover:text-blue-600'
+                  }`} aria-hidden="true" />
+                  {/* Hover effect overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
                 </div>
                 <span className={`ml-3 transition-all duration-500 ease-out whitespace-nowrap ${
                   isExpanded 
@@ -192,14 +213,17 @@ export default function CollapsibleSidebar() {
           onClick={handleLogout}
           className={`
             group flex items-center w-full px-3 py-3 rounded-xl text-sm font-medium 
-            text-slate-600 hover:bg-red-50 hover:text-red-600 
-            transition-all duration-200 transform hover:scale-[1.02] 
+            text-slate-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 
+            transition-all duration-300 transform hover:scale-[1.05] 
             focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2
+            relative overflow-hidden hover:shadow-md
           `}
           title={!isExpanded ? 'Logout' : ''}
         >
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 group-hover:bg-red-100 transition-all duration-300">
-            <LogOut className="w-4 h-4" aria-hidden="true" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-pink-100 transition-all duration-300 group-hover:scale-110 relative overflow-hidden">
+            <LogOut className="w-5 h-5 transition-all duration-300 group-hover:text-red-600" aria-hidden="true" />
+            {/* Hover effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
           </div>
           <span className={`ml-3 transition-all duration-500 ease-out whitespace-nowrap ${
             isExpanded 

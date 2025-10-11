@@ -22,7 +22,7 @@ export default function Deals() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStage, setSelectedStage] = useState('all');
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     value: '',
     contactId: '',
     probability: '',
@@ -35,18 +35,19 @@ export default function Deals() {
   // Deal stages with enhanced styling
   const dealStages = [
     { id: 'all', name: 'All', count: deals?.length || 0, color: 'bg-gray-100 text-gray-800' },
-    { id: 'lead', name: 'Lead', count: deals?.filter(d => d.stage === 'lead').length || 0, color: 'bg-blue-100 text-blue-800' },
+    { id: 'discovery', name: 'Discovery', count: deals?.filter(d => d.stage === 'discovery').length || 0, color: 'bg-blue-100 text-blue-800' },
     { id: 'qualified', name: 'Qualified', count: deals?.filter(d => d.stage === 'qualified').length || 0, color: 'bg-purple-100 text-purple-800' },
     { id: 'proposal', name: 'Proposal', count: deals?.filter(d => d.stage === 'proposal').length || 0, color: 'bg-yellow-100 text-yellow-800' },
     { id: 'negotiation', name: 'Negotiation', count: deals?.filter(d => d.stage === 'negotiation').length || 0, color: 'bg-orange-100 text-orange-800' },
-    { id: 'closed_won', name: 'Won', count: deals?.filter(d => d.stage === 'closed_won').length || 0, color: 'bg-green-100 text-green-800' },
-    { id: 'closed_lost', name: 'Lost', count: deals?.filter(d => d.stage === 'closed_lost').length || 0, color: 'bg-red-100 text-red-800' },
+    { id: 'closed-won', name: 'Won', count: deals?.filter(d => d.stage === 'closed-won').length || 0, color: 'bg-green-100 text-green-800' },
+    { id: 'closed-lost', name: 'Lost', count: deals?.filter(d => d.stage === 'closed-lost').length || 0, color: 'bg-red-100 text-red-800' },
   ];
 
   // Filter deals based on search and stage
   const filteredDeals = deals?.filter(deal => {
-    const matchesSearch = deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      deal.contactName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (deal.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (deal.company?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (deal.assignee?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesStage = selectedStage === 'all' || deal.stage === selectedStage;
     return matchesSearch && matchesStage;
   }) || [];
@@ -94,8 +95,8 @@ export default function Deals() {
   const validateForm = () => {
     const errors = {};
 
-    if (!validateRequired(formData.name)) {
-      errors.name = 'Deal name is required';
+    if (!validateRequired(formData.title)) {
+      errors.title = 'Deal title is required';
     }
 
     if (!validateRequired(formData.value)) {
@@ -127,12 +128,12 @@ export default function Deals() {
     try {
       const selectedContact = contacts.find(c => c.id === formData.contactId);
       const dealData = {
-        name: formData.name,
+        title: formData.title,
         value: parseFloat(formData.value),
         contactId: formData.contactId,
         contactName: selectedContact?.name || '',
         contactAvatar: selectedContact?.avatar,
-        stage: 'lead', // New deals start as leads
+        stage: 'discovery', // New deals start as discovery
         probability: formData.probability ? parseInt(formData.probability) : null,
         expectedCloseDate: formData.expectedCloseDate || null,
         notes: formData.notes || null,
@@ -199,7 +200,7 @@ export default function Deals() {
                 >
                   <td className="py-4 px-4">
                     <div>
-                      <div className="font-medium text-gray-900">{deal.name}</div>
+                      <div className="font-medium text-gray-900">{deal.title}</div>
                       <div className="text-sm text-gray-500">ID: {deal.id}</div>
                     </div>
                   </td>
@@ -224,8 +225,8 @@ export default function Deals() {
                   <td className="py-4 px-4">
                     <Badge
                       variant={
-                        deal.stage === 'closed_won' ? 'success' :
-                          deal.stage === 'closed_lost' ? 'danger' :
+                        deal.stage === 'closed-won' ? 'success' :
+                          deal.stage === 'closed-lost' ? 'danger' :
                             deal.stage === 'negotiation' ? 'warning' :
                               deal.stage === 'proposal' ? 'info' : 'default'
                       }
@@ -435,11 +436,11 @@ export default function Deals() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Deal Name"
-            value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            error={formErrors.name}
-            placeholder="Enter deal name"
+            label="Deal Title"
+            value={formData.title}
+            onChange={(e) => handleInputChange('title', e.target.value)}
+            error={formErrors.title}
+            placeholder="Enter deal title"
           />
 
           <Input
@@ -531,7 +532,7 @@ export default function Deals() {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {selectedDeal.name}
+                {selectedDeal.title}
               </h3>
               <div className="text-2xl font-bold text-primary-600 mb-4">
                 {formatCurrency(selectedDeal.value)}

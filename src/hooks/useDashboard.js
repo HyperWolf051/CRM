@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
 
 const useDashboard = () => {
   const [metrics, setMetrics] = useState(null);
@@ -10,15 +9,14 @@ const useDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/dashboard/metrics');
-      setMetrics(response.data?.data || response.data || {});
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch dashboard metrics');
-      console.error('Dashboard metrics fetch error:', err);
-      // Set default sample metrics to prevent undefined errors
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Set sample metrics data
       setMetrics({
         user: {
-          name: 'User'
+          name: 'John Doe'
         },
         counts: {
           totalContacts: 156,
@@ -41,6 +39,9 @@ const useDashboard = () => {
         revenue: 485000,
         conversionRate: 42.8
       });
+    } catch (err) {
+      setError('Failed to fetch dashboard metrics');
+      console.error('Dashboard metrics fetch error:', err);
     } finally {
       setLoading(false);
     }

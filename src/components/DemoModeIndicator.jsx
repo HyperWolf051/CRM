@@ -8,7 +8,7 @@ const DemoModeIndicator = memo(() => {
     if (isDemoMode()) {
       const timer = setTimeout(() => {
         setIsVisible(false);
-      }, 2000); // Hide after 2 seconds
+      }, 3000); // Hide after 3 seconds
 
       return () => clearTimeout(timer);
     }

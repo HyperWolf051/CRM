@@ -2,7 +2,73 @@ import { useState, useEffect } from 'react';
 import { Users, UserPlus, Mail, Phone, Calendar, TrendingUp, Award, Target } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import api from '@/utils/api';
+
+// Sample team data
+const sampleTeamMembers = [
+  {
+    _id: '1',
+    name: 'Sarah Johnson',
+    email: 'sarah.johnson@crm.com',
+    role: 'manager',
+    phone: '+1-555-0102',
+    department: 'Sales',
+    position: 'Sales Manager',
+    isActive: true
+  },
+  {
+    _id: '2',
+    name: 'Mike Chen',
+    email: 'mike.chen@crm.com',
+    role: 'user',
+    phone: '+1-555-0103',
+    department: 'Sales',
+    position: 'Sales Representative',
+    isActive: true
+  },
+  {
+    _id: '3',
+    name: 'Emily Davis',
+    email: 'emily.davis@crm.com',
+    role: 'user',
+    phone: '+1-555-0104',
+    department: 'Marketing',
+    position: 'Marketing Specialist',
+    isActive: true
+  }
+];
+
+const sampleTeamStats = [
+  {
+    _id: '1',
+    name: 'Sarah Johnson',
+    role: 'manager',
+    totalRevenue: 485000,
+    totalDeals: 24,
+    closedDeals: 18,
+    totalContacts: 156,
+    conversionRate: 75
+  },
+  {
+    _id: '2',
+    name: 'Mike Chen',
+    role: 'user',
+    totalRevenue: 320000,
+    totalDeals: 18,
+    closedDeals: 12,
+    totalContacts: 98,
+    conversionRate: 67
+  },
+  {
+    _id: '3',
+    name: 'Emily Davis',
+    role: 'user',
+    totalRevenue: 275000,
+    totalDeals: 15,
+    closedDeals: 9,
+    totalContacts: 87,
+    conversionRate: 60
+  }
+];
 
 const Team = () => {
   const { user } = useAuth();
@@ -10,7 +76,6 @@ const Team = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamStats, setTeamStats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
     fetchTeamData();
@@ -19,13 +84,11 @@ const Team = () => {
   const fetchTeamData = async () => {
     try {
       setLoading(true);
-      const [membersResponse, statsResponse] = await Promise.all([
-        api.get('/users'),
-        api.get('/dashboard/team-performance')
-      ]);
-
-      setTeamMembers(membersResponse.data.data || []);
-      setTeamStats(statsResponse.data.data || []);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setTeamMembers(sampleTeamMembers);
+      setTeamStats(sampleTeamStats);
     } catch (error) {
       console.error('Error fetching team data:', error);
       showToast('error', 'Failed to load team data');
@@ -36,9 +99,13 @@ const Team = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await api.put(`/users/${userId}/role`, { role: newRole });
+      // Update local state
+      setTeamMembers(prev => 
+        prev.map(member => 
+          member._id === userId ? { ...member, role: newRole } : member
+        )
+      );
       showToast('success', 'User role updated successfully');
-      fetchTeamData();
     } catch (error) {
       showToast('error', 'Failed to update user role');
     }
@@ -46,10 +113,13 @@ const Team = () => {
 
   const handleStatusToggle = async (userId, isActive) => {
     try {
-      const endpoint = isActive ? 'deactivate' : 'activate';
-      await api.put(`/users/${userId}/${endpoint}`);
+      // Update local state
+      setTeamMembers(prev => 
+        prev.map(member => 
+          member._id === userId ? { ...member, isActive: !isActive } : member
+        )
+      );
       showToast('success', `User ${isActive ? 'deactivated' : 'activated'} successfully`);
-      fetchTeamData();
     } catch (error) {
       showToast('error', `Failed to ${isActive ? 'deactivate' : 'activate'} user`);
     }
