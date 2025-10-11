@@ -1,856 +1,699 @@
 import { useState } from 'react';
-import {
-    ChevronLeft,
-    ChevronRight,
-    Plus,
-    Calendar as CalendarIcon,
-    Clock,
-    Users,
-    Phone,
-    Video,
-    MapPin,
-    Search,
-    Edit,
-    Trash2
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus, 
+  Clock, 
+  MapPin, 
+  Users, 
+  Video,
+  Calendar as CalendarIcon,
+  Filter,
+  Search
 } from 'lucide-react';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
-import Input from '../components/ui/Input';
-import Badge from '../components/ui/Badge';
-import Avatar from '../components/ui/Avatar';
-import { useToast } from '../context/ToastContext';
-
-// Mock calendar events data
-const mockEvents = [
-    {
-        id: '1',
-        title: 'Sales Call with TechCorp',
-        type: 'call',
-        date: '2024-02-15',
-        time: '10:00',
-        duration: 60,
-        attendees: ['John Smith'],
-        companyId: '1',
-        companyName: 'TechCorp Inc.',
-        dealId: '1',
-        dealName: 'Enterprise Software License',
-        location: 'Phone Call',
-        description: 'Discuss pricing and implementation timeline',
-        status: 'scheduled',
-        priority: 'high'
-    },
-    {
-        id: '2',
-        title: 'Product Demo - Cloud Migration',
-        type: 'meeting',
-        date: '2024-02-16',
-        time: '14:30',
-        duration: 90,
-        attendees: ['Sarah Johnson', 'Mike Wilson'],
-        companyId: '2',
-        companyName: 'Innovate Solutions',
-        dealId: '2',
-        dealName: 'Cloud Migration Project',
-        location: 'Conference Room A',
-        description: 'Demonstrate our cloud migration capabilities',
-        status: 'scheduled',
-        priority: 'high'
-    }
-];
 
 const Calendar = () => {
-    const { showToast } = useToast();
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [viewMode, setViewMode] = useState('month'); // 'month', 'week', 'day'
-    const [events, setEvents] = useState(mockEvents);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState('all');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState('month'); // month, week, day
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [events, setEvents] = useState([
+    {
+      id: 1,
+      title: 'Interview - Sarah Johnson',
+      type: 'interview',
+      date: new Date(2024, 11, 15, 14, 0),
+      duration: 60,
+      location: 'Conference Room A',
+      attendees: ['John Doe', 'Sarah Johnson'],
+      color: 'blue'
+    },
+    {
+      id: 2,
+      title: 'Team Standup',
+      type: 'meeting',
+      date: new Date(2024, 11, 16, 9, 0),
+      duration: 30,
+      location: 'Virtual',
+      attendees: ['Team'],
+      color: 'green'
+    },
+    {
+      id: 3,
+      title: 'Client Presentation',
+      type: 'presentation',
+      date: new Date(2024, 11, 18, 15, 30),
+      duration: 90,
+      location: 'Main Conference Room',
+      attendees: ['Client Team', 'Sales Team'],
+      color: 'purple'
+    },
+    {
+      id: 4,
+      title: 'Code Review Session',
+      type: 'review',
+      date: new Date(2024, 11, 20, 11, 0),
+      duration: 45,
+      location: 'Dev Room',
+      attendees: ['Dev Team'],
+      color: 'orange'
+    },
+    {
+      id: 5,
+      title: 'Candidate Phone Screen',
+      type: 'interview',
+      date: new Date(2024, 11, 22, 10, 0),
+      duration: 30,
+      location: 'Phone',
+      attendees: ['HR', 'Michael Chen'],
+      color: 'blue'
+    }
+  ]);
 
-    // Form state for creating/editing events
-    const [formData, setFormData] = useState({
-        title: '',
-        type: 'meeting',
-        date: '',
-        time: '',
-        duration: 60,
-        attendees: '',
-        companyName: '',
-        dealName: '',
-        location: '',
-        description: '',
-        priority: 'medium'
-    });
-    const [formErrors, setFormErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  // Event form state
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    type: 'meeting',
+    date: '',
+    time: '',
+    duration: 60,
+    location: '',
+    attendees: '',
+    description: ''
+  });
 
-    // Calendar navigation
-    const navigateMonth = (direction) => {
-        const newDate = new Date(currentDate);
-        newDate.setMonth(currentDate.getMonth() + direction);
-        setCurrentDate(newDate);
-    };
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
-    const navigateWeek = (direction) => {
-        const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() + (direction * 7));
-        setCurrentDate(newDate);
-    };
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const navigateDay = (direction) => {
-        const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() + direction);
-        setCurrentDate(newDate);
-    };
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
 
-    const goToToday = () => {
-        setCurrentDate(new Date());
-    };
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
 
-    // Get calendar data based on view mode
-    const getCalendarDays = () => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const startDate = new Date(firstDay);
-        startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-        const days = [];
-        const current = new Date(startDate);
-
-        for (let i = 0; i < 42; i++) {
-            days.push(new Date(current));
-            current.setDate(current.getDate() + 1);
-        }
-
-        return days;
-    };
-
-    const getWeekDays = () => {
-        const startOfWeek = new Date(currentDate);
-        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-
-        const days = [];
-        for (let i = 0; i < 7; i++) {
-            const day = new Date(startOfWeek);
-            day.setDate(startOfWeek.getDate() + i);
-            days.push(day);
-        }
-        return days;
-    };
-
-    // Get events for a specific date
-    const getEventsForDate = (date) => {
-        const dateStr = date.toISOString().split('T')[0];
-        return events.filter(event => {
-            const matchesDate = event.date === dateStr;
-            const matchesSearch = searchTerm === '' ||
-                event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                event.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesFilter = filterType === 'all' || event.type === filterType;
-            return matchesDate && matchesSearch && matchesFilter;
-        });
-    };
-
-    // Event handlers
-    const handleDateClick = (date) => {
-        setSelectedDate(date);
-        setFormData(prev => ({
-            ...prev,
-            date: date.toISOString().split('T')[0]
-        }));
-        setIsCreateModalOpen(true);
-    };
-
-    const handleEventClick = (event) => {
-        setSelectedEvent(event);
-        setIsEventModalOpen(true);
-    };
-
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        if (formErrors[field]) {
-            setFormErrors(prev => ({ ...prev, [field]: '' }));
-        }
-    };
-
-    const validateForm = () => {
-        const errors = {};
-        if (!formData.title.trim()) errors.title = 'Title is required';
-        if (!formData.date) errors.date = 'Date is required';
-        if (!formData.time) errors.time = 'Time is required';
-        if (!formData.location.trim()) errors.location = 'Location is required';
-
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) return;
-
-        setIsSubmitting(true);
-        try {
-            const newEvent = {
-                id: Date.now().toString(),
-                ...formData,
-                attendees: formData.attendees.split(',').map(a => a.trim()).filter(a => a),
-                status: 'scheduled',
-                createdAt: new Date().toISOString()
-            };
-
-            setEvents(prev => [...prev, newEvent]);
-            setIsCreateModalOpen(false);
-            setFormData({
-                title: '',
-                type: 'meeting',
-                date: '',
-                time: '',
-                duration: 60,
-                attendees: '',
-                companyName: '',
-                dealName: '',
-                location: '',
-                description: '',
-                priority: 'medium'
-            });
-            showToast('success', 'Event created successfully!');
-        } catch (error) {
-            showToast('error', 'Failed to create event');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleDeleteEvent = (eventId) => {
-        setEvents(prev => prev.filter(e => e.id !== eventId));
-        setIsEventModalOpen(false);
-        showToast('success', 'Event deleted successfully!');
-    };
-
-    // Format date helpers
-    const formatDate = (date) => {
-        return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
-    const formatTime = (time) => {
-        return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
-
-    const isToday = (date) => {
-        const today = new Date();
-        return date.toDateString() === today.toDateString();
-    };
-
-    const isCurrentMonth = (date) => {
-        return date.getMonth() === currentDate.getMonth();
-    };
-
-    // Event type styling
-    const getEventTypeStyle = (type) => {
-        const styles = {
-            meeting: 'bg-blue-100 text-blue-800 border-blue-200',
-            call: 'bg-green-100 text-green-800 border-green-200',
-            demo: 'bg-purple-100 text-purple-800 border-purple-200',
-            followup: 'bg-orange-100 text-orange-800 border-orange-200',
-            other: 'bg-gray-100 text-gray-800 border-gray-200'
-        };
-        return styles[type] || styles.other;
-    };
-
-    const getEventTypeIcon = (type) => {
-        const icons = {
-            meeting: <Users className="w-3 h-3" />,
-            call: <Phone className="w-3 h-3" />,
-            demo: <Video className="w-3 h-3" />,
-            followup: <Clock className="w-3 h-3" />,
-            other: <CalendarIcon className="w-3 h-3" />
-        };
-        return icons[type] || icons.other;
-    };
-
-    const getPriorityColor = (priority) => {
-        const colors = {
-            high: 'border-l-red-500',
-            medium: 'border-l-yellow-500',
-            low: 'border-l-green-500'
-        };
-        return colors[priority] || colors.medium;
-    };
-
-    return (
-        <div className="h-screen flex flex-col animate-fade-in overflow-hidden">
-            {/* Compact Header */}
-            <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 flex-shrink-0">
-                <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Calendar
-                    </h1>
-                    <p className="text-sm text-gray-600">Manage your meetings, calls, and events</p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={goToToday}
-                    >
-                        Today
-                    </Button>
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        icon={<Plus className="w-4 h-4" />}
-                        onClick={() => {
-                            setSelectedDate(new Date());
-                            setFormData(prev => ({
-                                ...prev,
-                                date: new Date().toISOString().split('T')[0]
-                            }));
-                            setIsCreateModalOpen(true);
-                        }}
-                    >
-                        Add Event
-                    </Button>
-                </div>
-            </div>
-
-            {/* Calendar Controls */}
-            <div className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
-                <div className="flex items-center justify-between gap-4">
-                    {/* Navigation */}
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => {
-                                    if (viewMode === 'month') navigateMonth(-1);
-                                    else if (viewMode === 'week') navigateWeek(-1);
-                                    else navigateDay(-1);
-                                }}
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                            </Button>
-
-                            <h2 className="text-xl font-semibold text-gray-900 min-w-[200px] text-center">
-                                {viewMode === 'month' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                                {viewMode === 'week' && `Week of ${currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                                {viewMode === 'day' && formatDate(currentDate)}
-                            </h2>
-
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => {
-                                    if (viewMode === 'month') navigateMonth(1);
-                                    else if (viewMode === 'week') navigateWeek(1);
-                                    else navigateDay(1);
-                                }}
-                            >
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* View Mode & Filters */}
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                            {['month', 'week', 'day'].map((mode) => (
-                                <button
-                                    key={mode}
-                                    onClick={() => setViewMode(mode)}
-                                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${viewMode === mode
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900'
-                                        }`}
-                                >
-                                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <input
-                                type="text"
-                                placeholder="Search events..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg hover:border-gray-400 hover:shadow-md transition-all duration-200"
-                            />
-                        </div>
-
-                        <select
-                            value={filterType}
-                            onChange={(e) => setFilterType(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg hover:border-gray-400 hover:shadow-md transition-all duration-200"
-                        >
-                            <option value="all">All Events</option>
-                            <option value="meeting">Meetings</option>
-                            <option value="call">Calls</option>
-                            <option value="demo">Demos</option>
-                            <option value="followup">Follow-ups</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Calendar Content */}
-                <div className="flex-1 overflow-hidden bg-white">
-                    {/* Calendar Grid */}
-                    {viewMode === 'month' && (
-                        <div className="h-full grid grid-cols-7 gap-1 p-4">
-                            {/* Day headers */}
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                                <div key={day} className="h-8 flex items-center justify-center text-sm font-medium text-gray-500 bg-gray-50 rounded-lg">
-                                    {day}
-                                </div>
-                            ))}
-
-                            {/* Calendar days */}
-                            {getCalendarDays().map((date, index) => {
-                                const dayEvents = getEventsForDate(date);
-                                const isCurrentMonthDay = isCurrentMonth(date);
-                                const isTodayDate = isToday(date);
-
-                                return (
-                                    <div
-                                        key={index}
-                                        className={`h-[calc((100vh-200px)/6)] p-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${!isCurrentMonthDay ? 'bg-gray-50 text-gray-400' : 'bg-white'
-                                            } ${isTodayDate ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}
-                                        onClick={() => handleDateClick(date)}
-                                    >
-                                        <div className={`text-sm font-medium mb-1 ${isTodayDate ? 'text-blue-600' : ''}`}>
-                                            {date.getDate()}
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            {dayEvents.slice(0, 3).map((event) => (
-                                                <div
-                                                    key={event.id}
-                                                    className={`text-xs p-1 rounded border-l-2 ${getEventTypeStyle(event.type)} ${getPriorityColor(event.priority)} cursor-pointer hover:shadow-sm`}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleEventClick(event);
-                                                    }}
-                                                >
-                                                    <div className="flex items-center gap-1">
-                                                        {getEventTypeIcon(event.type)}
-                                                        <span className="truncate">{event.title}</span>
-                                                    </div>
-                                                    <div className="text-xs opacity-75">
-                                                        {formatTime(event.time)}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {dayEvents.length > 3 && (
-                                                <div className="text-xs text-gray-500 text-center">
-                                                    +{dayEvents.length - 3} more
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                    {/* Week View */}
-                    {viewMode === 'week' && (
-                        <div className="h-full grid grid-cols-7 gap-1 p-4">
-                            {getWeekDays().map((date, index) => {
-                                const dayEvents = getEventsForDate(date);
-                                const isTodayDate = isToday(date);
-
-                                return (
-                                    <div key={index} className="h-full flex flex-col">
-                                        <div className={`p-2 text-center border-b border-gray-200 flex-shrink-0 ${isTodayDate ? 'bg-blue-50 text-blue-600' : 'bg-gray-50'}`}>
-                                            <div className="text-xs font-medium">
-                                                {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                                            </div>
-                                            <div className={`text-sm font-bold ${isTodayDate ? 'text-blue-600' : ''}`}>
-                                                {date.getDate()}
-                                            </div>
-                                        </div>
-
-                                        <div className="p-2 space-y-1 flex-1 overflow-y-auto">
-                                            {dayEvents.map((event) => (
-                                                <div
-                                                    key={event.id}
-                                                    className={`p-2 rounded border-l-2 ${getEventTypeStyle(event.type)} ${getPriorityColor(event.priority)} cursor-pointer hover:shadow-sm`}
-                                                    onClick={() => handleEventClick(event)}
-                                                >
-                                                    <div className="flex items-center gap-1 mb-1">
-                                                        {getEventTypeIcon(event.type)}
-                                                        <span className="text-sm font-medium truncate">{event.title}</span>
-                                                    </div>
-                                                    <div className="text-xs opacity-75">
-                                                        {formatTime(event.time)} ({event.duration}m)
-                                                    </div>
-                                                    {event.companyName && (
-                                                        <div className="text-xs opacity-75 truncate">
-                                                            {event.companyName}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                    {/* Day View */}
-                    {viewMode === 'day' && (
-                        <div className="h-full overflow-y-auto p-4">
-                            <div className="space-y-1">
-                                {Array.from({ length: 24 }, (_, hour) => {
-                                    const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
-                                    const hourEvents = getEventsForDate(currentDate).filter(event => {
-                                        const eventHour = parseInt(event.time.split(':')[0]);
-                                        return eventHour === hour;
-                                    });
-
-                                    return (
-                                        <div key={hour} className="flex border-b border-gray-100">
-                                            <div className="w-20 p-2 text-sm text-gray-500 text-right">
-                                                {new Date(`2000-01-01T${timeSlot}`).toLocaleTimeString('en-US', {
-                                                    hour: 'numeric',
-                                                    hour12: true
-                                                })}
-                                            </div>
-                                            <div className="flex-1 p-2 h-12">
-                                                {hourEvents.map((event) => (
-                                                    <div
-                                                        key={event.id}
-                                                        className={`p-3 rounded-lg border-l-4 ${getEventTypeStyle(event.type)} ${getPriorityColor(event.priority)} cursor-pointer hover:shadow-md mb-2`}
-                                                        onClick={() => handleEventClick(event)}
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-2">
-                                                                {getEventTypeIcon(event.type)}
-                                                                <span className="font-medium">{event.title}</span>
-                                                            </div>
-                                                            <span className="text-sm text-gray-500">
-                                                                {formatTime(event.time)} - {event.duration}m
-                                                            </span>
-                                                        </div>
-                                                        {event.companyName && (
-                                                            <div className="text-sm text-gray-600 mt-1">
-                                                                {event.companyName}
-                                                            </div>
-                                                        )}
-                                                        {event.location && (
-                                                            <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                                                                <MapPin className="w-3 h-3" />
-                                                                {event.location}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Create Event Modal - Compact Desktop Layout */}
-            <Modal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                title="Create New Event"
-                className="max-w-5xl"
-            >
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Row 1: Title and Type/Priority */}
-                    <div className="grid grid-cols-3 gap-6">
-                        <div className="col-span-2">
-                            <Input
-                                label="Event Title"
-                                value={formData.title}
-                                onChange={(e) => handleInputChange('title', e.target.value)}
-                                error={formErrors.title}
-                                placeholder="Enter event title"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                Type & Priority
-                            </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={formData.type}
-                                    onChange={(e) => handleInputChange('type', e.target.value)}
-                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg hover:border-gray-400 hover:shadow-md hover:bg-white/90 transition-all duration-200"
-                                >
-                                    <option value="meeting">Meeting</option>
-                                    <option value="call">Call</option>
-                                    <option value="demo">Demo</option>
-                                    <option value="followup">Follow-up</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <select
-                                    value={formData.priority}
-                                    onChange={(e) => handleInputChange('priority', e.target.value)}
-                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg hover:border-gray-400 hover:shadow-md hover:bg-white/90 transition-all duration-200"
-                                >
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Row 2: Date, Time, Duration, Location */}
-                    <div className="grid grid-cols-4 gap-4">
-                        <Input
-                            label="Date"
-                            type="date"
-                            value={formData.date}
-                            onChange={(e) => handleInputChange('date', e.target.value)}
-                            error={formErrors.date}
-                        />
-                        <Input
-                            label="Time"
-                            type="time"
-                            value={formData.time}
-                            onChange={(e) => handleInputChange('time', e.target.value)}
-                            error={formErrors.time}
-                        />
-                        <Input
-                            label="Duration (min)"
-                            type="number"
-                            value={formData.duration}
-                            onChange={(e) => handleInputChange('duration', parseInt(e.target.value))}
-                            placeholder="60"
-                        />
-                        <Input
-                            label="Location"
-                            value={formData.location}
-                            onChange={(e) => handleInputChange('location', e.target.value)}
-                            error={formErrors.location}
-                            placeholder="Room A, Zoom, etc."
-                        />
-                    </div>
-
-                    {/* Row 3: Company, Deal, Attendees */}
-                    <div className="grid grid-cols-3 gap-4">
-                        <Input
-                            label="Company"
-                            value={formData.companyName}
-                            onChange={(e) => handleInputChange('companyName', e.target.value)}
-                            placeholder="Company name (optional)"
-                        />
-                        <Input
-                            label="Related Deal"
-                            value={formData.dealName}
-                            onChange={(e) => handleInputChange('dealName', e.target.value)}
-                            placeholder="Deal name (optional)"
-                        />
-                        <Input
-                            label="Attendees"
-                            value={formData.attendees}
-                            onChange={(e) => handleInputChange('attendees', e.target.value)}
-                            placeholder="John, Jane (comma separated)"
-                        />
-                    </div>
-
-                    {/* Row 4: Description and Actions */}
-                    <div className="grid grid-cols-4 gap-4 items-end">
-                        <div className="col-span-3">
-                            <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                Description
-                            </label>
-                            <textarea
-                                value={formData.description}
-                                onChange={(e) => handleInputChange('description', e.target.value)}
-                                rows={2}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:bg-white focus:shadow-lg hover:border-gray-400 hover:shadow-md hover:bg-white/90 transition-all duration-200 resize-none"
-                                placeholder="Event description and agenda..."
-                            />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                loading={isSubmitting}
-                                className="w-full"
-                            >
-                                Create Event
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={() => setIsCreateModalOpen(false)}
-                                className="w-full"
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                </form>
-            </Modal>
-
-            {/* Event Details Modal */}
-            <Modal
-                isOpen={isEventModalOpen}
-                onClose={() => setIsEventModalOpen(false)}
-                title="Event Details"
-            >
-                {selectedEvent && (
-                    <div className="space-y-6">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                    {selectedEvent.title}
-                                </h3>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Badge variant={selectedEvent.type === 'call' ? 'success' : 'info'}>
-                                        <div className="flex items-center gap-1">
-                                            {getEventTypeIcon(selectedEvent.type)}
-                                            {selectedEvent.type.charAt(0).toUpperCase() + selectedEvent.type.slice(1)}
-                                        </div>
-                                    </Badge>
-                                    <Badge variant={
-                                        selectedEvent.priority === 'high' ? 'danger' :
-                                            selectedEvent.priority === 'medium' ? 'warning' : 'default'
-                                    }>
-                                        {selectedEvent.priority.charAt(0).toUpperCase() + selectedEvent.priority.slice(1)} Priority
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    icon={<Edit className="w-4 h-4" />}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    variant="danger"
-                                    size="sm"
-                                    icon={<Trash2 className="w-4 h-4" />}
-                                    onClick={() => handleDeleteEvent(selectedEvent.id)}
-                                >
-                                    Delete
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Date & Time
-                                </label>
-                                <div className="flex items-center gap-2 text-gray-900">
-                                    <CalendarIcon className="w-4 h-4 text-gray-500" />
-                                    {new Date(selectedEvent.date).toLocaleDateString('en-US', {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    })}
-                                </div>
-                                <div className="flex items-center gap-2 text-gray-900 mt-1">
-                                    <Clock className="w-4 h-4 text-gray-500" />
-                                    {formatTime(selectedEvent.time)} ({selectedEvent.duration} minutes)
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Location
-                                </label>
-                                <div className="flex items-center gap-2 text-gray-900">
-                                    <MapPin className="w-4 h-4 text-gray-500" />
-                                    {selectedEvent.location}
-                                </div>
-                            </div>
-                        </div>
-
-                        {(selectedEvent.companyName || selectedEvent.dealName) && (
-                            <div className="grid grid-cols-2 gap-4">
-                                {selectedEvent.companyName && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Company
-                                        </label>
-                                        <p className="text-gray-900">{selectedEvent.companyName}</p>
-                                    </div>
-                                )}
-
-                                {selectedEvent.dealName && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Related Deal
-                                        </label>
-                                        <p className="text-gray-900">{selectedEvent.dealName}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {selectedEvent.attendees && selectedEvent.attendees.length > 0 && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Attendees
-                                </label>
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedEvent.attendees.map((attendee, index) => (
-                                        <div key={index} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
-                                            <Avatar name={attendee} size="sm" />
-                                            <span className="text-sm text-gray-700">{attendee}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {selectedEvent.description && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Description
-                                </label>
-                                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
-                                    {selectedEvent.description}
-                                </p>
-                            </div>
-                        )}
-
-                        <div className="flex justify-end">
-                            <Button
-                                variant="secondary"
-                                onClick={() => setIsEventModalOpen(false)}
-                            >
-                                Close
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </Modal>
-        </div>
+  const getEventsForDate = (date) => {
+    if (!date) return [];
+    return events.filter(event => 
+      event.date.toDateString() === date.toDateString()
     );
+  };
+
+  const navigateMonth = (direction) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
+
+  const getEventColor = (color) => {
+    const colors = {
+      blue: 'bg-blue-500 border-blue-600',
+      green: 'bg-green-500 border-green-600',
+      purple: 'bg-purple-500 border-purple-600',
+      orange: 'bg-orange-500 border-orange-600',
+      red: 'bg-red-500 border-red-600'
+    };
+    return colors[color] || colors.blue;
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const isToday = (date) => {
+    if (!date) return false;
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const isSelected = (date) => {
+    if (!date) return false;
+    return date.toDateString() === selectedDate.toDateString();
+  };
+
+  // Event creation functions
+  const handleCreateEvent = () => {
+    setEventForm({
+      title: '',
+      type: 'meeting',
+      date: selectedDate.toISOString().split('T')[0],
+      time: '09:00',
+      duration: 60,
+      location: '',
+      attendees: '',
+      description: ''
+    });
+    setShowEventModal(true);
+  };
+
+  const handleEventFormChange = (field, value) => {
+    setEventForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleEventSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!eventForm.title.trim()) {
+      alert('Please enter an event title');
+      return;
+    }
+
+    // Create new event
+    const eventDateTime = new Date(`${eventForm.date}T${eventForm.time}`);
+    const newEvent = {
+      id: Math.max(...events.map(e => e.id), 0) + 1,
+      title: eventForm.title,
+      type: eventForm.type,
+      date: eventDateTime,
+      duration: parseInt(eventForm.duration),
+      location: eventForm.location || 'TBD',
+      attendees: eventForm.attendees ? eventForm.attendees.split(',').map(a => a.trim()) : [],
+      description: eventForm.description,
+      color: getEventTypeColor(eventForm.type)
+    };
+
+    setEvents(prev => [...prev, newEvent]);
+    setShowEventModal(false);
+    
+    // Reset form
+    setEventForm({
+      title: '',
+      type: 'meeting',
+      date: '',
+      time: '',
+      duration: 60,
+      location: '',
+      attendees: '',
+      description: ''
+    });
+  };
+
+  const getEventTypeColor = (type) => {
+    const typeColors = {
+      interview: 'blue',
+      meeting: 'green',
+      presentation: 'purple',
+      review: 'orange',
+      call: 'red',
+      training: 'indigo'
+    };
+    return typeColors[type] || 'blue';
+  };
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setEventForm(prev => ({
+      ...prev,
+      date: date.toISOString().split('T')[0]
+    }));
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            Calendar
+          </h1>
+          <p className="text-slate-600 mt-1">Manage your schedule and appointments</p>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <button 
+            onClick={handleCreateEvent}
+            className="px-4 py-2 text-white text-sm font-medium 
+                       rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+                       btn-primary-slide">
+            <Plus className="w-4 h-4 mr-2 inline" />
+            New Event
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Calendar */}
+        <div className="lg:col-span-3">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl overflow-hidden">
+            {/* Calendar Header */}
+            <div className="p-6 border-b border-slate-200/50 bg-gradient-to-r from-slate-50 to-blue-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <h2 className="text-xl font-semibold text-slate-900">
+                    {months[currentDate.getMonth()]} {currentDate.getFullYear()}
+                  </h2>
+                  <div className="flex items-center space-x-1">
+                    <button
+                      onClick={() => navigateMonth(-1)}
+                      className="p-2 hover:bg-white/80 rounded-lg transition-all duration-200 hover:scale-110 icon-wiggle"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-slate-600" />
+                    </button>
+                    <button
+                      onClick={() => navigateMonth(1)}
+                      className="p-2 hover:bg-white/80 rounded-lg transition-all duration-200 hover:scale-110 icon-wiggle"
+                    >
+                      <ChevronRight className="w-4 h-4 text-slate-600" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setCurrentDate(new Date())}
+                    className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  >
+                    Today
+                  </button>
+                  <div className="flex bg-slate-100 rounded-lg p-1">
+                    {['month', 'week', 'day'].map((mode) => (
+                      <button
+                        key={mode}
+                        onClick={() => setViewMode(mode)}
+                        className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 capitalize ${
+                          viewMode === mode
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="p-6">
+              {/* Days of Week Header */}
+              <div className="grid grid-cols-7 gap-1 mb-4">
+                {daysOfWeek.map((day) => (
+                  <div key={day} className="p-3 text-center text-sm font-medium text-slate-500">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar Days */}
+              <div className="grid grid-cols-7 gap-1">
+                {getDaysInMonth(currentDate).map((date, index) => {
+                  const dayEvents = getEventsForDate(date);
+                  
+                  return (
+                    <div
+                      key={index}
+                      className={`
+                        min-h-[100px] p-2 border border-slate-100 rounded-lg cursor-pointer
+                        transition-all duration-200 hover:bg-slate-50 hover:shadow-md hover:scale-[1.02]
+                        ${date ? 'hover:border-blue-200' : ''}
+                        ${isToday(date) ? 'bg-blue-50 border-blue-200' : ''}
+                        ${isSelected(date) ? 'bg-purple-50 border-purple-200' : ''}
+                        ${!date ? 'cursor-default hover:bg-transparent hover:shadow-none hover:scale-100' : ''}
+                      `}
+                      onClick={() => date && handleDateClick(date)}
+                    >
+                      {date && (
+                        <>
+                          <div className={`
+                            text-sm font-medium mb-1
+                            ${isToday(date) ? 'text-blue-700' : 'text-slate-900'}
+                            ${isSelected(date) ? 'text-purple-700' : ''}
+                          `}>
+                            {date.getDate()}
+                          </div>
+                          
+                          {/* Events */}
+                          <div className="space-y-1">
+                            {dayEvents.slice(0, 2).map((event) => (
+                              <div
+                                key={event.id}
+                                className={`
+                                  text-xs px-2 py-1 rounded text-white font-medium truncate
+                                  ${getEventColor(event.color)} hover:scale-105 transition-transform duration-200
+                                `}
+                                title={`${event.title} - ${formatTime(event.date)}`}
+                              >
+                                {event.title}
+                              </div>
+                            ))}
+                            {dayEvents.length > 2 && (
+                              <div className="text-xs text-slate-500 px-2">
+                                +{dayEvents.length - 2} more
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Mini Calendar */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick View</h3>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {selectedDate.getDate()}
+              </div>
+              <div className="text-sm text-slate-600">
+                {months[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+              </div>
+              <div className="text-xs text-slate-500 mt-1">
+                {selectedDate.toLocaleDateString('en-US', { weekday: 'long' })}
+              </div>
+            </div>
+          </div>
+
+          {/* Today's Events */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Today's Events</h3>
+            <div className="space-y-3">
+              {getEventsForDate(selectedDate).length === 0 ? (
+                <p className="text-slate-500 text-sm text-center py-4">No events scheduled</p>
+              ) : (
+                getEventsForDate(selectedDate).map((event) => (
+                  <div
+                    key={event.id}
+                    className="p-3 rounded-xl border border-slate-200/50 hover:shadow-md transition-all duration-200 hover:scale-[1.02] liquid-hover"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className={`w-3 h-3 rounded-full mt-1.5 ${getEventColor(event.color)}`}></div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-slate-900 truncate">
+                          {event.title}
+                        </h4>
+                        <div className="flex items-center space-x-1 mt-1 text-xs text-slate-500">
+                          <Clock className="w-3 h-3" />
+                          <span>{formatTime(event.date)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1 mt-1 text-xs text-slate-500">
+                          <MapPin className="w-3 h-3" />
+                          <span>{event.location}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
+            <div className="space-y-2">
+              <button 
+                onClick={() => {
+                  setEventForm(prev => ({
+                    ...prev,
+                    type: 'interview',
+                    title: 'Interview - ',
+                    date: selectedDate.toISOString().split('T')[0],
+                    time: '14:00',
+                    duration: 60
+                  }));
+                  setShowEventModal(true);
+                }}
+                className="w-full flex items-center space-x-3 p-3 text-left rounded-xl
+                           hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 
+                           hover:shadow-md transition-all duration-300 transform hover:scale-[1.02]
+                           group liquid-hover">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center
+                               group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-500
+                               group-hover:scale-110 transition-all duration-300 icon-wiggle">
+                  <Plus className="w-4 h-4 text-blue-600 group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm font-medium text-slate-900">Schedule Interview</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setEventForm(prev => ({
+                    ...prev,
+                    type: 'call',
+                    title: 'Video Call - ',
+                    date: selectedDate.toISOString().split('T')[0],
+                    time: '10:00',
+                    duration: 30,
+                    location: 'Virtual'
+                  }));
+                  setShowEventModal(true);
+                }}
+                className="w-full flex items-center space-x-3 p-3 text-left rounded-xl
+                           hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 
+                           hover:shadow-md transition-all duration-300 transform hover:scale-[1.02]
+                           group liquid-hover">
+                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center
+                               group-hover:bg-gradient-to-r group-hover:from-green-500 group-hover:to-emerald-500
+                               group-hover:scale-110 transition-all duration-300 icon-wiggle">
+                  <Video className="w-4 h-4 text-green-600 group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm font-medium text-slate-900">Video Call</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setEventForm(prev => ({
+                    ...prev,
+                    type: 'meeting',
+                    title: 'Team Meeting - ',
+                    date: selectedDate.toISOString().split('T')[0],
+                    time: '09:00',
+                    duration: 60,
+                    attendees: 'Team'
+                  }));
+                  setShowEventModal(true);
+                }}
+                className="w-full flex items-center space-x-3 p-3 text-left rounded-xl
+                           hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 
+                           hover:shadow-md transition-all duration-300 transform hover:scale-[1.02]
+                           group liquid-hover">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center
+                               group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500
+                               group-hover:scale-110 transition-all duration-300 icon-wiggle">
+                  <Users className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm font-medium text-slate-900">Team Meeting</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Event Creation Modal */}
+      {showEventModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-900">Create New Event</h2>
+                <button
+                  onClick={() => setShowEventModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                >
+                  <Plus className="w-5 h-5 text-slate-500 rotate-45" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEventSubmit} className="space-y-4">
+                {/* Event Title */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Event Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={eventForm.title}
+                    onChange={(e) => handleEventFormChange('title', e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                    placeholder="Enter event title"
+                    required
+                  />
+                </div>
+
+                {/* Event Type */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Event Type
+                  </label>
+                  <select
+                    value={eventForm.type}
+                    onChange={(e) => handleEventFormChange('type', e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                  >
+                    <option value="meeting">Meeting</option>
+                    <option value="interview">Interview</option>
+                    <option value="presentation">Presentation</option>
+                    <option value="review">Review</option>
+                    <option value="call">Call</option>
+                    <option value="training">Training</option>
+                  </select>
+                </div>
+
+                {/* Date and Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={eventForm.date}
+                      onChange={(e) => handleEventFormChange('date', e.target.value)}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                                 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                                 hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Time *
+                    </label>
+                    <input
+                      type="time"
+                      value={eventForm.time}
+                      onChange={(e) => handleEventFormChange('time', e.target.value)}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                                 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                                 hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Duration (minutes)
+                  </label>
+                  <select
+                    value={eventForm.duration}
+                    onChange={(e) => handleEventFormChange('duration', e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                  >
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1.5 hours</option>
+                    <option value="120">2 hours</option>
+                  </select>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={eventForm.location}
+                    onChange={(e) => handleEventFormChange('location', e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                    placeholder="Conference Room A, Virtual, etc."
+                  />
+                </div>
+
+                {/* Attendees */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Attendees
+                  </label>
+                  <input
+                    type="text"
+                    value={eventForm.attendees}
+                    onChange={(e) => handleEventFormChange('attendees', e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300"
+                    placeholder="John Doe, Jane Smith (comma separated)"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={eventForm.description}
+                    onChange={(e) => handleEventFormChange('description', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+                               text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
+                               hover:bg-white/80 hover:border-slate-300/50 transition-all duration-300 resize-none"
+                    placeholder="Event description or notes..."
+                  />
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex items-center justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowEventModal(false)}
+                    className="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium rounded-xl
+                               hover:bg-slate-100 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 text-white font-medium rounded-xl
+                               btn-primary-slide"
+                  >
+                    Create Event
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Calendar;

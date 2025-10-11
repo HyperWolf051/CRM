@@ -9,13 +9,13 @@ import {
   Calendar,
   BarChart3,
   Mail,
-  ArrowDownZA,
   Phone,
   FileText,
   Target,
   Briefcase,
   UserCheck,
-  Zap
+  Zap,
+  CheckSquare
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -27,31 +27,43 @@ const navigationItems = [
     color: 'from-blue-500 to-blue-600'
   },
   {
-    name: 'Contacts',
-    href: '/app/contacts',
+    name: 'Candidates',
+    href: '/app/candidates',
     icon: Users,
     color: 'from-green-500 to-green-600'
   },
   {
-    name: 'Deals',
+    name: 'Jobs',
     href: '/app/deals',
     icon: TrendingUp,
     color: 'from-purple-500 to-purple-600'
   },
   {
-    name: 'Companies',
+    name: 'Calendar',
+    href: '/app/calendar',
+    icon: Calendar,
+    color: 'from-pink-500 to-rose-600'
+  },
+  {
+    name: 'Tasks',
+    href: '/app/tasks',
+    icon: CheckSquare,
+    color: 'from-cyan-500 to-blue-600'
+  },
+  {
+    name: 'Contacts',
+    href: '/app/contacts',
+    icon: UserCheck,
+    color: 'from-emerald-500 to-emerald-600'
+  },
+  {
+    name: 'Clients',
     href: '/app/companies',
     icon: Building2,
     color: 'from-orange-500 to-orange-600'
   },
   {
-    name: 'Calendar',
-    href: '/app/calendar',
-    icon: Calendar,
-    color: 'from-red-500 to-red-600'
-  },
-  {
-    name: 'Analytics',
+    name: 'Reports',
     href: '/app/analytics',
     icon: BarChart3,
     color: 'from-indigo-500 to-indigo-600'

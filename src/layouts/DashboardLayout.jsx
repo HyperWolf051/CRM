@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from '@/components/Sidebar';
+import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import Topbar from '@/components/Topbar';
 import PageTransition from '@/components/PageTransition';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
@@ -7,10 +7,13 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
 // Map routes to page titles
 const pageTitles = {
   '/app/dashboard': 'Dashboard',
+  '/app/candidates': 'Candidates',
   '/app/contacts': 'Contacts',
-  '/app/deals': 'Deals',
-  '/app/companies': 'Companies',
+  '/app/deals': 'Jobs',
+  '/app/companies': 'Clients',
   '/app/calendar': 'Calendar',
+  '/app/tasks': 'Tasks',
+  '/app/analytics': 'Reports',
   '/app/settings': 'Settings',
 };
 
@@ -59,17 +62,21 @@ export default function DashboardLayout() {
   ]);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden relative">
       {/* Sidebar */}
-      <Sidebar />
+      <div className="relative z-20">
+        <CollapsibleSidebar />
+      </div>
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         {/* Topbar */}
-        <Topbar title={getPageTitle()} />
+        <div className="relative z-30">
+          <Topbar title={getPageTitle()} />
+        </div>
         
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6 relative z-10">
           <div className="max-w-none lg:max-w-7xl xl:max-w-none 2xl:max-w-[1600px] mx-auto">
             <PageTransition>
               <Outlet />

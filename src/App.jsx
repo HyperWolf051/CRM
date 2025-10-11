@@ -16,6 +16,8 @@ const ContactDetails = lazy(() => import('@/pages/ContactDetails'));
 const Deals = lazy(() => import('@/pages/Deals'));
 const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
+const Tasks = lazy(() => import('@/pages/Tasks'));
+const Candidates = lazy(() => import('@/pages/Candidates'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
@@ -65,11 +67,13 @@ function App() {
                   </ProtectedRoute>
                 }>
                   <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="candidates" element={<Candidates />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />
                   <Route path="companies" element={<Companies />} />
                   <Route path="calendar" element={<Calendar />} />
+                  <Route path="tasks" element={<Tasks />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Advanced reporting and business insights" />} />
                   <Route path="email" element={<ComingSoon title="Email" description="Integrated email management system" />} />
                   <Route path="calls" element={<ComingSoon title="Calls" description="Call tracking and management" />} />
