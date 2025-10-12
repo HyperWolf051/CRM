@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  TrendingUp, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  TrendingUp,
+  Settings,
   LogOut,
   Building2,
   Calendar,
@@ -15,9 +15,12 @@ import {
   Briefcase,
   UserCheck,
   Zap,
-  CheckSquare
+  CheckSquare,
+  Menu,
+  X
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from 'react';
 
 const navigationItems = [
   {
@@ -35,7 +38,7 @@ const navigationItems = [
   {
     name: 'Jobs',
     href: '/app/deals',
-    icon: TrendingUp,
+    icon: Briefcase,
     color: 'from-purple-500 to-purple-600'
   },
   {
@@ -118,16 +121,55 @@ const navigationItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onToggle }) {
   const location = useLocation();
   const { logout, user } = useAuth();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleLogout = () => {
     logout();
   };
 
   return (
-    <div className="w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col h-full shadow-2xl">
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+      
+      {/* Mobile Menu Button */}
+      <button 
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg border border-slate-200"
+        onClick={onToggle}
+      >
+        {isOpen ? (
+          <X className="w-5 h-5 text-slate-600" />
+        ) : (
+          <Menu className="w-5 h-5 text-slate-600" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <div className={`
+        ${isMobile ? 'fixed' : 'relative'} inset-y-0 left-0 z-50 w-64 
+        bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white 
+        flex flex-col h-full shadow-2xl transform transition-transform duration-300 ease-in-out
+        ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
+        lg:translate-x-0
+      `}>
       {/* Logo */}
       <div className="p-6 border-b border-slate-700/50">
         <div className="flex items-center">
@@ -166,7 +208,7 @@ export default function Sidebar() {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
-            
+
             return (
               <Link
                 key={item.name}
@@ -176,16 +218,16 @@ export default function Sidebar() {
                   group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium 
                   transition-all duration-200 transform hover:scale-[1.02]
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900
-                  ${isActive 
-                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white shadow-lg border border-blue-500/30 backdrop-blur-sm' 
+                  ${isActive
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white shadow-lg border border-blue-500/30 backdrop-blur-sm'
                     : 'text-slate-300 hover:bg-slate-700/50 hover:text-white hover:shadow-md'
                   }
                 `}
               >
                 <div className={`
                   w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-200
-                  ${isActive 
-                    ? `bg-gradient-to-r ${item.color} shadow-lg` 
+                  ${isActive
+                    ? `bg-gradient-to-r ${item.color} shadow-lg`
                     : 'bg-slate-700/50 group-hover:bg-slate-600/50'
                   }
                 `}>
@@ -213,6 +255,7 @@ export default function Sidebar() {
           <span>Logout</span>
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

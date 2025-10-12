@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Lock, Bell, Moon, Sun, Palette } from 'lucide-react';
+import { User, Lock, Bell, Moon, Sun, Palette, Globe, ChevronDown } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -189,6 +189,18 @@ const Settings = () => {
   // Handle preferences change
   const handlePreferenceChange = (field, value) => {
     setPreferences(prev => ({ ...prev, [field]: value }));
+    
+    // Show toast for language change
+    if (field === 'language') {
+      const languages = {
+        'en': 'English',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'it': 'Italian'
+      };
+      showToast('success', `Language changed to ${languages[value]}`);
+    }
   };
 
   // Handle preferences save
@@ -394,22 +406,31 @@ const Settings = () => {
 
           {/* Language Settings */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-4">Language & Region</h3>
+            <h3 className="text-base font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              Language & Region
+            </h3>
             <div className="max-w-xs">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Language
+                Display Language
               </label>
-              <select
-                value={preferences.language}
-                onChange={(e) => handlePreferenceChange('language', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-                <option value="it">Italian</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={preferences.language}
+                  onChange={(e) => handlePreferenceChange('language', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                >
+                  <option value="en">🇺🇸 English</option>
+                  <option value="es">🇪🇸 Spanish</option>
+                  <option value="fr">🇫🇷 French</option>
+                  <option value="de">🇩🇪 German</option>
+                  <option value="it">🇮🇹 Italian</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Changes will take effect immediately
+              </p>
             </div>
           </div>
 

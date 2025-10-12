@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  TrendingUp, 
+  Briefcase, 
   Settings, 
   LogOut,
   Building2,
   Calendar,
   BarChart3,
-  CheckSquare
+  CheckSquare,
+  Menu,
+  X
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -29,7 +31,7 @@ const navigationItems = [
   {
     name: 'Jobs',
     href: '/app/deals',
-    icon: TrendingUp,
+    icon: Briefcase,
     color: 'from-purple-500 to-purple-600'
   },
   {
@@ -66,33 +68,85 @@ const navigationItems = [
 
 export default function CollapsibleSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const { logout, user } = useAuth();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
   };
 
   const handleMouseEnter = () => {
-    setTimeout(() => setIsExpanded(true), 50);
+    if (!isMobile) {
+      setTimeout(() => setIsExpanded(true), 50);
+    }
   };
 
   const handleMouseLeave = () => {
-    setTimeout(() => setIsExpanded(false), 100);
+    if (!isMobile) {
+      setTimeout(() => setIsExpanded(false), 100);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileOpen(!isMobileOpen);
   };
 
   return (
-    <div 
-      className={`
-        ${isExpanded ? 'w-72' : 'w-28'} 
-        bg-white/95 backdrop-blur-xl border-r border-slate-200/50 
-        flex flex-col h-full shadow-xl 
-        transition-all duration-500 ease-out
-        relative z-40 overflow-hidden
-      `}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={toggleMobileMenu}
+        />
+      )}
+      
+      {/* Mobile Menu Button */}
+      <button 
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg border border-slate-200"
+        onClick={toggleMobileMenu}
+      >
+        {isMobileOpen ? (
+          <X className="w-5 h-5 text-slate-600" />
+        ) : (
+          <Menu className="w-5 h-5 text-slate-600" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <div 
+        className={`
+          ${isMobile 
+            ? `fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-in-out ${
+                isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+              }`
+            : `${isExpanded ? 'w-72' : 'w-28'} relative`
+          }
+          bg-white/95 backdrop-blur-xl border-r border-slate-200/50 
+          flex flex-col h-full shadow-xl 
+          ${!isMobile ? 'transition-all duration-500 ease-out' : ''}
+          overflow-hidden
+        `}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
 
 
       {/* Logo */}
@@ -102,7 +156,7 @@ export default function CollapsibleSidebar() {
             <span className="text-lg font-bold text-white">C</span>
           </div>
           <div className={`ml-3 transition-all duration-500 ease-out ${
-            isExpanded 
+            (isExpanded || isMobile) 
               ? 'opacity-100 translate-x-0' 
               : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
           }`}>
@@ -114,9 +168,9 @@ export default function CollapsibleSidebar() {
 
       {/* User Profile */}
       <div className={`p-4 border-b border-slate-200/50 transition-all duration-500 ease-out ${
-        isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+        (isExpanded || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
       }`}>
-        {isExpanded && (
+        {(isExpanded || isMobile) && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-semibold text-white">
@@ -148,7 +202,7 @@ export default function CollapsibleSidebar() {
                 to={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={`
-                  group flex items-center justify-center ${isExpanded ? 'justify-start' : ''} 
+                  group flex items-center ${(isExpanded || isMobile) ? 'justify-start' : 'justify-center'} 
                   px-4 py-3 mx-1 rounded-xl text-sm font-medium 
                   transition-all duration-300 transform magnetic-hover
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
@@ -158,7 +212,7 @@ export default function CollapsibleSidebar() {
                     : 'text-slate-600 hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50 hover:text-slate-900 hover:shadow-md'
                   }
                 `}
-                title={!isExpanded ? item.name : ''}
+                title={!(isExpanded || isMobile) ? item.name : ''}
               >
                 <div className={`
                   w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
@@ -177,13 +231,13 @@ export default function CollapsibleSidebar() {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
                 </div>
                 <span className={`ml-4 transition-all duration-500 ease-out whitespace-nowrap font-medium ${
-                  isExpanded 
+                  (isExpanded || isMobile) 
                     ? 'opacity-100 translate-x-0' 
                     : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
                 }`}>
                   {item.name}
                 </span>
-                {isActive && isExpanded && (
+                {isActive && (isExpanded || isMobile) && (
                   <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full animate-pulse transition-all duration-300"></div>
                 )}
               </Link>
@@ -192,33 +246,24 @@ export default function CollapsibleSidebar() {
         </div>
       </nav>
 
-      {/* Logout */}
-      <div className="p-2 border-t border-slate-200/50">
+      {/* Enhanced Logout Button */}
+      <div className="p-4 border-t border-slate-200/50">
         <button
           onClick={handleLogout}
-          className={`
-            group flex items-center w-full sidebar-item-enhanced text-sm font-medium 
-            text-slate-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 
-            transition-all duration-300 transform magnetic-hover liquid-hover
-            focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2
-            relative overflow-hidden hover:shadow-md
-          `}
-          title={!isExpanded ? 'Logout' : ''}
+          className={`w-full flex items-center ${(isExpanded || isMobile) ? 'justify-start' : 'justify-center'} 
+                     px-4 py-3 mx-1 rounded-xl text-sm font-medium 
+                     bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700
+                     shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105
+                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2`}
+          title={!(isExpanded || isMobile) ? 'Logout' : ''}
         >
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-pink-100 transition-all duration-300 group-hover:scale-110 relative overflow-hidden icon-wiggle sidebar-icon-glow">
-            <LogOut className="w-5 h-5 transition-all duration-300 group-hover:text-red-600" aria-hidden="true" />
-            {/* Enhanced hover effect overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-          </div>
-          <span className={`ml-4 transition-all duration-500 ease-out whitespace-nowrap font-medium ${
-            isExpanded 
-              ? 'opacity-100 translate-x-0' 
-              : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
-          }`}>
-            Logout
-          </span>
+          <LogOut className="w-5 h-5" aria-hidden="true" />
+          {(isExpanded || isMobile) && (
+            <span className="ml-3 font-medium">Logout</span>
+          )}
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

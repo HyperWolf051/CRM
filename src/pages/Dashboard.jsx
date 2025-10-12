@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
@@ -11,23 +12,101 @@ import {
   Calendar as CalendarIcon,
   Eye,
   Edit,
-  Clock
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Users,
+  Target,
+  BarChart3,
+  RefreshCw
 } from 'lucide-react';
+
+// Enhanced Components
+import { BarChart, LineChart, PieChart, ChartControls } from '../components/ui/Chart';
+import EnhancedHeader from '../components/dashboard/EnhancedHeader';
+import AdvancedMetricCard from '../components/dashboard/AdvancedMetricCard';
+import DealPipelineStep from '../components/dashboard/DealPipelineStep';
+import InteractiveCalendar from '../components/dashboard/InteractiveCalendar';
+import ActivityTimeline from '../components/dashboard/ActivityTimeline';
+import CandidateCard from '../components/dashboard/CandidateCard';
+import QuickActionsPanel from '../components/dashboard/QuickActionsPanel';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+  const [timeRange, setTimeRange] = useState('30D');
+  const [chartType, setChartType] = useState('bar');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
 
-  const daysOfWeek = [
-    { short: 'S', full: 'Sunday' },
-    { short: 'M', full: 'Monday' },
-    { short: 'T', full: 'Tuesday' },
-    { short: 'W', full: 'Wednesday' },
-    { short: 'T', full: 'Thursday' },
-    { short: 'F', full: 'Friday' },
-    { short: 'S', full: 'Saturday' }
+  // Enhanced chart data with more details
+  const salesData = [
+    { label: 'Jan', value: 45, color: 'fill-blue-500', details: 'Revenue: $45k, Profit: $12k' },
+    { label: 'Feb', value: 58, color: 'fill-blue-600', details: 'Revenue: $58k, Profit: $18k' },
+    { label: 'Mar', value: 38, color: 'fill-blue-400', details: 'Revenue: $38k, Profit: $8k' },
+    { label: 'Apr', value: 72, color: 'fill-blue-700', details: 'Revenue: $72k, Profit: $22k' },
+    { label: 'May', value: 52, color: 'fill-blue-500', details: 'Revenue: $52k, Profit: $15k' },
+    { label: 'Jun', value: 41, color: 'fill-blue-400', details: 'Revenue: $41k, Profit: $11k' }
   ];
 
-  // Sample candidate data for the candidate details section
+  const revenueData = [
+    { label: 'Q1', value: 125000, details: 'Growth: +15%' },
+    { label: 'Q2', value: 145000, details: 'Growth: +16%' },
+    { label: 'Q3', value: 165000, details: 'Growth: +14%' },
+    { label: 'Q4', value: 185000, details: 'Growth: +12%' }
+  ];
+
+  const statusData = [
+    { label: 'Active', value: 45, color: 'text-green-500' },
+    { label: 'Pending', value: 23, color: 'text-yellow-500' },
+    { label: 'Closed', value: 12, color: 'text-blue-500' },
+    { label: 'Lost', value: 8, color: 'text-red-500' }
+  ];
+
+  // Pipeline steps data
+  const pipelineSteps = [
+    { label: 'Lead', count: 45 },
+    { label: 'Qualified', count: 32 },
+    { label: 'Proposal', count: 18 },
+    { label: 'Negotiation', count: 12 },
+    { label: 'Closed', count: 8 }
+  ];
+
+  // Sparkline data for metric cards
+  const weeklyBalanceSparkline = [15, 18, 12, 20, 25, 22, 20];
+  const activeJobsSparkline = [20, 22, 18, 24, 26, 24, 24];
+  const candidatesSparkline = [45, 48, 42, 47, 49, 46, 47];
+
+  // Calendar events data
+  const calendarEvents = [
+    {
+      id: 1,
+      title: 'Interview - Sarah Johnson',
+      date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      time: '2:00 PM',
+      color: 'bg-blue-500',
+      type: 'interview'
+    },
+    {
+      id: 2,
+      title: 'Team Meeting',
+      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      time: '10:00 AM',
+      color: 'bg-green-500',
+      type: 'meeting'
+    },
+    {
+      id: 3,
+      title: 'Client Call',
+      date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      time: '3:30 PM',
+      color: 'bg-purple-500',
+      type: 'call'
+    }
+  ];
+
+  // Enhanced candidate data
   const candidateDetails = [
     {
       id: 1,
@@ -35,7 +114,11 @@ const Dashboard = () => {
       email: 'sarah.johnson@email.com',
       role: 'Senior React Developer',
       address: 'San Francisco, CA',
-      status: 'Available'
+      status: 'Available',
+      skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
+      rating: 4.8,
+      interviews: 2,
+      salary: '$120,000'
     },
     {
       id: 2,
@@ -43,7 +126,11 @@ const Dashboard = () => {
       email: 'michael.chen@email.com',
       role: 'UX/UI Designer',
       address: 'New York, NY',
-      status: 'Interviewed'
+      status: 'Interviewed',
+      skills: ['Figma', 'Adobe XD', 'Prototyping', 'User Research'],
+      rating: 4.6,
+      interviews: 1,
+      salary: '$95,000'
     },
     {
       id: 3,
@@ -51,207 +138,247 @@ const Dashboard = () => {
       email: 'emma.wilson@email.com',
       role: 'Backend Engineer',
       address: 'Austin, TX',
-      status: 'Hired'
+      status: 'Hired',
+      skills: ['Python', 'Django', 'PostgreSQL', 'Docker'],
+      rating: 4.9,
+      interviews: 3,
+      salary: '$110,000'
     }
   ];
 
-  // Recent activity data
+  // Enhanced activity data
+  const getTimeAgo = (hoursAgo) => {
+    const now = new Date();
+    const activityTime = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
+    const diffInHours = Math.floor((now - activityTime) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+  };
+
   const recentActivity = [
     {
       id: 1,
       message: 'Sarah Johnson was added as a candidate',
-      time: '2 hours ago',
-      type: 'candidate'
+      time: getTimeAgo(2),
+      type: 'candidate',
+      user: 'John Doe',
+      metadata: { location: 'San Francisco, CA' }
     },
     {
       id: 2,
-      message: 'Client call scheduled by Uroos',
-      time: '4 hours ago',
-      type: 'meeting'
+      message: 'Client call scheduled with TechCorp',
+      time: getTimeAgo(4),
+      type: 'meeting',
+      user: 'Uroos Khan',
+      metadata: { participants: 3, location: 'Virtual' }
     },
     {
       id: 3,
       message: 'Interview completed for Michael Chen',
-      time: '1 day ago',
-      type: 'interview'
+      time: getTimeAgo(24),
+      type: 'interview',
+      user: 'Sarah Smith',
+      metadata: { location: 'Conference Room A' }
     },
     {
       id: 4,
-      message: 'New job posting published',
-      time: '2 days ago',
-      type: 'job'
+      message: 'New Senior Developer job posting published',
+      time: getTimeAgo(48),
+      type: 'job',
+      user: 'System'
+    },
+    {
+      id: 5,
+      message: 'Deal closed with StartupXYZ - $50k',
+      time: getTimeAgo(72),
+      type: 'deal',
+      user: 'Mike Johnson'
     }
   ];
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Available':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'Interviewed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Hired':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+  // Event handlers
+  const handleMetricClick = (metric) => {
+    console.log('Metric clicked:', metric);
+    // Navigate to detailed view
+  };
+
+  const handleChartExport = () => {
+    console.log('Exporting chart data...');
+    // Implement export functionality
+  };
+
+  const handleChartRefresh = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1000);
+  };
+
+  const handleBarClick = (data, index) => {
+    console.log('Bar clicked:', data, index);
+  };
+
+  const handlePointClick = (data, index) => {
+    console.log('Point clicked:', data, index);
+  };
+
+  const handleEventClick = (event) => {
+    console.log('Event clicked:', event);
+    navigate('/app/calendar');
+  };
+
+  const handleDateClick = (date) => {
+    console.log('Date clicked:', date);
+    navigate('/app/calendar');
+  };
+
+  const handleActivityClick = (activity) => {
+    console.log('Activity clicked:', activity);
+  };
+
+  const handleCandidateAction = (action, candidate) => {
+    console.log(`${action} candidate:`, candidate);
+    switch (action) {
+      case 'view':
+        navigate(`/app/candidates/${candidate.id}`);
+        break;
+      case 'edit':
+        navigate(`/app/candidates/${candidate.id}/edit`);
+        break;
+      case 'contact':
+        // Open email client or contact modal
+        break;
+      case 'schedule':
+        navigate('/app/calendar');
+        break;
     }
   };
 
-  const quickActions = [
-    {
-      icon: UserPlus,
-      label: 'Add Candidate',
-      color: 'from-blue-500 to-blue-600',
-      action: () => navigate('/app/candidates')
-    },
-    {
-      icon: Briefcase,
-      label: 'Post Job',
-      color: 'from-green-500 to-green-600',
-      action: () => navigate('/app/deals')
-    },
-    {
-      icon: CalendarIcon,
-      label: 'Schedule',
-      color: 'from-purple-500 to-purple-600',
-      action: () => navigate('/app/calendar')
-    },
-    {
-      icon: Phone,
-      label: 'Call Client',
-      color: 'from-orange-500 to-orange-600',
-      action: () => console.log('Call client')
+  const handleQuickAction = (action) => {
+    console.log('Quick action:', action);
+    switch (action.id) {
+      case 'add-candidate':
+        navigate('/app/candidates');
+        break;
+      case 'post-job':
+        navigate('/app/deals');
+        break;
+      case 'schedule-meeting':
+        navigate('/app/calendar');
+        break;
+      case 'send-email':
+        // Open email composer
+        break;
+      default:
+        console.log('Action not implemented:', action.id);
     }
-  ];
+  };
+
+  const handlePipelineStepClick = (stepIndex) => {
+    setCurrentPipelineStep(stepIndex);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Hello, Uroos</h1>
-      </div>
-
-      {/* Main Grid Layout */}
-      <div className="grid grid-cols-12 gap-6">
-        
-        {/* Top Row - Metric Cards */}
-        <div className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Enhanced Header */}
+      <EnhancedHeader />
+      
+      {/* Main Dashboard Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min">
           
-          {/* Weekly Balance Card */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="relative z-10">
-              <h3 className="text-sm font-medium opacity-90 mb-2">Weekly Balance</h3>
-              <p className="text-3xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">$20k</p>
-              <button className="text-xs bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-all duration-200 hover:scale-105 font-medium">
-                View entire list
-              </button>
-            </div>
-            <div className="absolute bottom-4 right-4 opacity-20 group-hover:opacity-30 transition-opacity duration-300">
-              <div className="w-12 h-12 bg-white/20 rounded-xl"></div>
+          {/* Enhanced Metrics Row - Full Width */}
+          <div className="lg:col-span-12 xl:col-span-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+              {/* Weekly Balance Card */}
+              <AdvancedMetricCard
+                title="Weekly Balance"
+                value="$20k"
+                trend={12}
+                comparison="vs $17.8k last week"
+                icon={DollarSign}
+                color="from-blue-600 via-blue-700 to-blue-800"
+                onClick={() => handleMetricClick('weekly-balance')}
+                sparklineData={weeklyBalanceSparkline}
+                loading={isLoading}
+              />
+
+              {/* Active Jobs Card */}
+              <AdvancedMetricCard
+                title="Active Jobs"
+                value="24"
+                trend={8}
+                comparison="3 new this week"
+                icon={Briefcase}
+                color="from-orange-500 via-orange-600 to-orange-700"
+                onClick={() => handleMetricClick('active-jobs')}
+                sparklineData={activeJobsSparkline}
+                loading={isLoading}
+              />
+
+              {/* New Candidates Card */}
+              <AdvancedMetricCard
+                title="New Candidates"
+                value="47"
+                trend={-5}
+                comparison="vs 49 last week"
+                icon={Users}
+                color="from-emerald-600 via-emerald-700 to-emerald-800"
+                onClick={() => handleMetricClick('candidates')}
+                sparklineData={candidatesSparkline}
+                loading={isLoading}
+              />
+
+              {/* Pipeline Conversion Card */}
+              <AdvancedMetricCard
+                title="Pipeline Conversion"
+                value="18%"
+                trend={3}
+                comparison="vs 15% last month"
+                icon={Target}
+                color="from-purple-600 via-purple-700 to-purple-800"
+                onClick={() => handleMetricClick('conversion')}
+                sparklineData={[12, 15, 13, 18, 16, 18, 18]}
+                loading={isLoading}
+              />
             </div>
           </div>
 
-          {/* Orders In Line Card */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="relative z-10">
-              <h3 className="text-sm font-medium opacity-90 mb-2">Orders In Line</h3>
-              <p className="text-3xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">750</p>
-              <button className="text-xs bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-all duration-200 hover:scale-105 font-medium">
-                View entire list
-              </button>
-            </div>
-            <div className="absolute bottom-4 right-4 opacity-20 group-hover:opacity-30 transition-opacity duration-300">
-              <div className="w-12 h-12 bg-white/20 rounded-xl transform rotate-12"></div>
-            </div>
-          </div>
-
-          {/* New Clients Card */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="relative z-10">
-              <h3 className="text-sm font-medium opacity-90 mb-2">New Clients</h3>
-              <p className="text-3xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300">150</p>
-              <button className="text-xs bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-all duration-200 hover:scale-105 font-medium">
-                View entire list
-              </button>
-            </div>
-            <div className="absolute bottom-4 right-4 opacity-20 group-hover:opacity-30 transition-opacity duration-300">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400/30 to-orange-500/30 rounded-xl"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Second Row */}
-        <div className="col-span-12 grid grid-cols-12 gap-6">
-          
-          {/* Sales Analytics Chart */}
-          <div className="col-span-12 lg:col-span-6 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Sales</h2>
-              <div className="flex items-center space-x-2">
-                <select className="px-3 py-2 bg-gray-100 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 hover:bg-gray-200 transition-all duration-200 cursor-pointer">
-                  <option>2022</option>
-                  <option>2023</option>
-                  <option>2024</option>
-                </select>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-all duration-200 flex items-center shadow-md hover:shadow-lg transform hover:scale-105">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </button>
-              </div>
-            </div>
-            
-            {/* Bar Chart */}
-            <div className="relative h-56 bg-gray-50 rounded-xl p-4">
-              <div className="flex items-end justify-between h-40 mb-4">
-                {[
-                  { height: 80, color: 'bg-blue-500', label: 'Jan', revenue: '$45k', profit: '$12k', expenses: '$33k' },
-                  { height: 110, color: 'bg-blue-600', label: 'Feb', revenue: '$58k', profit: '$18k', expenses: '$40k' },
-                  { height: 60, color: 'bg-blue-400', label: 'Mar', revenue: '$38k', profit: '$8k', expenses: '$30k' },
-                  { height: 130, color: 'bg-blue-700', label: 'Apr', revenue: '$72k', profit: '$22k', expenses: '$50k' },
-                  { height: 95, color: 'bg-blue-500', label: 'May', revenue: '$52k', profit: '$15k', expenses: '$37k' },
-                  { height: 75, color: 'bg-blue-400', label: 'Jun', revenue: '$41k', profit: '$11k', expenses: '$30k' }
-                ].map((bar, index) => (
-                  <div key={index} className="flex flex-col items-center space-y-2">
-                    <div className="relative group">
-                      <div 
-                        className={`w-12 rounded-t-lg transition-all duration-700 delay-${index * 100} ${bar.color} hover:opacity-80 cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105`}
-                        style={{ height: `${bar.height}px` }}
-                      ></div>
-                      <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl z-10">
-                        <div className="text-center">
-                          <div className="font-semibold text-blue-300 mb-1">Revenue: {bar.revenue}</div>
-                          <div className="text-green-300 mb-1">Profit: {bar.profit}</div>
-                          <div className="text-red-300">Expenses: {bar.expenses}</div>
-                        </div>
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-700 font-semibold">{bar.label}</span>
+          {/* Enhanced Charts Row */}
+          <div className="lg:col-span-12 xl:col-span-16">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Interactive Sales Chart */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <ChartControls
+                  timeRange={timeRange}
+                  onTimeRangeChange={setTimeRange}
+                  onExport={handleChartExport}
+                  onRefresh={handleChartRefresh}
+                />
+                
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Monthly Sales</h2>
+                    <p className="text-sm text-gray-500">Revenue trends over time</p>
                   </div>
-                ))}
-              </div>
-              
-              {/* Chart Labels */}
-              <div className="flex items-center justify-center space-x-6 text-xs text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Monthly Revenue</span>
+                  <div className="flex items-center text-sm font-semibold text-green-600">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    +12.5%
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Profit Margin</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span>Operating Expenses</span>
-                </div>
-              </div>
-              
-              {/* Summary Stats */}
-              <div className="mt-4 pt-3 border-t border-gray-200">
-                <div className="grid grid-cols-3 gap-4 text-center">
+                
+                <BarChart 
+                  data={salesData} 
+                  height={250} 
+                  onBarClick={handleBarClick}
+                  animate={true}
+                  className="mb-4" 
+                />
+                
+                <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
                   <div>
                     <div className="text-lg font-bold text-blue-600">$306k</div>
                     <div className="text-xs text-gray-500">Total Revenue</div>
@@ -260,187 +387,120 @@ const Dashboard = () => {
                     <div className="text-lg font-bold text-green-600">$86k</div>
                     <div className="text-xs text-gray-500">Total Profit</div>
                   </div>
-                  <div>
-                    <div className="text-lg font-bold text-red-600">$220k</div>
-                    <div className="text-xs text-gray-500">Total Expenses</div>
-                  </div>
                 </div>
               </div>
+
+              {/* Interactive Revenue Trend */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Revenue Trend</h2>
+                    <p className="text-sm text-gray-500">Quarterly performance</p>
+                  </div>
+                  <div className="flex items-center text-sm font-semibold text-green-600">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    +8.2%
+                  </div>
+                </div>
+                
+                <LineChart 
+                  data={revenueData} 
+                  height={250} 
+                  onPointClick={handlePointClick}
+                  animate={true}
+                  className="mb-4" 
+                />
+                
+                <div className="text-center pt-4 border-t border-gray-200">
+                  <div className="text-lg font-bold text-purple-600">$620k</div>
+                  <div className="text-xs text-gray-500">Annual Revenue</div>
+                </div>
+              </div>
+
+              {/* Deal Pipeline Stepper */}
+              <DealPipelineStep
+                steps={pipelineSteps}
+                currentStep={currentPipelineStep}
+                onStepClick={handlePipelineStepClick}
+                showCounts={true}
+              />
             </div>
           </div>
 
-          {/* Calendar */}
-          <div className="col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Calendar</h2>
-              <button 
-                onClick={() => navigate('/app/calendar')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
-              >
-                View
-              </button>
-            </div>
-            
-            <div className="flex items-center justify-between mb-4">
-              <button className="p-2 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110 group">
-                <ChevronLeft className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-              </button>
-              <span className="text-sm font-semibold text-gray-900 px-3 py-1 bg-gray-100 rounded-lg">
-                Feb 2023
-              </span>
-              <button className="p-2 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110 group">
-                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-              </button>
-            </div>
+          {/* Content Row - Calendar and Activity */}
+          <div className="lg:col-span-8 xl:col-span-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Enhanced Interactive Calendar */}
+              <InteractiveCalendar
+                events={calendarEvents}
+                onEventClick={handleEventClick}
+                onDateClick={handleDateClick}
+                currentDate={currentCalendarDate}
+                onDateChange={setCurrentCalendarDate}
+              />
 
-            {/* Calendar Grid */}
-            <div className="space-y-1">
-              {/* Days of Week Header */}
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {daysOfWeek.map((day, index) => (
-                  <div key={`${day.full}-${index}`} className="p-1 text-center text-xs font-medium text-gray-500">
-                    {day.short}
-                  </div>
+              {/* Enhanced Activity Timeline */}
+              <ActivityTimeline
+                activities={recentActivity}
+                onActivityClick={handleActivityClick}
+              />
+            </div>
+          </div>
+
+          {/* Sidebar - Quick Actions */}
+          <div className="lg:col-span-4 xl:col-span-6">
+            <QuickActionsPanel onActionClick={handleQuickAction} />
+          </div>
+
+          {/* Bottom Row - Enhanced Candidate Grid */}
+          <div className="lg:col-span-12 xl:col-span-16">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-blue-600" />
+                    Top Candidates
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {candidateDetails.length} active candidates in pipeline
+                  </p>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110 group">
+                    <Filter className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                  </button>
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-all duration-200 flex items-center shadow-md hover:shadow-lg transform hover:scale-105">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View All
+                  </button>
+                </div>
+              </div>
+              
+              {/* Enhanced Candidate Cards Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {candidateDetails.map(candidate => (
+                  <CandidateCard
+                    key={candidate.id}
+                    candidate={candidate}
+                    onView={() => handleCandidateAction('view', candidate)}
+                    onEdit={() => handleCandidateAction('edit', candidate)}
+                    onContact={() => handleCandidateAction('contact', candidate)}
+                    onSchedule={() => handleCandidateAction('schedule', candidate)}
+                  />
                 ))}
               </div>
-
-              {/* Calendar Days */}
-              <div className="grid grid-cols-7 gap-1">
-                {[...Array(35)].map((_, index) => {
-                  const dayNumber = index - 6; // Adjust for Feb 2023 starting on Wednesday
-                  const isValidDay = dayNumber > 0 && dayNumber <= 28;
-                  const isHighlighted = [4, 5, 6, 7].includes(dayNumber);
-                  
-                  return (
-                    <div
-                      key={index}
-                      className={`
-                        aspect-square flex items-center justify-center text-xs rounded cursor-pointer
-                        transition-all duration-300
-                        ${!isValidDay ? 'text-transparent cursor-default' : ''}
-                        ${isHighlighted ? 'bg-blue-100 text-blue-800 font-bold' : 'text-gray-600 hover:bg-gray-100'}
-                        ${dayNumber === 15 ? 'bg-blue-500 text-white font-bold' : ''}
-                      `}
-                    >
-                      {isValidDay ? dayNumber : ''}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
-              <Clock className="w-4 h-4 text-gray-500" />
-            </div>
-            
-            <div className="space-y-3">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 cursor-pointer group hover:scale-[1.02]">
-                  <div className={`w-3 h-3 rounded-full mt-1.5 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform ${
-                    activity.type === 'candidate' ? 'bg-green-500' :
-                    activity.type === 'meeting' ? 'bg-blue-500' :
-                    activity.type === 'interview' ? 'bg-purple-500' :
-                    'bg-orange-500'
-                  }`}></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 group-hover:text-blue-700 transition-colors font-medium">{activity.message}</p>
-                    <p className="text-xs text-gray-500 mt-1 group-hover:text-gray-600 transition-colors">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
-        </div>
-
-        {/* Bottom Row */}
-        <div className="col-span-12 grid grid-cols-12 gap-6">
-          
-          {/* Candidate Details */}
-          <div className="col-span-12 lg:col-span-9 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Candidate Details</h2>
-              <div className="flex items-center space-x-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110 group">
-                  <Filter className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-all duration-200 flex items-center shadow-md hover:shadow-lg transform hover:scale-105">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
+              
+              {/* Show More Button */}
+              <div className="text-center pt-6 border-t border-gray-200 mt-6">
+                <button 
+                  onClick={() => navigate('/app/candidates')}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  View All Candidates →
                 </button>
               </div>
-            </div>
-            
-            {/* Candidate Cards */}
-            <div className="space-y-4">
-              {candidateDetails.map((candidate) => (
-                <div key={candidate.id} className="group bg-gray-50 rounded-xl p-5 hover:bg-white transition-all duration-300 border border-gray-200 hover:border-blue-200 hover:shadow-md transform hover:scale-[1.02]">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h3 className="font-semibold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">{candidate.name}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border transition-all duration-200 ${getStatusColor(candidate.status)}`}>
-                          {candidate.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-700 mb-2 font-medium">{candidate.role}</p>
-                      <p className="text-xs text-gray-500 mb-1">{candidate.email}</p>
-                      <p className="text-xs text-gray-500">{candidate.address}</p>
-                    </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      <button 
-                        onClick={() => navigate(`/app/candidates/${candidate.id}`)}
-                        className="p-3 hover:bg-blue-100 rounded-xl transition-all duration-200 group/btn hover:scale-110 shadow-sm hover:shadow-md"
-                        title="View Profile"
-                      >
-                        <Eye className="w-4 h-4 text-gray-500 group-hover/btn:text-blue-600 transition-colors" />
-                      </button>
-                      <button 
-                        onClick={() => navigate(`/app/candidates/${candidate.id}/edit`)}
-                        className="p-3 hover:bg-green-100 rounded-xl transition-all duration-200 group/btn hover:scale-110 shadow-sm hover:shadow-md"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-500 group-hover/btn:text-green-600 transition-colors" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="col-span-12 lg:col-span-3 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-              <Zap className="w-4 h-4 mr-2 text-blue-600" />
-              Quick Actions
-            </h2>
-            
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <button
-                    key={index}
-                    onClick={action.action}
-                    className={`
-                      group relative p-3 rounded-xl bg-gradient-to-r ${action.color}
-                      text-white shadow-md hover:shadow-lg transition-all duration-300
-                      transform hover:scale-105 hover:-translate-y-0.5
-                      overflow-hidden
-                    `}
-                  >
-                    <div className="relative z-10">
-                      <Icon className="w-5 h-5 mx-auto" />
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
