@@ -84,7 +84,7 @@ export default function CollapsibleSidebar() {
   return (
     <div 
       className={`
-        ${isExpanded ? 'w-72' : 'w-24'} 
+        ${isExpanded ? 'w-72' : 'w-28'} 
         bg-white/95 backdrop-blur-xl border-r border-slate-200/50 
         flex flex-col h-full shadow-xl 
         transition-all duration-500 ease-out
@@ -149,7 +149,7 @@ export default function CollapsibleSidebar() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`
                   group flex items-center justify-center ${isExpanded ? 'justify-start' : ''} 
-                  px-3 py-3 mx-2 rounded-xl text-sm font-medium 
+                  px-4 py-3 mx-1 rounded-xl text-sm font-medium 
                   transition-all duration-300 transform magnetic-hover
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
                   relative overflow-hidden enhanced-gradient-slide
@@ -161,7 +161,7 @@ export default function CollapsibleSidebar() {
                 title={!isExpanded ? item.name : ''}
               >
                 <div className={`
-                  w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300
+                  w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
                   relative overflow-hidden group-hover:scale-110 icon-wiggle
                   ${isActive 
                     ? `bg-gradient-to-r ${item.color} shadow-lg` 

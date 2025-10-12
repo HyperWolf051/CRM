@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Command, Plus } from 'lucide-react';
+import { Search, Command } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import NotificationPanel from '@/components/NotificationPanel';
@@ -11,38 +11,7 @@ export default function Topbar({ title = 'Dashboard' }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get the appropriate button text and action based on current page
-  const getQuickActionButton = () => {
-    switch (location.pathname) {
-      case '/app/dashboard':
-      case '/app/candidates':
-        return {
-          text: 'Add Candidate',
-          action: () => navigate('/app/candidates'),
-          icon: Plus
-        };
-      case '/app/calendar':
-        return {
-          text: 'New Event',
-          action: () => {
-            // This could trigger the calendar event modal
-            console.log('Open calendar event modal');
-          },
-          icon: Plus
-        };
-      case '/app/tasks':
-        return {
-          text: 'New Task',
-          action: () => {
-            // This could trigger the task creation modal
-            console.log('Open task creation modal');
-          },
-          icon: Plus
-        };
-      default:
-        return null;
-    }
-  };
+  // Removed quick action buttons to avoid duplicates with dashboard quick actions
 
   // Get contextual search placeholder
   const getSearchPlaceholder = () => {
@@ -64,7 +33,7 @@ export default function Topbar({ title = 'Dashboard' }) {
     }
   };
 
-  const quickAction = getQuickActionButton();
+
 
   return (
     <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm">
@@ -108,19 +77,7 @@ export default function Topbar({ title = 'Dashboard' }) {
 
         {/* Right Side - Actions */}
         <div className="flex items-center space-x-4">
-          {/* Quick Actions */}
-          {quickAction && (
-            <div className="hidden lg:flex items-center space-x-2">
-              <button 
-                onClick={quickAction.action}
-                className="px-4 py-2 text-white text-sm font-medium 
-                           rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 
-                           btn-primary-slide">
-                <quickAction.icon className="w-4 h-4 mr-2 inline" />
-                {quickAction.text}
-              </button>
-            </div>
-          )}
+
 
           {/* Notifications */}
           <NotificationPanel />
