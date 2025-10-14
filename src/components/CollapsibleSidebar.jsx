@@ -45,7 +45,7 @@ const navigationItems = [
     color: 'from-cyan-500 to-blue-600'
   },
   {
-    name: 'Clients',
+    name: 'Companies',
     href: '/app/companies',
     icon: Building2,
     color: 'from-orange-500 to-orange-600'

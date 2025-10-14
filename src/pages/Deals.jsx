@@ -399,12 +399,30 @@ export default function Deals() {
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                 />
               </div>
+<<<<<<< Updated upstream
               <Button variant="secondary" icon={<Filter className="w-4 h-4" />}>
                 Filter
               </Button>
               <Button variant="secondary" icon={<Download className="w-4 h-4" />}>
                 Export
               </Button>
+=======
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md transform hover:scale-105 ${showFilters ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                    }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  <span>Filters</span>
+                </button>
+                <button className="px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md transform hover:scale-105 border border-gray-200">
+                  <Download className="w-4 h-4" />
+                  <span>Export</span>
+                </button>
+              </div>
+>>>>>>> Stashed changes
             </div>
           </div>
 
