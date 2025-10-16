@@ -663,7 +663,8 @@ const Calendar = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -1203,6 +1204,7 @@ const Calendar = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

@@ -36,7 +36,7 @@ export default function Topbar({ title = 'Dashboard' }) {
 
 
   return (
-    <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm">
+    <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm relative">
       <div className="flex items-center justify-between">
         {/* Left Side - Page Title and Search */}
         <div className="flex items-center space-x-6">
@@ -77,8 +77,6 @@ export default function Topbar({ title = 'Dashboard' }) {
 
         {/* Right Side - Actions */}
         <div className="flex items-center space-x-4">
-
-
           {/* Notifications */}
           <NotificationPanel />
 

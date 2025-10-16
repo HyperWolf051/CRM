@@ -4,6 +4,9 @@
 /* Tailwind CSS import */
 @import "tailwindcss";
 
+/* Import layout fixes */
+@import "./styles/layout-fixes.css";
+
 /* CSS Custom Properties for Theme Configuration */
 :root {
   /* Custom color palette */

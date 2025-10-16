@@ -170,9 +170,12 @@ const NotificationPanel = () => {
         <div
           ref={panelRef}
           className="fixed right-4 top-20 w-96 bg-white/98 backdrop-blur-xl 
-                     border border-slate-200/50 rounded-2xl shadow-2xl z-[99999]
+                     border border-slate-200/50 rounded-2xl shadow-2xl
                      animate-in slide-in-from-top-2 duration-300"
-          style={{ maxHeight: 'calc(100vh - 100px)' }}
+          style={{ 
+            maxHeight: 'calc(100vh - 100px)',
+            zIndex: 700 // Using notification z-index from our system
+          }}
         >
           {/* Header */}
           <div className="p-4 border-b border-slate-200/50">

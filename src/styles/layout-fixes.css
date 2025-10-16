@@ -1,0 +1,204 @@
+/* Layout and Z-Index Fixes for CRM Application */
+
+/* Import z-index variables */
+:root {
+  --z-base: 0;
+  --z-content: 10;
+  --z-sidebar: 100;
+  --z-sidebar-overlay: 90;
+  --z-topbar: 200;
+  --z-dropdown: 300;
+  --z-tooltip: 400;
+  --z-overlay: 500;
+  --z-modal: 600;
+  --z-notification: 700;
+  --z-toast: 800;
+  --z-loading: 900;
+  --z-error: 1000;
+}
+
+/* Base layout fixes */
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure proper stacking context for main layout */
+.dashboard-layout {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* Sidebar layering */
+.sidebar-container {
+  z-index: var(--z-sidebar);
+}
+
+.sidebar-overlay {
+  z-index: var(--z-sidebar-overlay);
+}
+
+/* Topbar layering */
+.topbar-container {
+  z-index: var(--z-topbar);
+  position: relative;
+}
+
+/* Dropdown components */
+.dropdown-menu,
+.notification-panel,
+.profile-dropdown {
+  z-index: var(--z-dropdown);
+}
+
+/* Modal and overlay components */
+.modal-overlay {
+  z-index: var(--z-modal);
+}
+
+.notification-toast {
+  z-index: var(--z-toast);
+}
+
+
+
+/* Prevent layout shifts */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents flex item from overflowing */
+  overflow: hidden;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Fix for nested containers */
+.page-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive fixes */
+@media (max-width: 1024px) {
+  .mobile-sidebar {
+    z-index: var(--z-sidebar);
+  }
+  
+  .mobile-overlay {
+    z-index: var(--z-sidebar-overlay);
+  }
+}
+
+/* Animation improvements */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions for interactive elements */
+.interactive-element {
+  transition: all 0.2s ease-in-out;
+}
+
+.interactive-element:hover {
+  transform: translateY(-1px);
+}
+
+/* Fix for backdrop blur on older browsers */
+@supports not (backdrop-filter: blur(12px)) {
+  .backdrop-blur-xl {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  
+  .backdrop-blur-sm {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Scrollbar styling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Focus management */
+.focus-visible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .interactive-element {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .dropdown-menu,
+  .notification-panel,
+  .profile-dropdown {
+    border: 2px solid;
+  }
+}
+
+/* Print styles */
+@media print {
+  .sidebar-container,
+  .topbar-container {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin: 0;
+    padding: 0;
+  }
+}

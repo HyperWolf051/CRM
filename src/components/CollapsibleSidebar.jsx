@@ -113,14 +113,16 @@ export default function CollapsibleSidebar() {
       {/* Mobile Overlay */}
       {isMobile && isMobileOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 lg:hidden"
+          style={{ zIndex: 90 }}
           onClick={toggleMobileMenu}
         />
       )}
       
       {/* Mobile Menu Button */}
       <button 
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg border border-slate-200"
+        className="lg:hidden fixed top-4 left-4 p-3 bg-white rounded-xl shadow-lg border border-slate-200"
+        style={{ zIndex: 150 }}
         onClick={toggleMobileMenu}
       >
         {isMobileOpen ? (
@@ -134,7 +136,7 @@ export default function CollapsibleSidebar() {
       <div 
         className={`
           ${isMobile 
-            ? `fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-in-out ${
+            ? `fixed inset-y-0 left-0 w-72 transform transition-transform duration-300 ease-in-out ${
                 isMobileOpen ? 'translate-x-0' : '-translate-x-full'
               }`
             : `${isExpanded ? 'w-72' : 'w-28'} relative`
@@ -144,6 +146,7 @@ export default function CollapsibleSidebar() {
           ${!isMobile ? 'transition-all duration-500 ease-out' : ''}
           overflow-hidden
         `}
+        style={{ zIndex: isMobile ? 100 : 'auto' }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

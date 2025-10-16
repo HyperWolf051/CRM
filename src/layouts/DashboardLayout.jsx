@@ -62,25 +62,27 @@ export default function DashboardLayout() {
   ]);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden relative">
-      {/* Sidebar */}
-      <div className="relative z-20">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Sidebar - Fixed z-index for proper layering */}
+      <div className="flex-shrink-0" style={{ zIndex: 100 }}>
         <CollapsibleSidebar />
       </div>
       
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Topbar */}
-        <div className="relative z-30">
+      {/* Main Content Area - Flexbox layout */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Topbar - Fixed z-index above content */}
+        <div className="flex-shrink-0" style={{ zIndex: 200 }}>
           <Topbar title={getPageTitle()} />
         </div>
         
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 relative z-10">
-          <div className="max-w-none lg:max-w-7xl xl:max-w-none 2xl:max-w-[1600px] mx-auto">
-            <PageTransition>
-              <Outlet />
-            </PageTransition>
+        {/* Page Content - Scrollable area */}
+        <main className="flex-1 overflow-y-auto bg-gray-50" style={{ zIndex: 10 }}>
+          <div className="p-4 lg:p-6">
+            <div className="max-w-none lg:max-w-7xl xl:max-w-none 2xl:max-w-[1600px] mx-auto">
+              <PageTransition>
+                <Outlet />
+              </PageTransition>
+            </div>
           </div>
         </main>
       </div>

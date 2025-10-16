@@ -280,12 +280,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-full bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Enhanced Header */}
       <EnhancedHeader />
       
       {/* Main Dashboard Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min">
           
           {/* Enhanced Metrics Row - Full Width */}

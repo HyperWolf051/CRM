@@ -44,8 +44,9 @@ const Candidates = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
-      <div className="flex-shrink-0 p-6 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
@@ -66,9 +67,11 @@ const Candidates = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-80 flex-shrink-0 bg-white/80 backdrop-blur-xl border-r border-slate-200/50 overflow-y-auto">
-          <div className="p-6 space-y-6">
+      {/* Content Area */}
+      <div className="flex gap-6 px-6">
+        {/* Sidebar */}
+        <div className="w-80 flex-shrink-0">
+          <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -82,8 +85,9 @@ const Candidates = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6">
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6">
             {candidates.length === 0 ? (
               <EmptyState
                 icon={<Users className="w-16 h-16" />}

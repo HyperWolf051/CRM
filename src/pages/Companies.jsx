@@ -188,7 +188,8 @@ export default function Companies() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="space-y-6 animate-fade-in">
       {/* Header with Metrics */}
       <div className="flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -478,6 +479,7 @@ export default function Companies() {
             </div>
           )}
         </div>
+      </div>
       </div>
 
       {/* Add Company Modal */}

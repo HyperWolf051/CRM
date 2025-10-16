@@ -96,8 +96,9 @@ const ProfileAvatar = () => {
         <div
           ref={dropdownRef}
           className="fixed right-4 top-20 w-72 bg-white/98 backdrop-blur-xl 
-                     border border-slate-200/50 rounded-2xl shadow-2xl z-[99999]
+                     border border-slate-200/50 rounded-2xl shadow-2xl
                      animate-in slide-in-from-top-2 duration-300 overflow-hidden"
+          style={{ zIndex: 300 }} // Using dropdown z-index from our system
         >
           {/* User Info Header */}
           <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200/50">
