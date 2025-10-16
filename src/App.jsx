@@ -19,6 +19,7 @@ const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const AddJob = lazy(() => import('@/pages/AddJob'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -71,6 +72,7 @@ function App() {
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />
+                  <Route path="jobs/new" element={<AddJob />} />
                   <Route path="companies" element={<Companies />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="tasks" element={<Tasks />} />

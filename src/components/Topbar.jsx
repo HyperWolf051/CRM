@@ -7,11 +7,8 @@ import ProfileAvatar from '@/components/ProfileAvatar';
 
 export default function Topbar({ title = 'Dashboard' }) {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Removed quick action buttons to avoid duplicates with dashboard quick actions
 
   // Get contextual search placeholder
   const getSearchPlaceholder = () => {
@@ -32,8 +29,6 @@ export default function Topbar({ title = 'Dashboard' }) {
         return 'Search candidates, jobs, clients...';
     }
   };
-
-
 
   return (
     <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm relative">

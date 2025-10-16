@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, Download, Eye, Edit, Trash2, TrendingUp, Users, DollarSign, Target, MapPin, Briefcase } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 
 export default function Deals() {
+  const navigate = useNavigate();
+  
   // Mock jobs data for CRM
   const [jobs, setJobs] = useState([
     {
@@ -145,20 +148,7 @@ export default function Deals() {
   };
 
   const handleCreateJob = () => {
-    setFormData({
-      title: '',
-      company: '',
-      location: '',
-      type: 'Full-time',
-      remote: false,
-      salary: '',
-      description: '',
-      requirements: '',
-      benefits: '',
-      deadline: ''
-    });
-    setFormErrors({});
-    setIsCreateModalOpen(true);
+    navigate('/app/jobs/new');
   };
 
   const getStatusColor = (status) => {
