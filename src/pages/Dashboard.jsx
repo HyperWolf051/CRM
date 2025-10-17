@@ -290,7 +290,7 @@ const Dashboard = () => {
       {/* Enhanced Header */}
       <EnhancedHeader />
       
-      {/* Main Dashboard Content - Full Width */}
+      {/* Main Dashboard Content - Full Width (Day 1 & 2 Updates) */}
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-none">
         <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min w-full">
           

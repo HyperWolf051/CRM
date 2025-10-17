@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from 'react';
 
-// Enhanced Interactive Bar Chart
+// Enhanced Interactive Bar Chart with Day 2 Animations
 const BarChart = memo(({ 
   data, 
   height = 300, 
