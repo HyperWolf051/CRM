@@ -9,7 +9,6 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 
 // Lazy load pages for code splitting
 const Login = lazy(() => import('@/pages/Login'));
-const Register = lazy(() => import('@/pages/Register'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Contacts = lazy(() => import('@/pages/Contacts'));
 const ContactDetails = lazy(() => import('@/pages/ContactDetails'));
@@ -19,6 +18,7 @@ const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Team = lazy(() => import('@/pages/Team'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -57,7 +57,6 @@ function App() {
                 {/* Auth routes */}
                 <Route element={<AuthLayout />}>
                   <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
                 </Route>
                 
                 {/* Protected app routes */}
@@ -80,7 +79,7 @@ function App() {
                   <Route path="documents" element={<ComingSoon title="Documents" description="Document storage and management" />} />
                   <Route path="goals" element={<ComingSoon title="Goals" description="Set and track your business goals" />} />
                   <Route path="projects" element={<ComingSoon title="Projects" description="Project management and collaboration" />} />
-                  <Route path="team" element={<ComingSoon title="Team" description="Team management and collaboration tools" />} />
+                  <Route path="team" element={<Team />} />
                   <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>

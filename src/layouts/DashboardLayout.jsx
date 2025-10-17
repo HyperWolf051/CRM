@@ -14,6 +14,7 @@ const pageTitles = {
   '/app/calendar': 'Calendar',
   '/app/tasks': 'Tasks',
   '/app/analytics': 'Reports',
+  '/app/team': 'Team',
   '/app/settings': 'Settings',
 };
 
@@ -56,6 +57,11 @@ export default function DashboardLayout() {
     },
     {
       keys: '4',
+      callback: () => navigate('/app/team'),
+      options: { ignoreInputs: true }
+    },
+    {
+      keys: '5',
       callback: () => navigate('/app/settings'),
       options: { ignoreInputs: true }
     }
