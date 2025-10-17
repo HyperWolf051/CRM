@@ -212,7 +212,13 @@ const Dashboard = () => {
 
   const handleChartRefresh = () => {
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
+    // Force re-render of chart to trigger animations
+    const currentData = [...salesData];
+    setTimeout(() => {
+      setIsLoading(false);
+      // Trigger a small state change to re-animate
+      setTimeRange(timeRange === '30D' ? '30D ' : '30D');
+    }, 500);
   };
 
   const handleBarClick = (data, index) => {
@@ -361,8 +367,8 @@ const Dashboard = () => {
                 
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">Monthly Sales</h2>
-                    <p className="text-sm text-gray-500">Revenue trends over time</p>
+                    <h2 className="text-lg font-bold text-gray-900">Monthly Changes</h2>
+                    <p className="text-sm text-gray-500">Revenue trends with smooth growth animations</p>
                   </div>
                   <div className="flex items-center text-sm font-semibold text-green-600">
                     <TrendingUp className="w-4 h-4 mr-1" />
@@ -371,6 +377,7 @@ const Dashboard = () => {
                 </div>
                 
                 <BarChart 
+                  key={`chart-${timeRange}-${isLoading}`}
                   data={salesData} 
                   height={250} 
                   onBarClick={handleBarClick}
