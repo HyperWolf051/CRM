@@ -21,7 +21,7 @@ export default function Topbar({ title = 'Dashboard' }) {
       case '/app/deals':
         return 'Search jobs and deals...';
       case '/app/companies':
-        return 'Search clients and companies...';
+        return 'Search clients...';
       case '/app/calendar':
         return 'Search events...';
       case '/app/tasks':
@@ -38,18 +38,8 @@ export default function Topbar({ title = 'Dashboard' }) {
   return (
     <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm relative">
       <div className="flex items-center justify-between">
-        {/* Left Side - Page Title and Search */}
+        {/* Left Side - Search */}
         <div className="flex items-center space-x-6">
-          {/* Page Title */}
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              {title}
-            </h1>
-            <div className="text-sm text-slate-500 mt-0.5">
-              Welcome back, {user?.name?.split(' ')[0] || 'User'}
-            </div>
-          </div>
-
           {/* Search Bar */}
           <div className="relative hidden md:block">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -66,12 +56,6 @@ export default function Topbar({ title = 'Dashboard' }) {
                          hover:bg-white/80 hover:border-slate-300/50
                          transition-all duration-300"
             />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <kbd className="hidden sm:inline-flex items-center px-2 py-1 border border-slate-200 rounded text-xs font-mono text-slate-500 bg-slate-100">
-                <Command className="w-3 h-3 mr-1" />
-                K
-              </kbd>
-            </div>
           </div>
         </div>
 

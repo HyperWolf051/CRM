@@ -178,7 +178,7 @@ export default function Companies() {
 
     // In a real app, this would be handled by a state management system
     // For now, we'll just show a success message
-    alert('Company added successfully!');
+    alert('Client added successfully!');
     
     setNewCompany({
       name: '', industry: '', size: '', revenue: '', website: '',
@@ -195,16 +195,16 @@ export default function Companies() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Companies
+              Clients
             </h1>
-            <p className="text-gray-600 mt-1">Manage your company relationships and accounts</p>
+            <p className="text-gray-600 mt-1">Manage your client relationships and accounts</p>
           </div>
           <Button
             variant="primary"
             icon={<Plus className="w-4 h-4" />}
             onClick={() => setIsCreateModalOpen(true)}
           >
-            Add Company
+            Add Client
           </Button>
         </div>
 
@@ -213,7 +213,7 @@ export default function Companies() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Companies</p>
+                <p className="text-sm font-medium text-gray-600">Total Clients</p>
                 <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -285,7 +285,7 @@ export default function Companies() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search companies, industries..."
+                  placeholder="Search clients, industries..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 w-full"
@@ -354,17 +354,17 @@ export default function Companies() {
             )}
           </div>
 
-          {/* Companies Table */}
+          {/* Clients Table */}
           {isLoading ? (
             <SkeletonLoader rows={5} />
           ) : filteredCompanies.length === 0 ? (
             <EmptyState
               icon={<Building2 className="w-16 h-16" />}
-              title="No companies found"
+              title="No clients found"
               description={
                 searchTerm || selectedStatus !== 'all' || selectedIndustry !== 'all' || selectedSize !== 'all'
-                  ? "No companies match your current filters. Try adjusting your search criteria."
-                  : "You haven't added any companies yet. Start building your client database by adding your first company."
+                  ? "No clients match your current filters. Try adjusting your search criteria."
+                  : "You haven't added any clients yet. Start building your client database by adding your first client."
               }
               action={
                 <Button
@@ -372,7 +372,7 @@ export default function Companies() {
                   icon={<Plus className="w-4 h-4" />}
                   onClick={() => setIsCreateModalOpen(true)}
                 >
-                  Add Your First Company
+                  Add Your First Client
                 </Button>
               }
             />
@@ -381,7 +381,7 @@ export default function Companies() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Company</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Client</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Industry</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Size</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue</th>
@@ -488,7 +488,7 @@ export default function Companies() {
           <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-900">Add New Company</h2>
+                <h2 className="text-xl font-bold text-slate-900">Add New Client</h2>
                 <button
                   onClick={() => setIsCreateModalOpen(false)}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
@@ -500,13 +500,13 @@ export default function Companies() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Client Name *</label>
                     <input
                       type="text"
                       value={newCompany.name}
                       onChange={(e) => setNewCompany({...newCompany, name: e.target.value})}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Enter company name"
+                      placeholder="Enter client name"
                       required
                     />
                   </div>
@@ -530,7 +530,7 @@ export default function Companies() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Company Size</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Client Size</label>
                     <select
                       value={newCompany.size}
                       onChange={(e) => setNewCompany({...newCompany, size: e.target.value})}
@@ -585,7 +585,7 @@ export default function Companies() {
                       value={newCompany.email}
                       onChange={(e) => setNewCompany({...newCompany, email: e.target.value})}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="contact@company.com"
+                      placeholder="contact@client.com"
                     />
                   </div>
 
@@ -607,7 +607,7 @@ export default function Companies() {
                       onChange={(e) => setNewCompany({...newCompany, notes: e.target.value})}
                       rows={3}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 resize-none"
-                      placeholder="Additional notes about the company..."
+                      placeholder="Additional notes about the client..."
                     />
                   </div>
                 </div>
@@ -630,7 +630,7 @@ export default function Companies() {
                   onClick={handleAddCompany}
                   className="px-6 py-2 text-white font-medium rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
                 >
-                  Add Company
+                  Add Client
                 </button>
               </div>
             </div>
@@ -642,7 +642,7 @@ export default function Companies() {
       <Modal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
-        title="Company Details"
+        title="Client Details"
       >
         {selectedCompany && (
           <div className="space-y-6">
@@ -673,7 +673,7 @@ export default function Companies() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Company Size
+                  Client Size
                 </label>
                 <p className="text-sm text-gray-900 dark:text-white">{selectedCompany.size} employees</p>
               </div>
@@ -745,7 +745,7 @@ export default function Companies() {
                 Close
               </Button>
               <Button variant="primary">
-                Edit Company
+                Edit Client
               </Button>
             </div>
           </div>
