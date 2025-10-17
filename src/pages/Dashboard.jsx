@@ -284,9 +284,9 @@ const Dashboard = () => {
       {/* Enhanced Header */}
       <EnhancedHeader />
       
-      {/* Main Dashboard Content */}
-      <div className="px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min">
+      {/* Main Dashboard Content - Full Width */}
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-none">
+        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min w-full">
           
           {/* Enhanced Metrics Row - Full Width */}
           <div className="lg:col-span-12 xl:col-span-16">
