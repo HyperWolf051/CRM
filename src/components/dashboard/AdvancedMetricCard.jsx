@@ -13,10 +13,11 @@ const AdvancedMetricCard = ({
   sparklineData = []
 }) => (
   <div 
-    className={`group relative overflow-hidden rounded-2xl p-6 text-white shadow-lg hover:shadow-2xl 
+    className={`group relative overflow-hidden rounded-2xl p-5 text-white shadow-lg hover:shadow-2xl 
                 transition-all duration-500 transform hover:scale-105 cursor-pointer
                 bg-gradient-to-br ${color}`}
     onClick={onClick}
+    style={{ minHeight: '140px' }} // Reduced from ~165px to 140px (15% reduction)
   >
     {/* Loading State */}
     {loading && (
@@ -30,30 +31,30 @@ const AdvancedMetricCard = ({
     
     <div className="relative z-10">
       {/* Header with Icon and Trend */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-          <Icon className="w-6 h-6" />
+      <div className="flex items-center justify-between mb-3">
+        <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+          <Icon className="w-5 h-5" />
         </div>
-        <div className={`flex items-center text-sm font-semibold px-3 py-1.5 rounded-lg backdrop-blur-sm ${
+        <div className={`flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg backdrop-blur-sm ${
           trend > 0 ? 'bg-green-500/30' : 'bg-red-500/30'
         }`}>
-          {trend > 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+          {trend > 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
           {Math.abs(trend)}%
         </div>
       </div>
       
       {/* Main Value */}
-      <div className="text-4xl font-bold mb-2 group-hover:scale-105 transition-transform duration-300">
+      <div className="text-3xl font-bold mb-1.5 group-hover:scale-105 transition-transform duration-300">
         {value}
       </div>
       
       {/* Title and Comparison */}
-      <div className="text-sm opacity-90 mb-3">{title}</div>
+      <div className="text-sm opacity-90 mb-2">{title}</div>
       <div className="text-xs opacity-75">{comparison}</div>
       
       {/* Mini Sparkline */}
       {sparklineData.length > 0 && (
-        <div className="mt-4 h-8">
+        <div className="mt-3 h-6">
           <MiniSparkline data={sparklineData} color="white" />
         </div>
       )}

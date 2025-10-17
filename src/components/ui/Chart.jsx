@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from 'react';
 
-// Enhanced Interactive Bar Chart
+// Enhanced Interactive Bar Chart with Day 2 Animations
 const BarChart = memo(({ 
   data, 
   height = 300, 
@@ -14,12 +14,29 @@ const BarChart = memo(({
 
   useEffect(() => {
     if (animate) {
-      const timer = setTimeout(() => setAnimationProgress(1), 100);
-      return () => clearTimeout(timer);
+      // Smooth staggered animation for growth effect
+      let progress = 0;
+      const duration = 1500; // 1.5 seconds total
+      const interval = 16; // ~60fps
+      const increment = interval / duration;
+      
+      const timer = setInterval(() => {
+        progress += increment;
+        // Easing function for smooth growth (ease-out-cubic)
+        const easedProgress = 1 - Math.pow(1 - Math.min(progress, 1), 3);
+        setAnimationProgress(easedProgress);
+        
+        if (progress >= 1) {
+          clearInterval(timer);
+          setAnimationProgress(1);
+        }
+      }, interval);
+      
+      return () => clearInterval(timer);
     } else {
       setAnimationProgress(1);
     }
-  }, [animate]);
+  }, [animate, data]); // Re-animate when data changes
 
   if (!data || data.length === 0) return null;
 
@@ -46,35 +63,75 @@ const BarChart = memo(({
         {/* Bars */}
         {data.map((item, index) => {
           const barHeight = (item.value / maxValue) * (height - 60);
-          const animatedHeight = barHeight * animationProgress;
+          // Staggered animation delay for each bar (cascading effect)
+          const staggerDelay = index * 0.15; // 150ms delay between bars
+          const staggeredProgress = Math.max(0, Math.min(1, (animationProgress - staggerDelay) / 0.7));
+          const animatedHeight = barHeight * staggeredProgress;
           const x = 15 + (index * (70 / data.length));
           const y = height - animatedHeight - 40;
           
           return (
             <g key={index}>
-              {/* Bar */}
+              {/* Bar Shadow for depth */}
+              <rect
+                x={`${x + 0.5}%`}
+                y={y + 2}
+                width={`${60 / data.length}%`}
+                height={animatedHeight}
+                className="fill-black/10"
+                rx="4"
+              />
+              
+              {/* Main Bar */}
               <rect
                 x={`${x}%`}
                 y={y}
                 width={`${60 / data.length}%`}
                 height={animatedHeight}
-                className={`transition-all duration-300 cursor-pointer ${
-                  hoveredBar === index ? 'opacity-80' : 'opacity-100'
+                className={`transition-all duration-500 cursor-pointer transform-gpu ${
+                  hoveredBar === index 
+                    ? 'opacity-90 scale-105 drop-shadow-lg' 
+                    : 'opacity-100 scale-100'
                 } ${item.color || 'fill-blue-500'}`}
                 rx="4"
                 onMouseEnter={() => setHoveredBar(index)}
                 onMouseLeave={() => setHoveredBar(null)}
                 onClick={() => onBarClick?.(item, index)}
+                style={{
+                  filter: hoveredBar === index ? 'brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.15))' : 'none',
+                  transformOrigin: 'bottom center'
+                }}
               />
               
-              {/* Value Label */}
+              {/* Animated Glow Effect on Hover */}
+              {hoveredBar === index && (
+                <rect
+                  x={`${x - 0.5}%`}
+                  y={y - 2}
+                  width={`${60 / data.length + 1}%`}
+                  height={animatedHeight + 4}
+                  className="fill-blue-400/20 animate-pulse"
+                  rx="6"
+                />
+              )}
+              
+              {/* Animated Value Label */}
               <text
                 x={`${x + (30 / data.length)}%`}
-                y={y - 5}
+                y={y - 8}
                 textAnchor="middle"
-                className="text-xs font-medium fill-current text-gray-600"
+                className={`text-xs font-semibold transition-all duration-300 ${
+                  hoveredBar === index 
+                    ? 'fill-blue-600 text-sm' 
+                    : 'fill-gray-600'
+                }`}
+                style={{
+                  opacity: staggeredProgress,
+                  transform: hoveredBar === index ? 'scale(1.1)' : 'scale(1)',
+                  transformOrigin: 'center'
+                }}
               >
-                {item.value}
+                {Math.round(item.value * staggeredProgress)}
               </text>
               
               {/* Category Label */}
@@ -91,19 +148,31 @@ const BarChart = memo(({
         })}
       </svg>
       
-      {/* Interactive Tooltip */}
+      {/* Enhanced Interactive Tooltip */}
       {showTooltip && hoveredBar !== null && (
         <div 
-          className="absolute bg-black/80 text-white text-xs px-3 py-2 rounded-lg pointer-events-none z-50"
+          className="absolute bg-gradient-to-r from-slate-800 to-slate-900 text-white text-sm px-4 py-3 rounded-xl pointer-events-none z-50 shadow-2xl border border-white/10 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
           style={{
             left: `${15 + (hoveredBar * (70 / data.length)) + (30 / data.length)}%`,
-            top: `${height - (data[hoveredBar].value / maxValue) * (height - 60) - 60}px`,
+            top: `${height - (data[hoveredBar].value / maxValue) * (height - 60) - 80}px`,
             transform: 'translateX(-50%)'
           }}
         >
-          <div className="font-semibold">{data[hoveredBar].label}</div>
-          <div>Value: {data[hoveredBar].value}</div>
-          {data[hoveredBar].details && <div>{data[hoveredBar].details}</div>}
+          {/* Tooltip Arrow */}
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+          
+          <div className="space-y-1">
+            <div className="font-bold text-blue-300">{data[hoveredBar].label}</div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-300">Value:</span>
+              <span className="font-semibold text-green-400">{data[hoveredBar].value}</span>
+            </div>
+            {data[hoveredBar].details && (
+              <div className="text-xs text-gray-400 pt-1 border-t border-white/10">
+                {data[hoveredBar].details}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
