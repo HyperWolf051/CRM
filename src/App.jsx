@@ -17,6 +17,7 @@ const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
+const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Team = lazy(() => import('@/pages/Team'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -67,6 +68,7 @@ function App() {
                 }>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="candidates" element={<Candidates />} />
+                  <Route path="candidates/add" element={<AddCandidate />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />

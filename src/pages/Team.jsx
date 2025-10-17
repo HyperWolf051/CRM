@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
+import PasswordDisplayModal from '../components/ui/PasswordDisplayModal';
 
 const Team = () => {
   // Mock team data - in real app this would come from API
@@ -84,6 +85,8 @@ const Team = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newMemberCredentials, setNewMemberCredentials] = useState(null);
 
   // Form state for creating new team member
   const [newMember, setNewMember] = useState({
@@ -202,8 +205,13 @@ const Team = () => {
       });
       setFormErrors({});
       
-      // Show success message with temp password
-      alert(`Team member created successfully!\nTemporary password: ${tempPassword}\nPlease share this with the new team member.`);
+      // Show professional password modal instead of ugly alert
+      setNewMemberCredentials({
+        name: member.name,
+        email: member.email,
+        password: tempPassword
+      });
+      setShowPasswordModal(true);
     }
   };
 
@@ -758,6 +766,21 @@ const Team = () => {
           </div>
         </div>
       )}
+
+      {/* Professional Password Display Modal */}
+      <PasswordDisplayModal
+        isOpen={showPasswordModal}
+        onClose={() => {
+          setShowPasswordModal(false);
+          setNewMemberCredentials(null);
+        }}
+        memberName={newMemberCredentials?.name}
+        memberEmail={newMemberCredentials?.email}
+        temporaryPassword={newMemberCredentials?.password}
+        onEmailSent={() => {
+          console.log('Email sent to new team member');
+        }}
+      />
     </div>
   );
 };
