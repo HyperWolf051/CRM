@@ -15,7 +15,6 @@ const pageTitles = {
   '/app/tasks': 'Tasks',
   '/app/analytics': 'Reports',
   '/app/team': 'Team',
-  '/app/profile': 'Profile',
   '/app/settings': 'Settings',
 };
 

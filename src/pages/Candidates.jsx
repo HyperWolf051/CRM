@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   Plus, 
@@ -14,6 +15,7 @@ import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 
 const Candidates = () => {
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([
     {
       id: 1,
@@ -105,7 +107,7 @@ const Candidates = () => {
             <Button
               variant="primary"
               icon={<Plus className="w-4 h-4" />}
-              onClick={() => setShowAddModal(true)}
+              onClick={() => navigate('/app/candidates/add')}
             >
               Add Candidate
             </Button>
@@ -143,7 +145,7 @@ const Candidates = () => {
                   <Button
                     variant="primary"
                     icon={<Plus className="w-4 h-4" />}
-                    onClick={() => setShowAddModal(true)}
+                    onClick={() => navigate('/app/candidates/add')}
                   >
                     Add Your First Candidate
                   </Button>
