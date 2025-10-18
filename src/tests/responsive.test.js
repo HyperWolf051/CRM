@@ -98,7 +98,7 @@ describe('Responsive Design Tests', () => {
     it('should have correct width classes for different screen sizes', () => {
       render(
         <TestWrapper>
-          <Sidebar />
+          <CollapsibleSidebar />
         </TestWrapper>
       );
 

@@ -129,7 +129,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );
@@ -142,7 +142,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );
@@ -155,7 +155,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );
