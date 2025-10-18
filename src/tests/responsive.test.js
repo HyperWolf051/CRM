@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Dashboard from '../pages/Dashboard';
 import Contacts from '../pages/Contacts';
 import Deals from '../pages/Deals';
-import Sidebar from '../components/Sidebar';
+import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import KanbanBoard from '../components/KanbanBoard';
 import ContactTable from '../components/ContactTable';
 import { AuthProvider } from '../context/AuthContext';

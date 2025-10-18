@@ -271,6 +271,62 @@ const demoApiHandlers = {
     };
   },
 
+  'POST /auth/register': async (data) => {
+    await simulateApiDelay(500);
+    const { name, email, password } = data;
+    
+    // Check if email already exists
+    const existingUser = mockContacts.find(c => c.email === email);
+    if (existingUser) {
+      throw new Error('Email already exists');
+    }
+
+    return {
+      data: {
+        token: 'demo-token-' + Date.now(),
+        user: {
+          id: 'demo-user-' + Date.now(),
+          name: name,
+          email: email,
+          avatar: null,
+          role: 'user',
+          isDemo: true
+        }
+      }
+    };
+  },
+
+  'PATCH /deals/:id/stage': async (id, data) => {
+    await simulateApiDelay(300);
+    const index = mockDeals.findIndex(d => d.id === id);
+    if (index === -1) {
+      throw new Error('Deal not found');
+    }
+    mockDeals[index] = {
+      ...mockDeals[index],
+      stage: data.stage,
+      updatedAt: new Date().toISOString()
+    };
+    return {
+      data: mockDeals[index]
+    };
+  },
+
+  'PUT /users/me/password': async (data) => {
+    await simulateApiDelay(400);
+    // In demo mode, just simulate success
+    return {
+      data: { message: 'Password updated successfully' }
+    };
+  },
+
+  'PUT /users/me/preferences': async (data) => {
+    await simulateApiDelay(400);
+    return {
+      data: { message: 'Preferences updated successfully' }
+    };
+  },
+
   'GET /': async () => {
     await simulateApiDelay(200);
     return {
