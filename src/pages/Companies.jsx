@@ -87,6 +87,7 @@ const mockCompanies = [
 ];
 
 export default function Companies() {
+  const navigate = useNavigate();
   const [companies] = useState(mockCompanies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');

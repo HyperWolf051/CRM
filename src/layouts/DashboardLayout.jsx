@@ -14,6 +14,7 @@ const pageTitles = {
   '/app/calendar': 'Calendar',
   '/app/tasks': 'Tasks',
   '/app/analytics': 'Reports',
+  '/app/team': 'Team',
   '/app/settings': 'Settings',
 };
 
@@ -56,6 +57,11 @@ export default function DashboardLayout() {
     },
     {
       keys: '4',
+      callback: () => navigate('/app/team'),
+      options: { ignoreInputs: true }
+    },
+    {
+      keys: '5',
       callback: () => navigate('/app/settings'),
       options: { ignoreInputs: true }
     }
@@ -78,7 +84,7 @@ export default function DashboardLayout() {
         {/* Page Content - Scrollable area */}
         <main className="flex-1 overflow-y-auto bg-gray-50" style={{ zIndex: 10 }}>
           <div className="p-4 lg:p-6">
-            <div className="max-w-none lg:max-w-7xl xl:max-w-none 2xl:max-w-[1600px] mx-auto">
+            <div className="w-full max-w-none">
               <PageTransition>
                 <Outlet />
               </PageTransition>

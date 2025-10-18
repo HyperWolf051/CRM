@@ -4,7 +4,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Modal from '../components/ui/Modal';
 import { BrowserRouter } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import { AuthContext } from '../context/AuthContext';
 
 // Mock auth context
@@ -129,7 +129,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );
@@ -142,7 +142,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );
@@ -155,7 +155,7 @@ describe('Accessibility Features', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Sidebar />
+            <CollapsibleSidebar />
           </AuthProvider>
         </BrowserRouter>
       );

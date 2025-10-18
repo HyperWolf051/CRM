@@ -9,6 +9,7 @@ import {
   Calendar,
   BarChart3,
   CheckSquare,
+  UserCheck,
   Menu,
   X
 } from 'lucide-react';
@@ -56,6 +57,12 @@ const navigationItems = [
     href: '/app/analytics',
     icon: BarChart3,
     color: 'from-indigo-500 to-indigo-600'
+  },
+  {
+    name: 'Team',
+    href: '/app/team',
+    icon: UserCheck,
+    color: 'from-violet-500 to-violet-600'
   },
   {
     name: 'Settings',

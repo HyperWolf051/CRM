@@ -198,7 +198,7 @@ export default function Deals() {
               Table
             </button>
             <button
-              onClick={handleCreateJob}
+              onClick={() => navigate('/app/deals/add')}
               className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
@@ -365,7 +365,7 @@ export default function Deals() {
                 <Button
                   variant="primary"
                   icon={<Plus className="w-4 h-4" />}
-                  onClick={handleCreateJob}
+                  onClick={() => navigate('/app/deals/add')}
                 >
                   Post Your First Job
                 </Button>

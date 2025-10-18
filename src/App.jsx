@@ -9,7 +9,6 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 
 // Lazy load pages for code splitting
 const Login = lazy(() => import('@/pages/Login'));
-const Register = lazy(() => import('@/pages/Register'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Contacts = lazy(() => import('@/pages/Contacts'));
 const ContactDetails = lazy(() => import('@/pages/ContactDetails'));
@@ -18,8 +17,12 @@ const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
+const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
+const AddClient = lazy(() => import('@/pages/AddClient'));
+const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
+const Team = lazy(() => import('@/pages/Team'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -58,7 +61,6 @@ function App() {
                 {/* Auth routes */}
                 <Route element={<AuthLayout />}>
                   <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
                 </Route>
                 
                 {/* Protected app routes */}
@@ -69,11 +71,13 @@ function App() {
                 }>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="candidates" element={<Candidates />} />
+                  <Route path="candidates/add" element={<AddCandidate />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />
-                  <Route path="jobs/new" element={<AddJob />} />
+                  <Route path="deals/add" element={<AddJob />} />
                   <Route path="companies" element={<Companies />} />
+                  <Route path="companies/add" element={<AddClient />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="tasks" element={<Tasks />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Advanced reporting and business insights" />} />
@@ -82,7 +86,7 @@ function App() {
                   <Route path="documents" element={<ComingSoon title="Documents" description="Document storage and management" />} />
                   <Route path="goals" element={<ComingSoon title="Goals" description="Set and track your business goals" />} />
                   <Route path="projects" element={<ComingSoon title="Projects" description="Project management and collaboration" />} />
-                  <Route path="team" element={<ComingSoon title="Team" description="Team management and collaboration tools" />} />
+                  <Route path="team" element={<Team />} />
                   <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
