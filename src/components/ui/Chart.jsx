@@ -11,6 +11,7 @@ const BarChart = memo(({
 }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
 
   useEffect(() => {
     if (animate) {
@@ -37,6 +38,13 @@ const BarChart = memo(({
       setAnimationProgress(1);
     }
   }, [animate, data]); // Re-animate when data changes
+
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) clearTimeout(hoverTimeout);
+    };
+  }, [hoverTimeout]);
 
   if (!data || data.length === 0) return null;
 
@@ -72,6 +80,19 @@ const BarChart = memo(({
           
           return (
             <g key={index}>
+              {/* Glow Effect Behind Bar (prevents flickering) */}
+              {hoveredBar === index && (
+                <rect
+                  x={`${x - 0.5}%`}
+                  y={y - 2}
+                  width={`${60 / data.length + 1}%`}
+                  height={animatedHeight + 4}
+                  className="fill-blue-400/15"
+                  rx="6"
+                  style={{ pointerEvents: 'none' }}
+                />
+              )}
+              
               {/* Bar Shadow for depth */}
               <rect
                 x={`${x + 0.5}%`}
@@ -80,40 +101,46 @@ const BarChart = memo(({
                 height={animatedHeight}
                 className="fill-black/10"
                 rx="4"
+                style={{ pointerEvents: 'none' }}
               />
               
-              {/* Main Bar */}
+              {/* Invisible Hover Area (larger for better UX) */}
+              <rect
+                x={`${x - 1}%`}
+                y={y - 10}
+                width={`${60 / data.length + 2}%`}
+                height={animatedHeight + 20}
+                className="fill-transparent cursor-pointer"
+                onMouseEnter={() => {
+                  if (hoverTimeout) clearTimeout(hoverTimeout);
+                  setHoveredBar(index);
+                }}
+                onMouseLeave={() => {
+                  const timeout = setTimeout(() => setHoveredBar(null), 50);
+                  setHoverTimeout(timeout);
+                }}
+                onClick={() => onBarClick?.(item, index)}
+              />
+              
+              {/* Main Bar (visual only) */}
               <rect
                 x={`${x}%`}
                 y={y}
                 width={`${60 / data.length}%`}
                 height={animatedHeight}
-                className={`transition-all duration-500 cursor-pointer transform-gpu ${
+                className={`transition-all duration-200 ${
                   hoveredBar === index 
-                    ? 'opacity-90 scale-105 drop-shadow-lg' 
-                    : 'opacity-100 scale-100'
+                    ? 'opacity-95' 
+                    : 'opacity-100'
                 } ${item.color || 'fill-blue-500'}`}
                 rx="4"
-                onMouseEnter={() => setHoveredBar(index)}
-                onMouseLeave={() => setHoveredBar(null)}
-                onClick={() => onBarClick?.(item, index)}
                 style={{
-                  filter: hoveredBar === index ? 'brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.15))' : 'none',
-                  transformOrigin: 'bottom center'
+                  filter: hoveredBar === index ? 'brightness(1.08) drop-shadow(0 2px 4px rgba(0,0,0,0.1))' : 'none',
+                  transformOrigin: 'bottom center',
+                  transform: hoveredBar === index ? 'scale(1.01)' : 'scale(1)',
+                  pointerEvents: 'none'
                 }}
               />
-              
-              {/* Animated Glow Effect on Hover */}
-              {hoveredBar === index && (
-                <rect
-                  x={`${x - 0.5}%`}
-                  y={y - 2}
-                  width={`${60 / data.length + 1}%`}
-                  height={animatedHeight + 4}
-                  className="fill-blue-400/20 animate-pulse"
-                  rx="6"
-                />
-              )}
               
               {/* Animated Value Label */}
               <text

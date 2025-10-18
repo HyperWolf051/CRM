@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 // Enhanced Components
-import { BarChart, LineChart, PieChart, ChartControls } from '../components/ui/Chart';
+import { BarChart, PieChart, ChartControls } from '../components/ui/Chart';
 import EnhancedHeader from '../components/dashboard/EnhancedHeader';
 import AdvancedMetricCard from '../components/dashboard/AdvancedMetricCard';
 import DealPipelineStep from '../components/dashboard/DealPipelineStep';
@@ -38,7 +38,9 @@ const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('30D');
   const [chartType, setChartType] = useState('bar');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDealsLoading, setIsDealsLoading] = useState(false); // Separate loading for deals
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
+  const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
 
   // Enhanced chart data with more details
   const salesData = [
@@ -50,12 +52,7 @@ const Dashboard = () => {
     { label: 'Jun', value: 41, color: 'fill-blue-400', details: 'Revenue: $41k, Profit: $11k' }
   ];
 
-  const revenueData = [
-    { label: 'Q1', value: 125000, details: 'Growth: +15%' },
-    { label: 'Q2', value: 145000, details: 'Growth: +16%' },
-    { label: 'Q3', value: 165000, details: 'Growth: +14%' },
-    { label: 'Q4', value: 185000, details: 'Growth: +12%' }
-  ];
+
 
   const statusData = [
     { label: 'Active', value: 45, color: 'text-green-500' },
@@ -212,12 +209,14 @@ const Dashboard = () => {
 
   const handleChartRefresh = () => {
     setIsLoading(true);
-    // Force re-render of chart to trigger animations
-    const currentData = [...salesData];
+    // Disable animation temporarily, then re-enable to trigger fresh animation
+    // This ensures chart only animates on explicit refresh, not on other data updates
+    setShouldAnimateChart(false);
+    
     setTimeout(() => {
       setIsLoading(false);
-      // Trigger a small state change to re-animate
-      setTimeRange(timeRange === '30D' ? '30D ' : '30D');
+      // Re-enable animation to trigger the chart animation
+      setShouldAnimateChart(true);
     }, 500);
   };
 
@@ -225,9 +224,7 @@ const Dashboard = () => {
     console.log('Bar clicked:', data, index);
   };
 
-  const handlePointClick = (data, index) => {
-    console.log('Point clicked:', data, index);
-  };
+
 
   const handleEventClick = (event) => {
     console.log('Event clicked:', event);
@@ -285,6 +282,14 @@ const Dashboard = () => {
     setCurrentPipelineStep(stepIndex);
   };
 
+  const handleDealsRefresh = () => {
+    setIsDealsLoading(true);
+    // Simulate deals refresh without affecting chart animations
+    setTimeout(() => {
+      setIsDealsLoading(false);
+    }, 1000);
+  };
+
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Enhanced Header */}
@@ -321,7 +326,7 @@ const Dashboard = () => {
                 color="from-orange-500 via-orange-600 to-orange-700"
                 onClick={() => handleMetricClick('active-jobs')}
                 sparklineData={activeJobsSparkline}
-                loading={isLoading}
+                loading={isDealsLoading}
               />
 
               {/* New Candidates Card */}
@@ -334,7 +339,7 @@ const Dashboard = () => {
                 color="from-emerald-600 via-emerald-700 to-emerald-800"
                 onClick={() => handleMetricClick('candidates')}
                 sparklineData={candidatesSparkline}
-                loading={isLoading}
+                loading={false} // Candidates not affected by deals refresh
               />
 
               {/* Pipeline Conversion Card */}
@@ -347,16 +352,16 @@ const Dashboard = () => {
                 color="from-purple-600 via-purple-700 to-purple-800"
                 onClick={() => handleMetricClick('conversion')}
                 sparklineData={[12, 15, 13, 18, 16, 18, 18]}
-                loading={isLoading}
+                loading={isDealsLoading}
               />
             </div>
           </div>
 
-          {/* Enhanced Charts Row */}
+          {/* Enhanced Charts Row - 2 Column Layout */}
           <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              {/* Interactive Sales Chart */}
+              {/* Interactive Monthly Changes Chart */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                 <ChartControls
                   timeRange={timeRange}
@@ -377,11 +382,11 @@ const Dashboard = () => {
                 </div>
                 
                 <BarChart 
-                  key={`chart-${timeRange}-${isLoading}`}
+                  key={`chart-${shouldAnimateChart}`}
                   data={salesData} 
                   height={250} 
                   onBarClick={handleBarClick}
-                  animate={true}
+                  animate={shouldAnimateChart}
                   className="mb-4" 
                 />
                 
@@ -397,39 +402,14 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Interactive Revenue Trend */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900">Revenue Trend</h2>
-                    <p className="text-sm text-gray-500">Quarterly performance</p>
-                  </div>
-                  <div className="flex items-center text-sm font-semibold text-green-600">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    +8.2%
-                  </div>
-                </div>
-                
-                <LineChart 
-                  data={revenueData} 
-                  height={250} 
-                  onPointClick={handlePointClick}
-                  animate={true}
-                  className="mb-4" 
-                />
-                
-                <div className="text-center pt-4 border-t border-gray-200">
-                  <div className="text-lg font-bold text-purple-600">$620k</div>
-                  <div className="text-xs text-gray-500">Annual Revenue</div>
-                </div>
-              </div>
-
-              {/* Deal Pipeline Stepper */}
+              {/* Enhanced Deal Pipeline */}
               <DealPipelineStep
                 steps={pipelineSteps}
                 currentStep={currentPipelineStep}
                 onStepClick={handlePipelineStepClick}
+                onRefresh={handleDealsRefresh}
                 showCounts={true}
+                loading={isDealsLoading}
               />
             </div>
           </div>
