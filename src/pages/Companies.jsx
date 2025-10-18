@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -87,6 +88,7 @@ const mockCompanies = [
 ];
 
 export default function Companies() {
+  const navigate = useNavigate();
   const [companies] = useState(mockCompanies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -202,7 +204,7 @@ export default function Companies() {
           <Button
             variant="primary"
             icon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => navigate('/app/companies/add')}
           >
             Add Client
           </Button>
@@ -370,7 +372,7 @@ export default function Companies() {
                 <Button
                   variant="primary"
                   icon={<Plus className="w-4 h-4" />}
-                  onClick={() => setIsCreateModalOpen(true)}
+                  onClick={() => navigate('/app/companies/add')}
                 >
                   Add Your First Client
                 </Button>

@@ -25,7 +25,7 @@ const EnhancedHeader = () => {
           <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
             <span className="text-xl font-bold text-white">C</span>
           </div>
-          
+
           {/* Enhanced Greeting */}
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-blue-700 to-purple-700 bg-clip-text text-transparent">
@@ -37,20 +37,20 @@ const EnhancedHeader = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Date & Time Widget */}
         <div className="text-right">
           <div className="text-lg font-semibold text-slate-900">
-            {currentTime.toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'long', 
-              day: 'numeric' 
+            {currentTime.toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric'
             })}
           </div>
           <div className="text-sm text-slate-500">
-            {currentTime.toLocaleTimeString('en-US', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {currentTime.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </div>
         </div>
