@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
 import Modal from '../components/ui/Modal';
