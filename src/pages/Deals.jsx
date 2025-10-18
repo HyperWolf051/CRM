@@ -6,7 +6,6 @@ import Button from '../components/ui/Button';
 
 export default function Deals() {
   const navigate = useNavigate();
-  
   // Mock jobs data for CRM
   const [jobs, setJobs] = useState([
     {
@@ -148,7 +147,20 @@ export default function Deals() {
   };
 
   const handleCreateJob = () => {
-    navigate('/app/jobs/new');
+    setFormData({
+      title: '',
+      company: '',
+      location: '',
+      type: 'Full-time',
+      remote: false,
+      salary: '',
+      description: '',
+      requirements: '',
+      benefits: '',
+      deadline: ''
+    });
+    setFormErrors({});
+    setIsCreateModalOpen(true);
   };
 
   const getStatusColor = (status) => {
