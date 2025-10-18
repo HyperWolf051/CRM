@@ -21,6 +21,7 @@ const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
 const AddClient = lazy(() => import('@/pages/AddClient'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const AddJob = lazy(() => import('@/pages/AddJob'));
 const Team = lazy(() => import('@/pages/Team'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
