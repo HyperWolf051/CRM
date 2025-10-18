@@ -176,28 +176,7 @@ export default function CollapsibleSidebar() {
         </div>
       </div>
 
-      {/* User Profile */}
-      <div className={`p-4 border-b border-slate-200/50 transition-all duration-500 ease-out ${
-        (isExpanded || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-      }`}>
-        {(isExpanded || isMobile) && (
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-xs font-semibold text-white">
-                {user?.name?.charAt(0) || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
-                {user?.name || 'User'}
-              </p>
-              <p className="text-xs text-slate-500 truncate">
-                {user?.email || 'user@example.com'}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+
 
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
