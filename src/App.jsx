@@ -18,7 +18,11 @@ const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
 const Candidates = lazy(() => import('@/pages/Candidates'));
 const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
+<<<<<<< Updated upstream
 const AddClient = lazy(() => import('@/pages/AddClient'));
+=======
+const Jobs = lazy(() => import('@/pages/Jobs'));
+>>>>>>> Stashed changes
 const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
@@ -57,12 +61,12 @@ function App() {
               <Routes>
                 {/* Root redirect */}
                 <Route path="/" element={<RootRedirect />} />
-                
+
                 {/* Auth routes */}
                 <Route element={<AuthLayout />}>
                   <Route path="/login" element={<Login />} />
                 </Route>
-                
+
                 {/* Protected app routes */}
                 <Route path="/app" element={
                   <ProtectedRoute>
@@ -75,7 +79,12 @@ function App() {
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
                   <Route path="deals" element={<Deals />} />
+<<<<<<< Updated upstream
                   <Route path="deals/add" element={<AddJob />} />
+=======
+                  <Route path="jobs" element={<Jobs />} />
+                  <Route path="jobs/new" element={<AddJob />} />
+>>>>>>> Stashed changes
                   <Route path="companies" element={<Companies />} />
                   <Route path="companies/add" element={<AddClient />} />
                   <Route path="calendar" element={<Calendar />} />
@@ -90,7 +99,7 @@ function App() {
                   <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
-                
+
                 {/* 404 Not Found */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -117,3 +117,21 @@ export const formatPercentage = (value, isDecimal = false) => {
   const percentage = isDecimal ? value * 100 : value;
   return `${percentage.toFixed(1)}%`;
 };
+/**
+ * Formats a number as compact currency (e.g., $1.2M, $500K)
+ * @param {number} amount - Amount to format
+ * @param {string} currency - Currency code (default: 'USD')
+ * @returns {string} - Formatted compact currency string
+ */
+export const formatCompactCurrency = (amount, currency = 'USD') => {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '$0';
+  }
+  
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(amount);
+};

@@ -1,795 +1,745 @@
-import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe, MoreHorizontal, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { useState } from 'react';
+import {
+  Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp,
+  Phone, Mail, Globe, MapPin, Grid3X3, List, ArrowUpRight, Target, Star,
+  MoreVertical, Eye, Edit, Trash2, Calendar, Briefcase
+} from 'lucide-react';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
-import SkeletonLoader from '../components/ui/SkeletonLoader';
-
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, formatCompactCurrency } from '../utils/formatters';
 
 // Mock companies data
 const mockCompanies = [
   {
     id: '1',
-    name: 'TechCorp Inc.',
+    name: 'TechCorp Solutions',
     industry: 'Technology',
-    size: '500-1000',
-    revenue: 50000000,
+    size: '100-500',
+    revenue: 2500000,
+    status: 'customer',
+    contactsCount: 12,
+    totalDealsValue: 450000,
+    location: 'San Francisco, CA',
     website: 'https://techcorp.com',
     phone: '+1 (555) 123-4567',
     email: 'contact@techcorp.com',
-    address: '123 Tech Street, San Francisco, CA 94105',
-    status: 'active',
-    contactsCount: 15,
-    dealsCount: 8,
-    totalDealsValue: 450000,
     logo: null,
-    createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Major technology company, potential for large enterprise deals.'
+    description: 'Leading technology solutions provider specializing in enterprise software development.',
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: 'Key client with high growth potential. Regular monthly meetings scheduled.',
+    growth: '+24%',
+    priority: 'high',
+    rating: 4.8
   },
   {
     id: '2',
-    name: 'Innovate Solutions',
-    industry: 'Consulting',
-    size: '100-500',
+    name: 'Global Manufacturing Inc',
+    industry: 'Manufacturing',
+    size: '1000+',
     revenue: 15000000,
-    website: 'https://innovatesolutions.com',
-    phone: '+1 (555) 987-6543',
-    email: 'hello@innovatesolutions.com',
-    address: '456 Innovation Ave, Austin, TX 78701',
-    status: 'prospect',
+    status: 'active',
     contactsCount: 8,
-    dealsCount: 3,
-    totalDealsValue: 125000,
+    totalDealsValue: 1200000,
+    location: 'Detroit, MI',
+    website: 'https://globalmanufacturing.com',
+    phone: '+1 (555) 987-6543',
+    email: 'info@globalmanufacturing.com',
     logo: null,
-    createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Growing consulting firm, interested in our automation solutions.'
+    description: 'Large-scale manufacturing company with operations across North America.',
+    createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: 'Established partnership, looking to expand services.',
+    growth: '+12%',
+    priority: 'medium',
+    rating: 4.5
   },
   {
     id: '3',
     name: 'StartupXYZ',
-    industry: 'Fintech',
+    industry: 'Technology',
     size: '10-50',
-    revenue: 2000000,
+    revenue: 500000,
+    status: 'prospect',
+    contactsCount: 3,
+    totalDealsValue: 75000,
+    location: 'Austin, TX',
     website: 'https://startupxyz.com',
     phone: '+1 (555) 456-7890',
-    email: 'team@startupxyz.com',
-    address: '789 Startup Blvd, New York, NY 10001',
-    status: 'lead',
-    contactsCount: 5,
-    dealsCount: 2,
-    totalDealsValue: 75000,
+    email: 'hello@startupxyz.com',
     logo: null,
-    createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Fast-growing fintech startup, budget-conscious but high potential.'
-  },
-  {
-    id: '4',
-    name: 'Global Tech',
-    industry: 'Manufacturing',
-    size: '1000+',
-    revenue: 200000000,
-    website: 'https://globaltech.com',
-    phone: '+1 (555) 321-0987',
-    email: 'info@globaltech.com',
-    address: '321 Global Way, Chicago, IL 60601',
-    status: 'customer',
-    contactsCount: 25,
-    dealsCount: 12,
-    totalDealsValue: 850000,
-    logo: null,
-    createdAt: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Long-term customer, excellent relationship, regular repeat business.'
+    description: 'Innovative startup focused on AI-powered business solutions.',
+    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: 'High potential prospect, currently in negotiation phase.',
+    growth: '+45%',
+    priority: 'high',
+    rating: 4.2
   }
 ];
 
 export default function Companies() {
-  const navigate = useNavigate();
   const [companies] = useState(mockCompanies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState('all');
-  const [selectedSize, setSelectedSize] = useState('all');
-  const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [newCompany, setNewCompany] = useState({
     name: '',
     industry: '',
     size: '',
     revenue: '',
+    location: '',
     website: '',
     phone: '',
     email: '',
-    address: '',
-    notes: ''
+    description: ''
   });
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [sortField, setSortField] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
 
-  // Company statuses and filters
+  // Company statuses
   const companyStatuses = [
     { id: 'all', name: 'All', count: companies.length, color: 'bg-gray-100 text-gray-800' },
-    { id: 'lead', name: 'Lead', count: companies.filter(c => c.status === 'lead').length, color: 'bg-blue-100 text-blue-800' },
-    { id: 'prospect', name: 'Prospect', count: companies.filter(c => c.status === 'prospect').length, color: 'bg-yellow-100 text-yellow-800' },
-    { id: 'customer', name: 'Customer', count: companies.filter(c => c.status === 'customer').length, color: 'bg-green-100 text-green-800' },
-    { id: 'active', name: 'Active', count: companies.filter(c => c.status === 'active').length, color: 'bg-purple-100 text-purple-800' },
+    { id: 'customer', name: 'Customers', count: companies.filter(c => c.status === 'customer').length, color: 'bg-green-100 text-green-800' },
+    { id: 'active', name: 'Active', count: companies.filter(c => c.status === 'active').length, color: 'bg-blue-100 text-blue-800' },
+    { id: 'prospect', name: 'Prospects', count: companies.filter(c => c.status === 'prospect').length, color: 'bg-yellow-100 text-yellow-800' },
   ];
 
   const industries = [
     { id: 'all', name: 'All Industries' },
     { id: 'Technology', name: 'Technology' },
-    { id: 'Consulting', name: 'Consulting' },
-    { id: 'Fintech', name: 'Fintech' },
     { id: 'Manufacturing', name: 'Manufacturing' },
     { id: 'Healthcare', name: 'Healthcare' },
+    { id: 'Finance', name: 'Finance' },
     { id: 'Education', name: 'Education' }
   ];
 
-  const companySizes = [
-    { id: 'all', name: 'All Sizes' },
-    { id: '1-10', name: '1-10 employees' },
-    { id: '10-50', name: '10-50 employees' },
-    { id: '100-500', name: '100-500 employees' },
-    { id: '500-1000', name: '500-1000 employees' },
-    { id: '1000+', name: '1000+ employees' }
-  ];
-
-  // Filter and sort companies
-  const filteredCompanies = companies
-    .filter(company => {
-      const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.industry.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = selectedStatus === 'all' || company.status === selectedStatus;
-      const matchesIndustry = selectedIndustry === 'all' || company.industry === selectedIndustry;
-      const matchesSize = selectedSize === 'all' || company.size === selectedSize;
-      return matchesSearch && matchesStatus && matchesIndustry && matchesSize;
-    })
-    .sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
-      
-      // Handle different data types
-      if (sortField === 'revenue' || sortField === 'contactsCount' || sortField === 'dealsCount' || sortField === 'totalDealsValue') {
-        aValue = Number(aValue);
-        bValue = Number(bValue);
-      } else if (typeof aValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
-      
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
+  // Filter companies
+  const filteredCompanies = companies.filter(company => {
+    const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = selectedStatus === 'all' || company.status === selectedStatus;
+    const matchesIndustry = selectedIndustry === 'all' || company.industry === selectedIndustry;
+    return matchesSearch && matchesStatus && matchesIndustry;
+  });
 
   // Calculate metrics
   const totalRevenue = companies.reduce((sum, company) => sum + company.revenue, 0);
   const totalContacts = companies.reduce((sum, company) => sum + company.contactsCount, 0);
-  const totalDeals = companies.reduce((sum, company) => sum + company.dealsCount, 0);
-  const avgCompanyValue = companies.length ? totalRevenue / companies.length : 0;
+  const totalDealsValue = companies.reduce((sum, company) => sum + company.totalDealsValue, 0);
 
   const handleCompanyClick = (company) => {
     setSelectedCompany(company);
     setIsDetailsModalOpen(true);
   };
 
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const getSortIcon = (field) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />;
-    }
-    return sortDirection === 'asc' 
-      ? <ArrowUp className="w-4 h-4 text-blue-600" />
-      : <ArrowDown className="w-4 h-4 text-blue-600" />;
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenDropdown(null);
+  const getStatusBadge = (status) => {
+    const variants = {
+      customer: 'success',
+      active: 'info',
+      prospect: 'warning'
     };
+    return variants[status] || 'default';
+  };
 
-    if (openDropdown) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [openDropdown]);
+  const getPriorityColor = (priority) => {
+    const colors = {
+      high: 'text-red-600 bg-red-50 border-red-200',
+      medium: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+      low: 'text-green-600 bg-green-50 border-green-200'
+    };
+    return colors[priority] || 'text-gray-600 bg-gray-50 border-gray-200';
+  };
 
-  const handleAddCompany = () => {
+  const handleCreateCompany = () => {
     if (!newCompany.name || !newCompany.industry) {
       alert('Please fill in all required fields');
       return;
     }
 
-    const company = {
-      id: (Math.max(...companies.map(c => parseInt(c.id))) + 1).toString(),
-      ...newCompany,
-      revenue: parseInt(newCompany.revenue) || 0,
-      status: 'lead',
-      contactsCount: 0,
-      dealsCount: 0,
-      totalDealsValue: 0,
-      logo: null,
-      createdAt: new Date().toISOString()
-    };
-
-    alert('Client added successfully!');
-
-    setNewCompany({
-      name: '', industry: '', size: '', revenue: '', website: '',
-      phone: '', email: '', address: '', notes: ''
-    });
+    console.log('Creating company:', newCompany);
     setIsCreateModalOpen(false);
+    setNewCompany({
+      name: '',
+      industry: '',
+      size: '',
+      revenue: '',
+      location: '',
+      website: '',
+      phone: '',
+      email: '',
+      description: ''
+    });
+  };
+
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+      />
+    ));
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="space-y-6 animate-fade-in">
-        {/* Header with Metrics */}
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="min-h-screen bg-white">
+      {/* Modern Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Top Section */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Clients
-              </h1>
-              <p className="text-gray-600 mt-1">Manage your client relationships and accounts</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Client Management</h1>
+              <p className="text-gray-600">Manage your business relationships and track performance</p>
             </div>
-            <Button
-              variant="primary"
-              icon={<Plus className="w-4 h-4" />}
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              Add Client
-            </Button>
-          </div>
-
-          {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Clients</p>
-                  <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Contacts</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalContacts}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Company Value</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgCompanyValue)}</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                icon={<Download className="w-4 h-4" />}
+              >
+                Export
+              </Button>
+              <Button
+                variant="primary"
+                className="bg-blue-600 hover:bg-blue-700"
+                icon={<Plus className="w-4 h-4" />}
+                onClick={() => setIsCreateModalOpen(true)}
+              >
+                Add Client
+              </Button>
             </div>
           </div>
 
-          {/* Filters and Search */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex flex-col gap-4 mb-6">
-              {/* Status Filters */}
-              <div className="flex flex-wrap gap-2">
-                {companyStatuses.map((status) => (
-                  <button
-                    key={status.id}
-                    onClick={() => setSelectedStatus(status.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedStatus === status.id
-                        ? status.color + ' shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    {status.name} ({status.count})
-                  </button>
-                ))}
-              </div>
-
-              {/* Search and Advanced Filters */}
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search clients, industries..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 w-full"
-                  />
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-600 text-sm font-medium">Total Clients</p>
+                  <p className="text-3xl font-bold text-blue-900">{companies.length}</p>
+                  <p className="text-blue-600 text-sm">+12% this month</p>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${showFilters ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    <Filter className="w-4 h-4" />
-                    <span>Filters</span>
-                  </button>
-                  <button className="px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Export</span>
-                  </button>
+                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-white" />
                 </div>
               </div>
-
-              {/* Advanced Filters */}
-              {showFilters && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                    <select
-                      value={selectedIndustry}
-                      onChange={(e) => setSelectedIndustry(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
-                    >
-                      {industries.map((industry) => (
-                        <option key={industry.id} value={industry.id}>{industry.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
-                    <select
-                      value={selectedSize}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
-                    >
-                      {companySizes.map((size) => (
-                        <option key={size.id} value={size.id}>{size.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-end">
-                    <button
-                      onClick={() => {
-                        setSelectedIndustry('all');
-                        setSelectedSize('all');
-                        setSearchTerm('');
-                      }}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200"
-                    >
-                      Clear Filters
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Clients Table */}
-            {isLoading ? (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
-                <div className="animate-pulse">
-                  <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 p-4">
-                    <div className="flex space-x-4">
-                      <div className="h-4 bg-slate-300 rounded w-20"></div>
-                      <div className="h-4 bg-slate-300 rounded w-24"></div>
-                      <div className="h-4 bg-slate-300 rounded w-16"></div>
-                      <div className="h-4 bg-slate-300 rounded w-20"></div>
-                      <div className="h-4 bg-slate-300 rounded w-16"></div>
-                      <div className="h-4 bg-slate-300 rounded w-20"></div>
-                      <div className="h-4 bg-slate-300 rounded w-16"></div>
-                    </div>
-                  </div>
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="border-b border-slate-100 p-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-slate-300 rounded-full"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-slate-300 rounded w-32"></div>
-                          <div className="h-3 bg-slate-200 rounded w-24"></div>
-                        </div>
-                        <div className="h-6 bg-slate-300 rounded-full w-20"></div>
-                        <div className="h-4 bg-slate-300 rounded w-16"></div>
-                        <div className="h-6 bg-slate-300 rounded w-24"></div>
-                        <div className="h-6 bg-slate-300 rounded-full w-16"></div>
-                        <div className="w-8 h-8 bg-slate-300 rounded-full"></div>
-                      </div>
-                    </div>
-                  ))}
+            <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-600 text-sm font-medium">Total Revenue</p>
+                  <p className="text-3xl font-bold text-green-900">{formatCompactCurrency(totalRevenue)}</p>
+                  <p className="text-green-600 text-sm">+18% growth</p>
+                </div>
+                <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-white" />
                 </div>
               </div>
-            ) : filteredCompanies.length === 0 ? (
-              <EmptyState
-                icon={<Building2 className="w-16 h-16" />}
-                title="No clients found"
-                description={
-                  searchTerm || selectedStatus !== 'all' || selectedIndustry !== 'all' || selectedSize !== 'all'
-                    ? "No clients match your current filters. Try adjusting your search criteria."
-                    : "You haven't added any clients yet. Start building your client database by adding your first client."
-                }
-                action={
-                  <Button
-                    variant="primary"
-                    icon={<Plus className="w-4 h-4" />}
-                    onClick={() => setIsCreateModalOpen(true)}
-                  >
-                    Add Your First Client
-                  </Button>
-                }
-              />
-            ) : (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
-                {/* Results Counter */}
-                <div className="px-6 py-4 bg-gradient-to-r from-slate-50/50 to-white border-b border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-slate-600">
-                      Showing <span className="font-semibold text-slate-900">{filteredCompanies.length}</span> of <span className="font-semibold text-slate-900">{companies.length}</span> clients
-                    </div>
-                    <div className="text-xs text-slate-500 hidden sm:block">
-                      Sorted by {sortField} ({sortDirection === 'asc' ? 'ascending' : 'descending'})
-                    </div>
-                  </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-600 text-sm font-medium">Active Contacts</p>
+                  <p className="text-3xl font-bold text-purple-900">{totalContacts}</p>
+                  <p className="text-purple-600 text-sm">Across all clients</p>
                 </div>
-                
-                {/* Mobile Card View - Hidden on larger screens */}
-                <div className="block sm:hidden">
-                  {filteredCompanies.map((company, index) => (
-                    <div
-                      key={company.id}
-                      className={`p-4 border-b border-slate-100 cursor-pointer transition-all duration-200 ${
-                        index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
-                      } hover:bg-blue-50/50 active:bg-blue-100/50`}
-                      onClick={() => handleCompanyClick(company)}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="relative flex-shrink-0">
-                          <Avatar
-                            src={company.logo}
-                            name={company.name}
-                            size="md"
-                          />
-                          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-900 text-base truncate">{company.name}</h3>
-                            <div className="flex items-center space-x-1 ml-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                company.status === 'customer' ? 'bg-green-400' :
-                                company.status === 'active' ? 'bg-blue-400' :
-                                company.status === 'prospect' ? 'bg-yellow-400' : 'bg-gray-400'
-                              }`}></div>
-                              <Badge
-                                variant={
-                                  company.status === 'customer' ? 'success' :
-                                  company.status === 'active' ? 'info' :
-                                  company.status === 'prospect' ? 'warning' : 'default'
-                                }
-                                size="sm"
-                              >
-                                {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="mt-1 space-y-1">
-                            <div className="text-sm text-slate-600">{company.industry} • {company.size}</div>
-                            <div className="text-sm font-semibold text-emerald-600">{formatCurrency(company.revenue)}</div>
-                            <div className="flex items-center space-x-4 text-xs text-slate-500">
-                              <span className="flex items-center space-x-1">
-                                <Users className="w-3 h-3" />
-                                <span>{company.contactsCount} contacts</span>
-                              </span>
-                              <span className="flex items-center space-x-1">
-                                <DollarSign className="w-3 h-3" />
-                                <span>{company.dealsCount} deals</span>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Desktop Table View - Hidden on mobile */}
-                <div className="hidden sm:block w-full">
-                  <table className="w-full table-fixed">
-                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
-                      <tr>
-                        <th className="text-left py-4 px-3 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/4">
-                          <button
-                            onClick={() => handleSort('name')}
-                            className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <Building2 className="w-4 h-4 text-slate-600" />
-                            <span>Client</span>
-                            {getSortIcon('name')}
-                          </button>
-                        </th>
-                        <th className="text-left py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/6 hidden md:table-cell">
-                          <button
-                            onClick={() => handleSort('industry')}
-                            className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <Users className="w-4 h-4 text-slate-600" />
-                            <span>Industry</span>
-                            {getSortIcon('industry')}
-                          </button>
-                        </th>
-                        <th className="text-left py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/8 hidden lg:table-cell">
-                          <button
-                            onClick={() => handleSort('size')}
-                            className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <span>Size</span>
-                            {getSortIcon('size')}
-                          </button>
-                        </th>
-                        <th className="text-left py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/6">
-                          <button
-                            onClick={() => handleSort('revenue')}
-                            className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <DollarSign className="w-4 h-4 text-slate-600" />
-                            <span>Revenue</span>
-                            {getSortIcon('revenue')}
-                          </button>
-                        </th>
-                        <th className="text-left py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/8">
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <span>Status</span>
-                            {getSortIcon('status')}
-                          </button>
-                        </th>
-                        <th className="text-center py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/12 hidden sm:table-cell">
-                          <button
-                            onClick={() => handleSort('contactsCount')}
-                            className="flex items-center justify-center space-x-1 hover:text-blue-600 transition-colors group w-full"
-                          >
-                            <Users className="w-4 h-4 text-slate-600" />
-                            {getSortIcon('contactsCount')}
-                          </button>
-                        </th>
-                        <th className="text-center py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/12 hidden sm:table-cell">
-                          <button
-                            onClick={() => handleSort('totalDealsValue')}
-                            className="flex items-center justify-center space-x-1 hover:text-blue-600 transition-colors group w-full"
-                          >
-                            <DollarSign className="w-4 h-4 text-slate-600" />
-                            {getSortIcon('totalDealsValue')}
-                          </button>
-                        </th>
-                        <th className="text-center py-4 px-2 font-semibold text-slate-800 text-sm uppercase tracking-wide w-1/12">
-                          <MoreHorizontal className="w-4 h-4 mx-auto text-slate-600" />
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredCompanies.map((company, index) => (
-                        <tr
-                          key={company.id}
-                          className={`cursor-pointer transition-all duration-300 group ${
-                            index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
-                          } hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 hover:shadow-md hover:scale-[1.01] hover:border-blue-200 border border-transparent`}
-                          onClick={() => handleCompanyClick(company)}
-                        >
-                          <td className="py-4 px-3">
-                            <div className="flex items-center space-x-3">
-                              <div className="relative flex-shrink-0">
-                                <Avatar
-                                  src={company.logo}
-                                  name={company.name}
-                                  size="sm"
-                                />
-                                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></div>
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="font-semibold text-slate-900 text-sm group-hover:text-blue-700 transition-colors truncate">
-                                  {company.name}
-                                </div>
-                                <div className="text-xs text-slate-500 truncate sm:hidden">
-                                  {company.industry}
-                                </div>
-                                <div className="text-xs text-slate-500 truncate hidden sm:block">
-                                  <Globe className="w-3 h-3 inline mr-1" />
-                                  {company.website}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-2 hidden md:table-cell">
-                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
-                              {company.industry}
-                            </div>
-                          </td>
-                          <td className="py-4 px-2 hidden lg:table-cell">
-                            <div className="text-slate-700 font-medium text-sm">{company.size}</div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="font-bold text-emerald-600 text-sm">
-                              {formatCurrency(company.revenue)}
-                            </div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="flex items-center space-x-1">
-                              <div className={`w-2 h-2 rounded-full ${
-                                company.status === 'customer' ? 'bg-green-400' :
-                                company.status === 'active' ? 'bg-blue-400' :
-                                company.status === 'prospect' ? 'bg-yellow-400' : 'bg-gray-400'
-                              } animate-pulse`}></div>
-                              <Badge
-                                variant={
-                                  company.status === 'customer' ? 'success' :
-                                  company.status === 'active' ? 'info' :
-                                  company.status === 'prospect' ? 'warning' : 'default'
-                                }
-                                size="sm"
-                              >
-                                {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                              </Badge>
-                            </div>
-                          </td>
-                          <td className="py-4 px-2 text-center hidden sm:table-cell">
-                            <div className="flex items-center justify-center space-x-1">
-                              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Users className="w-3 h-3 text-blue-600" />
-                              </div>
-                              <span className="font-semibold text-slate-900 text-sm">{company.contactsCount}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-2 text-center hidden sm:table-cell">
-                            <div className="space-y-1">
-                              <div className="font-semibold text-slate-900 text-xs">{company.dealsCount}</div>
-                              <div className="text-xs text-emerald-600 font-medium">{formatCurrency(company.totalDealsValue)}</div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-2 text-center">
-                            <div className="relative">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenDropdown(openDropdown === company.id ? null : company.id);
-                                }}
-                                className="inline-flex items-center justify-center w-8 h-8 text-slate-600 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200 group"
-                              >
-                                <MoreHorizontal className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-                              </button>
-
-                              {openDropdown === company.id && (
-                                <div className="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 z-30 overflow-hidden">
-                                  <div className="py-3">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCompanyClick(company);
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-200 group"
-                                    >
-                                      <div className="w-8 h-8 rounded-xl bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center mr-3 transition-all duration-200">
-                                        <Eye className="w-4 h-4 text-blue-600" />
-                                      </div>
-                                      <div className="flex-1 text-left">
-                                        <div className="font-semibold text-slate-900 group-hover:text-blue-700">View Details</div>
-                                        <div className="text-xs text-slate-500 group-hover:text-blue-600">See complete information</div>
-                                      </div>
-                                    </button>
-
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Handle edit
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:text-emerald-700 transition-all duration-200 group"
-                                    >
-                                      <div className="w-8 h-8 rounded-lg bg-emerald-100 group-hover:bg-emerald-200 flex items-center justify-center mr-3 transition-colors duration-200">
-                                        <Edit className="w-4 h-4 text-emerald-600" />
-                                      </div>
-                                      <div className="flex-1 text-left">
-                                        <div className="font-medium">Edit Client</div>
-                                        <div className="text-xs text-slate-500 group-hover:text-emerald-600">Modify information</div>
-                                      </div>
-                                    </button>
-
-                                    <div className="border-t border-slate-200 my-2"></div>
-
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Handle delete
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 hover:text-red-700 transition-all duration-200 group"
-                                    >
-                                      <div className="w-8 h-8 rounded-lg bg-red-100 group-hover:bg-red-200 flex items-center justify-center mr-3 transition-colors duration-200">
-                                        <Trash2 className="w-4 h-4 text-red-600" />
-                                      </div>
-                                      <div className="flex-1 text-left">
-                                        <div className="font-medium">Delete Client</div>
-                                        <div className="text-xs text-slate-500 group-hover:text-red-600">Remove permanently</div>
-                                      </div>
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                {/* Table Footer with Summary */}
-                <div className="px-6 py-4 bg-gradient-to-r from-slate-50/50 to-white border-t border-slate-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-center space-x-6 text-sm text-slate-600">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                        <span>Total Revenue: <span className="font-semibold text-emerald-600">{formatCurrency(filteredCompanies.reduce((sum, c) => sum + c.revenue, 0))}</span></span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                        <span>Total Contacts: <span className="font-semibold text-blue-600">{filteredCompanies.reduce((sum, c) => sum + c.contactsCount, 0)}</span></span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        <span>Total Deals: <span className="font-semibold text-purple-600">{filteredCompanies.reduce((sum, c) => sum + c.dealsCount, 0)}</span></span>
-                      </div>
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      Last updated: {new Date().toLocaleDateString()}
-                    </div>
-                  </div>
+                <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
                 </div>
               </div>
-            )}
+            </div>
+
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-6 border border-orange-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-600 text-sm font-medium">Pipeline Value</p>
+                  <p className="text-3xl font-bold text-orange-900">{formatCompactCurrency(totalDealsValue)}</p>
+                  <p className="text-orange-600 text-sm">Active deals</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Search and Filters */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search clients..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex items-center space-x-4">
+              <select
+                value={selectedIndustry}
+                onChange={(e) => setSelectedIndustry(e.target.value)}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {industries.map((industry) => (
+                  <option key={industry.id} value={industry.id}>{industry.name}</option>
+                ))}
+              </select>
+
+              {/* View Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'grid' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Filters */}
+          <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-gray-200">
+            {companyStatuses.map((status) => (
+              <button
+                key={status.id}
+                onClick={() => setSelectedStatus(status.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedStatus === status.id
+                    ? 'bg-blue-600 text-white'
+                    : `${status.color} hover:bg-opacity-80`
+                }`}
+              >
+                {status.name} ({status.count})
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Companies Display */}
+        {filteredCompanies.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
+            <EmptyState
+              icon={<Building2 className="w-16 h-16" />}
+              title="No clients found"
+              description="No clients match your current filters. Try adjusting your search criteria."
+              action={
+                <Button
+                  variant="primary"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  icon={<Plus className="w-5 h-5" />}
+                  onClick={() => setIsCreateModalOpen(true)}
+                >
+                  Add Your First Client
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          <div className={`${
+            viewMode === 'grid' 
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+              : 'space-y-4'
+          }`}>
+            {filteredCompanies.map((company) => (
+              viewMode === 'grid' ? (
+                // Grid Card View
+                <div
+                  key={company.id}
+                  className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                  onClick={() => handleCompanyClick(company)}
+                >
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <Avatar
+                        src={company.logo}
+                        name={company.name}
+                        size="md"
+                        className="ring-2 ring-gray-100"
+                      />
+                      <div>
+                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {company.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">{company.industry}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveDropdown(activeDropdown === company.id ? null : company.id);
+                        }}
+                        className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                      
+                      {activeDropdown === company.id && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                          <div className="py-1">
+                            <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                              <Eye className="w-4 h-4 mr-3" />
+                              View Details
+                            </button>
+                            <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                              <Edit className="w-4 h-4 mr-3" />
+                              Edit Client
+                            </button>
+                            <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                              <Trash2 className="w-4 h-4 mr-3" />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Status and Priority */}
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge variant={getStatusBadge(company.status)}>
+                      {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
+                    </Badge>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(company.priority)}`}>
+                      {company.priority.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Company Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      {company.location}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Users className="w-4 h-4 mr-2" />
+                      {company.contactsCount} contacts
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Briefcase className="w-4 h-4 mr-2" />
+                      {company.size} employees
+                    </div>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="flex items-center">
+                      {renderStars(company.rating)}
+                    </div>
+                    <span className="text-sm text-gray-600">{company.rating}</span>
+                  </div>
+
+                  {/* Revenue and Growth */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Revenue</p>
+                        <p className="text-lg font-semibold text-gray-900">{formatCompactCurrency(company.revenue)}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center text-green-600">
+                          <TrendingUp className="w-4 h-4 mr-1" />
+                          <span className="font-semibold">{company.growth}</span>
+                        </div>
+                        <p className="text-xs text-gray-500">growth</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // List View
+                <div
+                  key={company.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-300 cursor-pointer"
+                  onClick={() => handleCompanyClick(company)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <Avatar
+                        src={company.logo}
+                        name={company.name}
+                        size="sm"
+                        className="ring-2 ring-gray-100"
+                      />
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{company.name}</h3>
+                        <p className="text-sm text-gray-600">{company.industry} • {company.location}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-6">
+                      <Badge variant={getStatusBadge(company.status)}>
+                        {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
+                      </Badge>
+                      
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900">{formatCompactCurrency(company.revenue)}</p>
+                        <div className="flex items-center text-green-600">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          <span className="text-sm">{company.growth}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        {renderStars(company.rating)}
+                        <span className="ml-2 text-sm text-gray-600">{company.rating}</span>
+                      </div>
+                      
+                      <ArrowUpRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Company Details Modal */}
+      {isDetailsModalOpen && selectedCompany && (
+        <Modal
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          title={selectedCompany.name}
+        >
+          <div className="space-y-6">
+            {/* Company Header */}
+            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+              <Avatar
+                src={selectedCompany.logo}
+                name={selectedCompany.name}
+                size="lg"
+              />
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-gray-900">{selectedCompany.name}</h2>
+                <p className="text-gray-600">{selectedCompany.industry}</p>
+                <div className="flex items-center space-x-4 mt-2">
+                  <Badge variant={getStatusBadge(selectedCompany.status)}>
+                    {selectedCompany.status.charAt(0).toUpperCase() + selectedCompany.status.slice(1)}
+                  </Badge>
+                  <div className="flex items-center">
+                    {renderStars(selectedCompany.rating)}
+                    <span className="ml-2 text-sm text-gray-600">{selectedCompany.rating}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900">Contact Information</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">{selectedCompany.email}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">{selectedCompany.phone}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Globe className="w-4 h-4 text-gray-400" />
+                    <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800">
+                      {selectedCompany.website}
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">{selectedCompany.location}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900">Business Metrics</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Annual Revenue:</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(selectedCompany.revenue)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Total Contacts:</span>
+                    <span className="font-semibold text-gray-900">{selectedCompany.contactsCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Deal Value:</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(selectedCompany.totalDealsValue)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Growth Rate:</span>
+                    <span className="font-semibold text-green-600">{selectedCompany.growth}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Client Since:</span>
+                    <span className="font-semibold text-gray-900">{new Date(selectedCompany.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            {selectedCompany.description && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+                <p className="text-gray-600">{selectedCompany.description}</p>
+              </div>
+            )}
+
+            {/* Notes */}
+            {selectedCompany.notes && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Notes</h3>
+                <p className="text-gray-600">{selectedCompany.notes}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={() => setIsDetailsModalOpen(false)}>
+                Close
+              </Button>
+              <Button variant="primary" className="bg-blue-600 hover:bg-blue-700">
+                Edit Client
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Create Company Modal */}
+      {isCreateModalOpen && (
+        <Modal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          title="Add New Client"
+        >
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                <input
+                  type="text"
+                  value={newCompany.name}
+                  onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter company name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
+                <select
+                  value={newCompany.industry}
+                  onChange={(e) => setNewCompany({ ...newCompany, industry: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select industry</option>
+                  {industries.slice(1).map((industry) => (
+                    <option key={industry.id} value={industry.id}>{industry.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  value={newCompany.location}
+                  onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter location"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input
+                  type="url"
+                  value={newCompany.website}
+                  onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  value={newCompany.phone}
+                  onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={newCompany.email}
+                  onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="contact@company.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                value={newCompany.description}
+                onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Brief description of the company..."
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" className="bg-blue-600 hover:bg-blue-700" onClick={handleCreateCompany}>
+                Add Client
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

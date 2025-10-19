@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -514,3 +515,272 @@ const AddJob = () => {
 };
 
 export default AddJob;
+=======
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Briefcase,
+  Building,
+  MapPin,
+  DollarSign,
+  Calendar,
+  Users,
+  FileText,
+  Save,
+  X
+} from 'lucide-react';
+import Button from '../components/ui/Button';
+
+export default function AddJob() {
+  const navigate = useNavigate();
+  const [jobData, setJobData] = useState({
+    title: '',
+    company: '',
+    location: '',
+    type: 'full-time',
+    salary: '',
+    description: '',
+    requirements: '',
+    deadline: '',
+    status: 'draft'
+  });
+
+  const handleInputChange = (field, value) => {
+    setJobData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Creating job:', jobData);
+    // Here you would typically save to your backend
+    alert('Job created successfully!');
+    navigate('/app/jobs');
+  };
+
+  const handleCancel = () => {
+    navigate('/app/jobs');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Create New Job</h1>
+                <p className="text-gray-600">Add a new job posting to your recruitment pipeline</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="px-4 py-2 text-gray-700 border-gray-300 hover:bg-gray-50 transition-all duration-200"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                className="bg-blue-600 hover:bg-blue-700 px-4 py-2"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Create Job
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {/* Basic Information */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                <Briefcase className="w-5 h-5 mr-2 text-blue-600" />
+                Basic Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={jobData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. Senior Software Engineer"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Company *
+                  </label>
+                  <input
+                    type="text"
+                    value={jobData.company}
+                    onChange={(e) => handleInputChange('company', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. TechCorp Solutions"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={jobData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. San Francisco, CA"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Type
+                  </label>
+                  <select
+                    value={jobData.type}
+                    onChange={(e) => handleInputChange('type', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="full-time">Full-time</option>
+                    <option value="part-time">Part-time</option>
+                    <option value="contract">Contract</option>
+                    <option value="freelance">Freelance</option>
+                    <option value="internship">Internship</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Salary Range
+                  </label>
+                  <input
+                    type="text"
+                    value={jobData.salary}
+                    onChange={(e) => handleInputChange('salary', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. $80,000 - $120,000"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Application Deadline
+                  </label>
+                  <input
+                    type="date"
+                    value={jobData.deadline}
+                    onChange={(e) => handleInputChange('deadline', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Job Description */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Job Details
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Description *
+                  </label>
+                  <textarea
+                    value={jobData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    rows={6}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Describe the role, responsibilities, and what the candidate will be doing..."
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Requirements & Qualifications
+                  </label>
+                  <textarea
+                    value={jobData.requirements}
+                    onChange={(e) => handleInputChange('requirements', e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="List the required skills, experience, education, etc..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Publication Status
+              </h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={jobData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className="w-full max-w-xs px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                className="px-6 py-2 text-gray-700 border-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                className="bg-blue-600 hover:bg-blue-700 px-6 py-2"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Create Job
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+>>>>>>> Stashed changes
