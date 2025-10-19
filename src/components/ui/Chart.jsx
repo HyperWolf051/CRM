@@ -261,14 +261,20 @@ const LineChart = memo(({
   const minValue = Math.min(...data.map(d => d.value));
   const range = maxValue - minValue || 1;
   
-  // Compact padding for smaller chart size
-  const chartPadding = { top: 15, right: 15, bottom: 35, left: 45 };
-  const chartWidth = 100 - ((chartPadding.left + chartPadding.right) / height * 100);
+  // Optimized padding for wide rectangular chart
+  const chartPadding = { top: 25, right: 25, bottom: 30, left: 45 };
   const chartHeight = height - chartPadding.top - chartPadding.bottom;
   
+  // Set Y-axis range from 35k to 75k as specified
+  const minDisplayValue = 35;
+  const maxDisplayValue = 75;
+  const displayRange = maxDisplayValue - minDisplayValue;
+  
   const points = data.map((item, index) => {
-    const x = chartPadding.left + (index / (data.length - 1)) * (height - chartPadding.left - chartPadding.right);
-    const y = chartPadding.top + ((maxValue - item.value) / range) * chartHeight;
+    // Calculate x position for wide chart (600px viewBox width for wider appearance)
+    const chartWidth = 600 - chartPadding.left - chartPadding.right;
+    const x = chartPadding.left + (index / (data.length - 1)) * chartWidth;
+    const y = chartPadding.top + ((maxDisplayValue - item.value) / displayRange) * chartHeight;
     return { x, y, ...item };
   });
 
@@ -283,10 +289,10 @@ const LineChart = memo(({
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
-  // Generate Y-axis labels
+  // Generate Y-axis labels for 35k to 75k range
   const yAxisLabels = [];
   for (let i = 0; i <= 4; i++) {
-    const value = minValue + (range * i / 4);
+    const value = minDisplayValue + (displayRange * i / 4);
     const y = chartPadding.top + (chartHeight * (4 - i) / 4);
     yAxisLabels.push({ value: Math.round(value), y });
   }
@@ -298,25 +304,26 @@ const LineChart = memo(({
   };
 
   return (
-    <div className={`relative ${className}`} style={{ height }}>
-      <svg width="100%" height="100%" className="overflow-visible">
-        {/* Enhanced Grid Lines */}
+    <div className={`relative ${className}`} style={{ height, width: '100%' }}>
+
+      <svg width="100%" height="100%" className="overflow-visible relative z-10" viewBox={`0 0 600 ${height}`} preserveAspectRatio="xMidYMid meet">
+        {/* Minimal Grid Lines */}
         {yAxisLabels.map((label, index) => (
           <line
             key={index}
             x1={chartPadding.left}
             y1={label.y}
-            x2={height - chartPadding.right}
+            x2={600 - chartPadding.right}
             y2={label.y}
             stroke="currentColor"
             className="text-gray-100"
-            strokeWidth="1"
-            strokeDasharray="2,2"
-            opacity="0.4"
+            strokeWidth="0.5"
+            strokeDasharray="1,3"
+            opacity="0.3"
           />
         ))}
         
-        {/* Y-Axis */}
+        {/* Minimal Axes */}
         <line
           x1={chartPadding.left}
           y1={chartPadding.top}
@@ -324,50 +331,49 @@ const LineChart = memo(({
           y2={height - chartPadding.bottom}
           stroke="currentColor"
           className="text-gray-200"
-          strokeWidth="1"
+          strokeWidth="0.5"
+          opacity="0.5"
         />
         
-        {/* X-Axis */}
         <line
           x1={chartPadding.left}
           y1={height - chartPadding.bottom}
-          x2={height - chartPadding.right}
+          x2={600 - chartPadding.right}
           y2={height - chartPadding.bottom}
           stroke="currentColor"
           className="text-gray-200"
-          strokeWidth="1"
+          strokeWidth="0.5"
+          opacity="0.5"
         />
         
         {/* Y-Axis Labels */}
         {yAxisLabels.map((label, index) => (
           <text
             key={index}
-            x={chartPadding.left - 6}
+            x={chartPadding.left - 5}
             y={label.y + 3}
             textAnchor="end"
-            className="text-xs font-medium fill-current text-gray-500"
+            className="text-xs font-medium fill-current text-gray-400"
           >
-            {label.value}k
+            ${label.value}k
           </text>
         ))}
         
-        {/* Y-Axis Title */}
-        <text
-          x={12}
-          y={height / 2}
-          textAnchor="middle"
-          className="text-xs font-medium fill-current text-gray-500"
-          transform={`rotate(-90, 12, ${height / 2})`}
-        >
-          Revenue ($k)
-        </text>
+
         
-        {/* Enhanced Gradient Fill */}
+        {/* Modern Gradient Fill */}
         <defs>
           <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgb(147, 51, 234)" stopOpacity="0.15" />
-            <stop offset="50%" stopColor="rgb(196, 181, 253)" stopOpacity="0.08" />
+            <stop offset="0%" stopColor="rgb(99, 102, 241)" stopOpacity="0.2" />
+            <stop offset="50%" stopColor="rgb(139, 92, 246)" stopOpacity="0.1" />
             <stop offset="100%" stopColor="rgb(147, 51, 234)" stopOpacity="0" />
+          </linearGradient>
+          
+          {/* Gradient for the line itself */}
+          <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgb(99, 102, 241)" />
+            <stop offset="50%" stopColor="rgb(139, 92, 246)" />
+            <stop offset="100%" stopColor="rgb(147, 51, 234)" />
           </linearGradient>
         </defs>
         
@@ -379,27 +385,26 @@ const LineChart = memo(({
           className="transition-opacity duration-500"
         />
         
-        {/* Main Line with smooth drawing animation */}
+        {/* Modern Gradient Line with smooth drawing animation */}
         <path
           d={pathData}
           fill="none"
-          stroke="rgb(147, 51, 234)"
-          strokeWidth="2.5"
+          stroke="url(#lineStroke)"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray={totalLength}
           strokeDashoffset={totalLength * (1 - animationProgress)}
           className="transition-all duration-300"
           style={{ 
-            filter: hoveredPoint !== null ? 'drop-shadow(0 0 6px rgba(147, 51, 234, 0.3))' : 'none'
+            filter: hoveredPoint !== null ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))' : 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.1))'
           }}
         />
         
-        {/* Data Points with enhanced interactions */}
+        {/* Modern Data Points with Change Labels */}
         {points.map((point, index) => {
-          const prevValue = index > 0 ? points[index - 1].value : point.value;
-          const changePercent = getChangePercentage(point.value, prevValue);
-          const isSignificantChange = Math.abs(changePercent) > 20;
+          const changePercent = point.change;
+          const hasChange = changePercent !== null;
           
           return (
             <g key={index}>
@@ -420,84 +425,75 @@ const LineChart = memo(({
                 onClick={() => onPointClick?.(point, index)}
               />
               
-              {/* Main data point */}
+              {/* Modern data point with gradient */}
               <circle
                 cx={point.x}
                 cy={point.y}
-                r={hoveredPoint === index ? "5" : isSignificantChange ? "3.5" : "3"}
-                className={`cursor-pointer transition-all duration-300 ${
-                  isSignificantChange ? 'fill-orange-500' : 'fill-purple-600'
-                }`}
+                r={hoveredPoint === index ? "5" : "4"}
+                fill="url(#lineStroke)"
+                className="cursor-pointer transition-all duration-300"
                 opacity={animationProgress}
                 style={{
-                  filter: hoveredPoint === index ? 'drop-shadow(0 0 4px rgba(147, 51, 234, 0.6))' : 'none',
-                  transform: hoveredPoint === index ? 'scale(1.1)' : 'scale(1)',
+                  filter: hoveredPoint === index ? 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))' : 'drop-shadow(0 1px 2px rgba(139, 92, 246, 0.2))',
+                  transform: hoveredPoint === index ? 'scale(1.2)' : 'scale(1)',
                   transformOrigin: 'center'
                 }}
               />
               
-              {/* Highlight ring for significant changes */}
-              {isSignificantChange && (
-                <circle
-                  cx={point.x}
-                  cy={point.y}
-                  r="6"
-                  className="fill-none stroke-orange-400 stroke-1.5 opacity-60 animate-pulse"
+              {/* White center dot for modern look */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={hoveredPoint === index ? "2" : "1.5"}
+                className="fill-white cursor-pointer transition-all duration-300"
+                opacity={animationProgress}
+              />
+              
+              {/* Percentage Change Labels */}
+              {hasChange && (
+                <text
+                  x={point.x}
+                  y={point.y - 18}
+                  textAnchor="middle"
+                  className={`text-xs font-bold transition-all duration-500 ${
+                    changePercent > 0 
+                      ? changePercent > 50 ? 'fill-orange-600' : 'fill-green-600'
+                      : 'fill-red-500'
+                  }`}
                   opacity={animationProgress}
-                />
+                >
+                  {changePercent > 0 ? '+' : ''}{changePercent}%
+                </text>
               )}
               
               {/* Value labels on hover */}
               {hoveredPoint === index && (
                 <text
                   x={point.x}
-                  y={point.y - 10}
+                  y={point.y - (hasChange ? 35 : 25)}
                   textAnchor="middle"
-                  className="text-xs font-bold fill-purple-600 animate-in fade-in duration-200"
+                  className="text-xs font-bold fill-indigo-600 animate-in fade-in duration-200"
                 >
-                  {point.value}k
+                  ${point.value}k
                 </text>
               )}
             </g>
           );
         })}
         
-        {/* X-Axis Labels with better spacing */}
+        {/* X-Axis Labels */}
         {points.map((point, index) => (
           <text
             key={index}
             x={point.x}
-            y={height - chartPadding.bottom + 12}
+            y={height - chartPadding.bottom + 15}
             textAnchor="middle"
-            className="text-xs font-medium fill-current text-gray-500"
+            className="text-xs font-medium fill-current text-gray-400"
           >
             {point.label}
           </text>
         ))}
-        
-        {/* Significant change annotations */}
-        {points.map((point, index) => {
-          if (index === 0) return null;
-          const prevValue = points[index - 1].value;
-          const changePercent = getChangePercentage(point.value, prevValue);
-          
-          if (Math.abs(changePercent) > 25) {
-            return (
-              <g key={`annotation-${index}`}>
-                <text
-                  x={point.x}
-                  y={point.y - 16}
-                  textAnchor="middle"
-                  className="text-xs font-bold fill-orange-600 animate-in fade-in duration-500"
-                  opacity={animationProgress}
-                >
-                  {changePercent > 0 ? '+' : ''}{Math.round(changePercent)}%
-                </text>
-              </g>
-            );
-          }
-          return null;
-        })}
+
       </svg>
       
       {/* Enhanced Interactive Tooltip */}
@@ -505,7 +501,7 @@ const LineChart = memo(({
         <div 
           className="absolute bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white text-sm px-4 py-3 rounded-xl pointer-events-none z-50 shadow-2xl border border-white/10 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
           style={{
-            left: `${points[hoveredPoint].x}px`,
+            left: `${(points[hoveredPoint].x / 600) * 100}%`,
             top: `${points[hoveredPoint].y - 50}px`,
             transform: 'translateX(-50%)',
             minWidth: '150px'
@@ -532,16 +528,15 @@ const LineChart = memo(({
               )}
               
               {/* Show change from previous month */}
-              {hoveredPoint > 0 && (
+              {points[hoveredPoint].change !== null && (
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
                   <span className="text-gray-400">Change:</span>
                   <span className={`font-medium ${
-                    points[hoveredPoint].value > points[hoveredPoint - 1].value 
-                      ? 'text-green-400' 
+                    points[hoveredPoint].change > 0 
+                      ? points[hoveredPoint].change > 50 ? 'text-orange-400' : 'text-green-400'
                       : 'text-red-400'
                   }`}>
-                    {points[hoveredPoint].value > points[hoveredPoint - 1].value ? '+' : ''}
-                    {Math.round(getChangePercentage(points[hoveredPoint].value, points[hoveredPoint - 1].value))}%
+                    {points[hoveredPoint].change > 0 ? '+' : ''}{points[hoveredPoint].change}%
                   </span>
                 </div>
               )}

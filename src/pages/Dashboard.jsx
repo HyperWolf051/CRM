@@ -26,14 +26,14 @@ const Dashboard = () => {
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
   const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
 
-  // Enhanced chart data with more details
+  // Monthly Revenue Changes data with exact specifications
   const salesData = [
-    { label: 'Jan', value: 45, details: 'New clients: 12, Profit margin: 27%' },
-    { label: 'Feb', value: 58, details: 'New clients: 18, Profit margin: 31%' },
-    { label: 'Mar', value: 38, details: 'New clients: 8, Profit margin: 21%' },
-    { label: 'Apr', value: 72, details: 'New clients: 24, Profit margin: 31%' },
-    { label: 'May', value: 52, details: 'New clients: 15, Profit margin: 29%' },
-    { label: 'Jun', value: 41, details: 'New clients: 11, Profit margin: 27%' }
+    { label: 'Jan', value: 47, details: 'New clients: 12, Profit margin: 27%', change: null },
+    { label: 'Feb', value: 60, details: 'New clients: 18, Profit margin: 31%', change: 29 },
+    { label: 'Mar', value: 46, details: 'New clients: 8, Profit margin: 21%', change: -34 },
+    { label: 'Apr', value: 72, details: 'New clients: 24, Profit margin: 31%', change: 89 },
+    { label: 'May', value: 52, details: 'New clients: 15, Profit margin: 29%', change: -28 },
+    { label: 'Jun', value: 40, details: 'New clients: 11, Profit margin: 27%', change: -23 }
   ];
 
 
@@ -295,12 +295,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Enhanced Charts Row - 2 Column Layout */}
+          {/* Enhanced Charts Row - Wide Chart Layout */}
           <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Interactive Monthly Changes Chart */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              {/* Interactive Monthly Changes Chart - Wider */}
+              <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
                 <ChartControls
                   timeRange={timeRange}
                   onTimeRangeChange={handleTimeRangeChange}
@@ -321,7 +321,7 @@ const Dashboard = () => {
                 <LineChart 
                   key={`chart-${shouldAnimateChart}-${timeRange}`}
                   data={salesData} 
-                  height={200} 
+                  height={260} 
                   onPointClick={handlePointClick}
                   animate={shouldAnimateChart}
                   className="mb-2" 
@@ -329,46 +329,52 @@ const Dashboard = () => {
                 
                 <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
                   <div>
-                    <div className="text-lg font-bold text-blue-600">$306k</div>
+                    <div className="text-xl font-bold text-blue-600">$317k</div>
                     <div className="text-xs text-gray-500">Total Revenue</div>
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-green-600">$86k</div>
+                    <div className="text-xl font-bold text-green-600">$89k</div>
                     <div className="text-xs text-gray-500">Total Profit</div>
                   </div>
                 </div>
               </div>
 
-              {/* Enhanced Deal Pipeline */}
-              <DealPipelineStep
-                steps={pipelineSteps}
-                currentStep={currentPipelineStep}
-                onStepClick={handlePipelineStepClick}
-                onRefresh={handleDealsRefresh}
-                showCounts={true}
-                loading={isDealsLoading}
-              />
+              {/* Enhanced Deal Pipeline - Narrower */}
+              <div className="lg:col-span-1">
+                <DealPipelineStep
+                  steps={pipelineSteps}
+                  currentStep={currentPipelineStep}
+                  onStepClick={handlePipelineStepClick}
+                  onRefresh={handleDealsRefresh}
+                  showCounts={true}
+                  loading={isDealsLoading}
+                />
+              </div>
             </div>
           </div>
 
           {/* Content Row - Calendar and Activity */}
           <div className="lg:col-span-8 xl:col-span-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
               
-              {/* Enhanced Interactive Calendar */}
-              <InteractiveCalendar
-                events={calendarEvents}
-                onEventClick={handleEventClick}
-                onDateClick={handleDateClick}
-                currentDate={currentCalendarDate}
-                onDateChange={setCurrentCalendarDate}
-              />
+              {/* Enhanced Interactive Calendar - Slightly Wider */}
+              <div className="lg:col-span-3">
+                <InteractiveCalendar
+                  events={calendarEvents}
+                  onEventClick={handleEventClick}
+                  onDateClick={handleDateClick}
+                  currentDate={currentCalendarDate}
+                  onDateChange={setCurrentCalendarDate}
+                />
+              </div>
 
-              {/* Enhanced Activity Timeline */}
-              <ActivityTimeline
-                activities={recentActivity}
-                onActivityClick={handleActivityClick}
-              />
+              {/* Enhanced Activity Timeline - Slightly Narrower */}
+              <div className="lg:col-span-2">
+                <ActivityTimeline
+                  activities={recentActivity}
+                  onActivityClick={handleActivityClick}
+                />
+              </div>
             </div>
           </div>
 
