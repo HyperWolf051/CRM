@@ -6,11 +6,19 @@ const InteractiveCalendar = ({
   onEventClick, 
   onDateClick, 
   onEventDrop,
+  onEventAdd,
   currentDate,
   onDateChange 
 }) => {
   const [draggedEvent, setDraggedEvent] = useState(null);
   const [hoveredDate, setHoveredDate] = useState(null);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [quickAddForm, setQuickAddForm] = useState({
+    title: '',
+    time: '',
+    date: new Date(),
+    type: 'meeting'
+  });
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -54,6 +62,57 @@ const InteractiveCalendar = ({
       onEventDrop(draggedEvent, date);
     }
     setDraggedEvent(null);
+  };
+
+  const handleQuickAdd = () => {
+    setQuickAddForm({
+      title: '',
+      time: '10:00 AM',
+      date: new Date(),
+      type: 'meeting'
+    });
+    setShowQuickAdd(true);
+  };
+
+  const handleQuickAddSubmit = (e) => {
+    e.preventDefault();
+    if (quickAddForm.title.trim() && onEventAdd) {
+      const newEvent = {
+        id: Date.now(), // Simple ID generation
+        title: quickAddForm.title.trim(),
+        date: quickAddForm.date,
+        time: quickAddForm.time,
+        type: quickAddForm.type,
+        color: getEventColor(quickAddForm.type)
+      };
+      
+      onEventAdd(newEvent);
+      setShowQuickAdd(false);
+      setQuickAddForm({
+        title: '',
+        time: '10:00 AM',
+        date: new Date(),
+        type: 'meeting'
+      });
+    }
+  };
+
+  const getEventColor = (type) => {
+    const colors = {
+      meeting: 'bg-blue-500',
+      interview: 'bg-green-500',
+      call: 'bg-purple-500',
+      task: 'bg-orange-500',
+      event: 'bg-pink-500'
+    };
+    return colors[type] || 'bg-blue-500';
+  };
+
+  const handleDateClickForAdd = (date) => {
+    if (date) {
+      setQuickAddForm(prev => ({ ...prev, date }));
+      setShowQuickAdd(true);
+    }
   };
 
   return (
@@ -104,7 +163,10 @@ const InteractiveCalendar = ({
               className={`min-h-[80px] p-1 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 ${
                 isToday ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
               } ${isHovered ? 'shadow-md scale-105' : ''}`}
-              onClick={() => onDateClick && onDateClick(date)}
+              onClick={() => {
+                if (onDateClick) onDateClick(date);
+                handleDateClickForAdd(date);
+              }}
               onMouseEnter={() => setHoveredDate(index)}
               onMouseLeave={() => setHoveredDate(null)}
               onDrop={(e) => handleEventDrop(e, date)}
@@ -155,11 +217,114 @@ const InteractiveCalendar = ({
         <div className="text-sm text-gray-500">
           Click a date to add an event
         </div>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2">
+        <button 
+          onClick={handleQuickAdd}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2"
+        >
           <Plus className="w-4 h-4" />
           <span>Quick Add</span>
         </button>
       </div>
+
+      {/* Quick Add Modal */}
+      {showQuickAdd && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Quick Add Event</h3>
+              <button 
+                onClick={() => setShowQuickAdd(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickAddSubmit} className="space-y-4">
+              {/* Event Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Title
+                </label>
+                <input
+                  type="text"
+                  value={quickAddForm.title}
+                  onChange={(e) => setQuickAddForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter event title..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  required
+                  autoFocus
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={quickAddForm.date.toISOString().split('T')[0]}
+                  onChange={(e) => setQuickAddForm(prev => ({ ...prev, date: new Date(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              {/* Time */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Time
+                </label>
+                <input
+                  type="text"
+                  value={quickAddForm.time}
+                  onChange={(e) => setQuickAddForm(prev => ({ ...prev, time: e.target.value }))}
+                  placeholder="e.g., 10:00 AM"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              {/* Event Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Type
+                </label>
+                <select
+                  value={quickAddForm.type}
+                  onChange={(e) => setQuickAddForm(prev => ({ ...prev, type: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                >
+                  <option value="meeting">Meeting</option>
+                  <option value="interview">Interview</option>
+                  <option value="call">Call</option>
+                  <option value="task">Task</option>
+                  <option value="event">Event</option>
+                </select>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowQuickAdd(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Event</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

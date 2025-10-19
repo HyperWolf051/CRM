@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // Enhanced Components
-import { LineChart, ChartControls } from '../components/ui/Chart';
+import { ChartContainer, ChartControls } from '../components/ui/Chart';
 import EnhancedHeader from '../components/dashboard/EnhancedHeader';
 import AdvancedMetricCard from '../components/dashboard/AdvancedMetricCard';
 import DealPipelineStep from '../components/dashboard/DealPipelineStep';
@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [isDealsLoading, setIsDealsLoading] = useState(false); // Separate loading for deals
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
   const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
+  const [chartType, setChartType] = useState('line'); // Chart type toggle
 
   // Monthly Revenue Changes data with exact specifications
   const salesData = [
@@ -54,8 +55,8 @@ const Dashboard = () => {
   const activeJobsSparkline = [20, 22, 18, 24, 26, 24, 24];
   const candidatesSparkline = [45, 48, 42, 47, 49, 46, 47];
 
-  // Calendar events data
-  const calendarEvents = [
+  // Calendar events state
+  const [calendarEvents, setCalendarEvents] = useState([
     {
       id: 1,
       title: 'Interview - Sarah Johnson',
@@ -80,7 +81,7 @@ const Dashboard = () => {
       color: 'bg-purple-500',
       type: 'call'
     }
-  ];
+  ]);
 
 
 
@@ -165,6 +166,19 @@ const Dashboard = () => {
     console.log('Point clicked:', data, index);
   };
 
+  const handleBarClick = (data, index) => {
+    console.log('Bar clicked:', data, index);
+  };
+
+  const handleChartTypeChange = (newType) => {
+    setChartType(newType);
+    // Trigger re-animation when chart type changes
+    setShouldAnimateChart(false);
+    setTimeout(() => {
+      setShouldAnimateChart(true);
+    }, 100);
+  };
+
 
 
   const handleEventClick = (event) => {
@@ -179,6 +193,11 @@ const Dashboard = () => {
 
   const handleActivityClick = (activity) => {
     console.log('Activity clicked:', activity);
+  };
+
+  const handleEventAdd = (newEvent) => {
+    setCalendarEvents(prevEvents => [...prevEvents, newEvent]);
+    console.log('New event added:', newEvent);
   };
 
 
@@ -295,20 +314,22 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Enhanced Charts Row - Wide Chart Layout */}
+          {/* Enhanced Charts Row - Graph | Activity Feed | Deal Pipeline */}
           <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
-              {/* Interactive Monthly Changes Chart - Wider */}
-              <div className="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
+              {/* Interactive Monthly Changes Chart */}
+              <div className="lg:col-span-6 bg-white rounded-2xl p-3 shadow-sm border border-gray-200">
                 <ChartControls
                   timeRange={timeRange}
                   onTimeRangeChange={handleTimeRangeChange}
                   onExport={handleChartExport}
                   onRefresh={handleChartRefresh}
+                  chartType={chartType}
+                  onChartTypeChange={handleChartTypeChange}
                 />
                 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">Monthly Changes</h2>
                   </div>
@@ -318,12 +339,15 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                <LineChart 
-                  key={`chart-${shouldAnimateChart}-${timeRange}`}
+                <ChartContainer 
+                  key={`chart-${shouldAnimateChart}-${timeRange}-${chartType}`}
                   data={salesData} 
-                  height={260} 
+                  height={280} 
                   onPointClick={handlePointClick}
+                  onBarClick={handleBarClick}
                   animate={shouldAnimateChart}
+                  chartType={chartType}
+                  onChartTypeChange={handleChartTypeChange}
                   className="mb-2" 
                 />
                 
@@ -339,8 +363,16 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Enhanced Deal Pipeline - Narrower */}
-              <div className="lg:col-span-1">
+              {/* Enhanced Activity Timeline - Vertical between Graph and Pipeline */}
+              <div className="lg:col-span-3">
+                <ActivityTimeline
+                  activities={recentActivity}
+                  onActivityClick={handleActivityClick}
+                />
+              </div>
+
+              {/* Enhanced Deal Pipeline */}
+              <div className="lg:col-span-3">
                 <DealPipelineStep
                   steps={pipelineSteps}
                   currentStep={currentPipelineStep}
@@ -353,29 +385,16 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Content Row - Calendar and Activity */}
+          {/* Content Row - Calendar */}
           <div className="lg:col-span-8 xl:col-span-10">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-              
-              {/* Enhanced Interactive Calendar - Slightly Wider */}
-              <div className="lg:col-span-3">
-                <InteractiveCalendar
-                  events={calendarEvents}
-                  onEventClick={handleEventClick}
-                  onDateClick={handleDateClick}
-                  currentDate={currentCalendarDate}
-                  onDateChange={setCurrentCalendarDate}
-                />
-              </div>
-
-              {/* Enhanced Activity Timeline - Slightly Narrower */}
-              <div className="lg:col-span-2">
-                <ActivityTimeline
-                  activities={recentActivity}
-                  onActivityClick={handleActivityClick}
-                />
-              </div>
-            </div>
+            <InteractiveCalendar
+              events={calendarEvents}
+              onEventClick={handleEventClick}
+              onDateClick={handleDateClick}
+              onEventAdd={handleEventAdd}
+              currentDate={currentCalendarDate}
+              onDateChange={setCurrentCalendarDate}
+            />
           </div>
 
           {/* Sidebar - Quick Actions */}
