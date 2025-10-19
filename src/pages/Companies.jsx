@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp,
   Phone, Mail, Globe, MapPin, Grid3X3, List, ArrowUpRight, Target, Star,
@@ -99,6 +99,18 @@ export default function Companies() {
     email: '',
     description: ''
   });
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveDropdown(null);
+    };
+
+    if (activeDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [activeDropdown]);
 
   // Company statuses
   const companyStatuses = [
@@ -306,21 +318,19 @@ export default function Companies() {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
+                  className={`p-2 rounded-md transition-colors ${viewMode === 'grid'
+                      ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <Grid3X3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
+                  className={`p-2 rounded-md transition-colors ${viewMode === 'list'
+                      ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -334,11 +344,10 @@ export default function Companies() {
               <button
                 key={status.id}
                 onClick={() => setSelectedStatus(status.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  selectedStatus === status.id
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedStatus === status.id
                     ? 'bg-blue-600 text-white'
                     : `${status.color} hover:bg-opacity-80`
-                }`}
+                  }`}
               >
                 {status.name} ({status.count})
               </button>
@@ -366,11 +375,10 @@ export default function Companies() {
             />
           </div>
         ) : (
-          <div className={`${
-            viewMode === 'grid' 
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+          <div className={`${viewMode === 'grid'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
               : 'space-y-4'
-          }`}>
+            }`}>
             {filteredCompanies.map((company) => (
               viewMode === 'grid' ? (
                 // Grid Card View
@@ -395,7 +403,7 @@ export default function Companies() {
                         <p className="text-sm text-gray-600">{company.industry}</p>
                       </div>
                     </div>
-                    
+
                     <div className="relative">
                       <button
                         onClick={(e) => {
@@ -406,19 +414,43 @@ export default function Companies() {
                       >
                         <MoreVertical className="w-4 h-4" />
                       </button>
-                      
+
                       {activeDropdown === company.id && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                           <div className="py-1">
-                            <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCompanyClick(company);
+                                setActiveDropdown(null);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
                               <Eye className="w-4 h-4 mr-3" />
                               View Details
                             </button>
-                            <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdown(null);
+                                // Add edit functionality here
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
                               <Edit className="w-4 h-4 mr-3" />
                               Edit Client
                             </button>
-                            <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdown(null);
+                                if (confirm('Are you sure you want to delete this client?')) {
+                                  // Add delete functionality here
+                                  console.log('Deleting client:', company.name);
+                                }
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
                               <Trash2 className="w-4 h-4 mr-3" />
                               Delete
                             </button>
@@ -499,12 +531,12 @@ export default function Companies() {
                         <p className="text-sm text-gray-600">{company.industry} • {company.location}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-6">
                       <Badge variant={getStatusBadge(company.status)}>
                         {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
                       </Badge>
-                      
+
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">{formatCompactCurrency(company.revenue)}</p>
                         <div className="flex items-center text-green-600">
@@ -512,12 +544,12 @@ export default function Companies() {
                           <span className="text-sm">{company.growth}</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center">
                         {renderStars(company.rating)}
                         <span className="ml-2 text-sm text-gray-600">{company.rating}</span>
                       </div>
-                      
+
                       <ArrowUpRight className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
