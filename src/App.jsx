@@ -22,6 +22,9 @@ const AddClient = lazy(() => import('@/pages/AddClient'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Team = lazy(() => import('@/pages/Team'));
+const EmailAutomation = lazy(() => import('@/pages/EmailAutomation'));
+const ReminderSystem = lazy(() => import('@/pages/ReminderSystem'));
+const AutomationDashboard = lazy(() => import('@/pages/AutomationDashboard'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 
@@ -86,7 +89,9 @@ function App() {
                   <Route path="goals" element={<ComingSoon title="Goals" description="Set and track your business goals" />} />
                   <Route path="projects" element={<ComingSoon title="Projects" description="Project management and collaboration" />} />
                   <Route path="team" element={<Team />} />
-                  <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
+                  <Route path="automation" element={<AutomationDashboard />} />
+                  <Route path="email-automation" element={<EmailAutomation />} />
+                  <Route path="reminders" element={<ReminderSystem />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
                 

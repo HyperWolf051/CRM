@@ -11,7 +11,8 @@ import {
   CheckSquare,
   UserCheck,
   Menu,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -57,6 +58,12 @@ const navigationItems = [
     href: '/app/analytics',
     icon: BarChart3,
     color: 'from-indigo-500 to-indigo-600'
+  },
+  {
+    name: 'Automation',
+    href: '/app/automation',
+    icon: Zap,
+    color: 'from-yellow-500 to-orange-600'
   },
   {
     name: 'Team',
