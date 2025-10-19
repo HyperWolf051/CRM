@@ -15,17 +15,17 @@ const BarChart = memo(({
 
   useEffect(() => {
     if (animate) {
-      // Smooth staggered animation for growth effect
+      // Ultra smooth staggered animation for growth effect
       let progress = 0;
-      const duration = 1500; // 1.5 seconds total
-      const interval = 16; // ~60fps
+      const duration = 4000; // 4 seconds total for slow, relaxed animation
+      const interval = 16; // ~60fps for smooth but relaxed animation
       const increment = interval / duration;
       
       const timer = setInterval(() => {
         progress += increment;
-        // Easing function for smooth growth (ease-out-cubic)
-        const easedProgress = 1 - Math.pow(1 - Math.min(progress, 1), 3);
-        setAnimationProgress(easedProgress);
+        // Linear easing for constant speed - matches line chart
+        const clampedProgress = Math.min(progress, 1);
+        setAnimationProgress(clampedProgress);
         
         if (progress >= 1) {
           clearInterval(timer);
@@ -48,67 +48,137 @@ const BarChart = memo(({
 
   if (!data || data.length === 0) return null;
 
-  const maxValue = Math.max(...data.map(d => d.value));
+  // Use same padding and sizing as LineChart for consistency
+  const chartPadding = { top: 15, right: 20, bottom: 25, left: 40 };
+  const chartHeight = height - chartPadding.top - chartPadding.bottom;
+  
+  // Set Y-axis range from 35k to 75k to match LineChart
+  const minDisplayValue = 35;
+  const maxDisplayValue = 75;
+  const displayRange = maxDisplayValue - minDisplayValue;
+
+  // Calculate bar dimensions once for reuse
+  const chartWidth = 600 - chartPadding.left - chartPadding.right;
+  const barWidth = Math.min(chartWidth / (data.length * 2), 40);
+  const totalBarsWidth = data.length * barWidth;
+  const totalSpacing = chartWidth - totalBarsWidth;
+  const spaceBetweenBars = totalSpacing / (data.length + 1);
 
   return (
-    <div className={`relative ${className}`} style={{ height }}>
-      <svg width="100%" height="100%" className="overflow-visible">
-        {/* Grid Lines */}
-        {[0, 25, 50, 75, 100].map(y => (
-          <line
-            key={y}
-            x1="10%"
-            y1={`${y}%`}
-            x2="90%"
-            y2={`${y}%`}
-            stroke="currentColor"
-            className="text-gray-200"
-            strokeWidth="1"
-            strokeDasharray="2,2"
-          />
-        ))}
+    <div className={`relative ${className}`} style={{ height, width: '100%' }}>
+      <svg width="100%" height="100%" className="overflow-visible relative z-10" viewBox={`0 0 600 ${height}`} preserveAspectRatio="xMidYMid meet">
+        {/* Y-axis labels and grid lines to match LineChart */}
+        {(() => {
+          const yAxisLabels = [];
+          for (let i = 0; i <= 4; i++) {
+            const value = minDisplayValue + (displayRange * i / 4);
+            const y = chartPadding.top + (chartHeight * (4 - i) / 4);
+            yAxisLabels.push({ value: Math.round(value), y });
+          }
+          return yAxisLabels.map((label, index) => (
+            <g key={index}>
+              <line
+                x1={chartPadding.left}
+                y1={label.y}
+                x2={600 - chartPadding.right}
+                y2={label.y}
+                stroke="currentColor"
+                className="text-gray-100"
+                strokeWidth="0.5"
+                strokeDasharray="1,3"
+                opacity="0.3"
+              />
+              <text
+                x={chartPadding.left - 5}
+                y={label.y + 3}
+                textAnchor="end"
+                className="text-xs font-medium fill-current text-gray-400"
+              >
+                ${label.value}k
+              </text>
+            </g>
+          ));
+        })()}
         
+        {/* Axes */}
+        <line
+          x1={chartPadding.left}
+          y1={chartPadding.top}
+          x2={chartPadding.left}
+          y2={height - chartPadding.bottom}
+          stroke="currentColor"
+          className="text-gray-200"
+          strokeWidth="0.5"
+          opacity="0.5"
+        />
+        
+        <line
+          x1={chartPadding.left}
+          y1={height - chartPadding.bottom}
+          x2={600 - chartPadding.right}
+          y2={height - chartPadding.bottom}
+          stroke="currentColor"
+          className="text-gray-200"
+          strokeWidth="0.5"
+          opacity="0.5"
+        />
+        
+        {/* Modern Gradient Fill for bars */}
+        <defs>
+          <linearGradient id="barGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="rgb(99, 102, 241)" />
+            <stop offset="50%" stopColor="rgb(139, 92, 246)" />
+            <stop offset="100%" stopColor="rgb(147, 51, 234)" />
+          </linearGradient>
+        </defs>
+
         {/* Bars */}
         {data.map((item, index) => {
-          const barHeight = (item.value / maxValue) * (height - 60);
+          // Use pre-calculated bar dimensions
+          const x = chartPadding.left + spaceBetweenBars + (index * (barWidth + spaceBetweenBars));
+          
+          // Map value to chart height using same scale as LineChart
+          const normalizedValue = Math.max(0, (item.value - minDisplayValue) / displayRange);
+          const barHeight = Math.max(2, normalizedValue * chartHeight); // Minimum height of 2px to avoid axis collision
+          const y = height - chartPadding.bottom - barHeight;
+          
           // Staggered animation delay for each bar (cascading effect)
-          const staggerDelay = index * 0.15; // 150ms delay between bars
-          const staggeredProgress = Math.max(0, Math.min(1, (animationProgress - staggerDelay) / 0.7));
-          const animatedHeight = barHeight * staggeredProgress;
-          const x = 15 + (index * (70 / data.length));
-          const y = height - animatedHeight - 40;
+          const staggerDelay = index * 0.2; // 200ms delay between bars for smoother effect
+          const staggeredProgress = Math.max(0, Math.min(1, (animationProgress - staggerDelay) / 0.8));
+          const animatedHeight = Math.max(1, barHeight * staggeredProgress); // Ensure minimum animated height
+          const animatedY = height - chartPadding.bottom - animatedHeight;
           
           return (
             <g key={index}>
               {/* Glow Effect Behind Bar (prevents flickering) */}
               {hoveredBar === index && (
                 <rect
-                  x={`${x - 0.5}%`}
-                  y={y - 2}
-                  width={`${60 / data.length + 1}%`}
+                  x={x - 2}
+                  y={animatedY - 2}
+                  width={barWidth + 4}
                   height={animatedHeight + 4}
                   className="fill-blue-400/15"
-                  rx="6"
+                  rx="8"
                   style={{ pointerEvents: 'none' }}
                 />
               )}
               
               {/* Bar Shadow for depth */}
               <rect
-                x={`${x + 0.5}%`}
-                y={y + 2}
-                width={`${60 / data.length}%`}
+                x={x + 2}
+                y={animatedY + 2}
+                width={barWidth}
                 height={animatedHeight}
                 className="fill-black/10"
-                rx="4"
+                rx="6"
                 style={{ pointerEvents: 'none' }}
               />
               
               {/* Invisible Hover Area (larger for better UX) */}
               <rect
-                x={`${x - 1}%`}
-                y={y - 10}
-                width={`${60 / data.length + 2}%`}
+                x={x - 10}
+                y={animatedY - 10}
+                width={barWidth + 20}
                 height={animatedHeight + 20}
                 className="fill-transparent cursor-pointer"
                 onMouseEnter={() => {
@@ -122,34 +192,31 @@ const BarChart = memo(({
                 onClick={() => onBarClick?.(item, index)}
               />
               
-              {/* Main Bar (visual only) */}
+              {/* Main Bar with gradient */}
               <rect
-                x={`${x}%`}
-                y={y}
-                width={`${60 / data.length}%`}
+                x={x}
+                y={animatedY}
+                width={barWidth}
                 height={animatedHeight}
-                className={`transition-all duration-200 ${
-                  hoveredBar === index 
-                    ? 'opacity-95' 
-                    : 'opacity-100'
-                } ${item.color || 'fill-blue-500'}`}
-                rx="4"
+                fill="url(#barGradient)"
+                className="transition-all duration-300"
+                rx="6"
                 style={{
-                  filter: hoveredBar === index ? 'brightness(1.08) drop-shadow(0 2px 4px rgba(0,0,0,0.1))' : 'none',
+                  filter: hoveredBar === index ? 'brightness(1.1) drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))' : 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.1))',
                   transformOrigin: 'bottom center',
-                  transform: hoveredBar === index ? 'scale(1.01)' : 'scale(1)',
+                  transform: hoveredBar === index ? 'scale(1.02)' : 'scale(1)',
                   pointerEvents: 'none'
                 }}
               />
               
               {/* Animated Value Label */}
               <text
-                x={`${x + (30 / data.length)}%`}
-                y={y - 8}
+                x={x + barWidth / 2}
+                y={animatedY - 8}
                 textAnchor="middle"
                 className={`text-xs font-semibold transition-all duration-300 ${
                   hoveredBar === index 
-                    ? 'fill-blue-600 text-sm' 
+                    ? 'fill-indigo-600' 
                     : 'fill-gray-600'
                 }`}
                 style={{
@@ -158,15 +225,15 @@ const BarChart = memo(({
                   transformOrigin: 'center'
                 }}
               >
-                {Math.round(item.value * staggeredProgress)}
+                ${Math.round(item.value * staggeredProgress)}k
               </text>
               
               {/* Category Label */}
               <text
-                x={`${x + (30 / data.length)}%`}
-                y={height - 20}
+                x={x + barWidth / 2}
+                y={height - chartPadding.bottom + 15}
                 textAnchor="middle"
-                className="text-xs font-medium fill-current text-gray-500"
+                className="text-xs font-medium fill-current text-gray-400"
               >
                 {item.label}
               </text>
@@ -178,27 +245,48 @@ const BarChart = memo(({
       {/* Enhanced Interactive Tooltip */}
       {showTooltip && hoveredBar !== null && (
         <div 
-          className="absolute bg-gradient-to-r from-slate-800 to-slate-900 text-white text-sm px-4 py-3 rounded-xl pointer-events-none z-50 shadow-2xl border border-white/10 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
+          className="absolute bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white text-sm px-4 py-3 rounded-xl pointer-events-none z-50 shadow-2xl border border-white/10 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
           style={{
-            left: `${15 + (hoveredBar * (70 / data.length)) + (30 / data.length)}%`,
-            top: `${height - (data[hoveredBar].value / maxValue) * (height - 60) - 80}px`,
-            transform: 'translateX(-50%)'
+            left: `${((chartPadding.left + spaceBetweenBars + (hoveredBar * (barWidth + spaceBetweenBars)) + barWidth / 2) / 600) * 100}%`,
+            top: `${Math.max(10, height - chartPadding.bottom - ((data[hoveredBar].value - minDisplayValue) / displayRange) * chartHeight - 60)}px`,
+            transform: 'translateX(-50%)',
+            minWidth: '150px'
           }}
         >
           {/* Tooltip Arrow */}
           <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
           
-          <div className="space-y-1">
-            <div className="font-bold text-blue-300">{data[hoveredBar].label}</div>
-            <div className="flex items-center space-x-2">
-              <span className="text-gray-300">Value:</span>
-              <span className="font-semibold text-green-400">{data[hoveredBar].value}</span>
+          <div className="space-y-2">
+            <div className="font-bold text-blue-300 text-center border-b border-white/20 pb-1">
+              {data[hoveredBar].label}
             </div>
-            {data[hoveredBar].details && (
-              <div className="text-xs text-gray-400 pt-1 border-t border-white/10">
-                {data[hoveredBar].details}
+            
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Revenue:</span>
+                <span className="font-semibold text-green-400">${data[hoveredBar].value}k</span>
               </div>
-            )}
+              
+              {data[hoveredBar].details && (
+                <div className="text-xs text-gray-400 pt-1 border-t border-white/10">
+                  {data[hoveredBar].details}
+                </div>
+              )}
+              
+              {/* Show change from previous month */}
+              {data[hoveredBar].change !== null && (
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                  <span className="text-gray-400">Change:</span>
+                  <span className={`font-medium ${
+                    data[hoveredBar].change > 0 
+                      ? data[hoveredBar].change > 50 ? 'text-orange-400' : 'text-green-400'
+                      : 'text-red-400'
+                  }`}>
+                    {data[hoveredBar].change > 0 ? '+' : ''}{data[hoveredBar].change}%
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -206,7 +294,7 @@ const BarChart = memo(({
   );
 });
 
-// Enhanced Interactive Line Chart
+// Enhanced Interactive Line Chart with Professional UI
 const LineChart = memo(({ 
   data, 
   height = 300, 
@@ -217,15 +305,45 @@ const LineChart = memo(({
 }) => {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
 
   useEffect(() => {
     if (animate) {
-      const timer = setTimeout(() => setAnimationProgress(1), 100);
+      // Ultra smooth animation for line drawing with delay
+      setAnimationProgress(0);
+      const timer = setTimeout(() => {
+        const startTime = performance.now();
+        const duration = 4000; // 4 seconds for moderate, constant speed line drawing
+        
+        const animationFrame = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // Perfectly linear progress - no easing at all
+          setAnimationProgress(progress);
+          
+          if (progress < 1) {
+            requestAnimationFrame(animationFrame);
+          } else {
+            setAnimationProgress(1);
+          }
+        };
+        
+        requestAnimationFrame(animationFrame);
+      }, 400); // Slightly longer delay for dramatic effect
+      
       return () => clearTimeout(timer);
     } else {
       setAnimationProgress(1);
     }
-  }, [animate]);
+  }, [animate, data]); // Re-animate when data changes
+
+  // Cleanup hover timeout
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) clearTimeout(hoverTimeout);
+    };
+  }, [hoverTimeout]);
 
   if (!data || data.length === 0) return null;
 
@@ -233,101 +351,286 @@ const LineChart = memo(({
   const minValue = Math.min(...data.map(d => d.value));
   const range = maxValue - minValue || 1;
   
+  // Optimized padding for wide rectangular chart - minimal empty space
+  const chartPadding = { top: 15, right: 20, bottom: 25, left: 40 };
+  const chartHeight = height - chartPadding.top - chartPadding.bottom;
+  
+  // Set Y-axis range from 35k to 75k as specified
+  const minDisplayValue = 35;
+  const maxDisplayValue = 75;
+  const displayRange = maxDisplayValue - minDisplayValue;
+  
   const points = data.map((item, index) => {
-    const x = (index / (data.length - 1)) * 80 + 10; // 10% padding on each side
-    const y = ((maxValue - item.value) / range) * (height - 80) + 40;
+    // Calculate x position for wide chart (600px viewBox width for wider appearance)
+    const chartWidth = 600 - chartPadding.left - chartPadding.right;
+    const x = chartPadding.left + (index / (data.length - 1)) * chartWidth;
+    const y = chartPadding.top + ((maxDisplayValue - item.value) / displayRange) * chartHeight;
     return { x, y, ...item };
   });
+
+  // Calculate path data for smooth line drawing animation
+  const totalLength = points.reduce((acc, point, index) => {
+    if (index === 0) return 0;
+    const prevPoint = points[index - 1];
+    return acc + Math.sqrt(Math.pow(point.x - prevPoint.x, 2) + Math.pow(point.y - prevPoint.y, 2));
+  }, 0);
 
   const pathData = points.map((point, index) => 
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
+  // Generate Y-axis labels for 35k to 75k range
+  const yAxisLabels = [];
+  for (let i = 0; i <= 4; i++) {
+    const value = minDisplayValue + (displayRange * i / 4);
+    const y = chartPadding.top + (chartHeight * (4 - i) / 4);
+    yAxisLabels.push({ value: Math.round(value), y });
+  }
+
+  // Detect significant changes for highlighting
+  const getChangePercentage = (current, previous) => {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous) * 100;
+  };
+
   return (
-    <div className={`relative ${className}`} style={{ height }}>
-      <svg width="100%" height="100%" className="overflow-visible">
-        {/* Grid lines */}
-        {[0, 25, 50, 75, 100].map(y => (
+    <div className={`relative ${className}`} style={{ height, width: '100%' }}>
+
+      <svg width="100%" height="100%" className="overflow-visible relative z-10" viewBox={`0 0 600 ${height}`} preserveAspectRatio="xMidYMid meet">
+        {/* Minimal Grid Lines */}
+        {yAxisLabels.map((label, index) => (
           <line
-            key={y}
-            x1="10%"
-            y1={`${y}%`}
-            x2="90%"
-            y2={`${y}%`}
+            key={index}
+            x1={chartPadding.left}
+            y1={label.y}
+            x2={600 - chartPadding.right}
+            y2={label.y}
             stroke="currentColor"
-            className="text-gray-200"
-            strokeWidth="1"
-            strokeDasharray="2,2"
+            className="text-gray-100"
+            strokeWidth="0.5"
+            strokeDasharray="1,3"
+            opacity="0.3"
           />
         ))}
         
-        {/* Gradient Fill */}
+        {/* Minimal Axes */}
+        <line
+          x1={chartPadding.left}
+          y1={chartPadding.top}
+          x2={chartPadding.left}
+          y2={height - chartPadding.bottom}
+          stroke="currentColor"
+          className="text-gray-200"
+          strokeWidth="0.5"
+          opacity="0.5"
+        />
+        
+        <line
+          x1={chartPadding.left}
+          y1={height - chartPadding.bottom}
+          x2={600 - chartPadding.right}
+          y2={height - chartPadding.bottom}
+          stroke="currentColor"
+          className="text-gray-200"
+          strokeWidth="0.5"
+          opacity="0.5"
+        />
+        
+        {/* Y-Axis Labels */}
+        {yAxisLabels.map((label, index) => (
+          <text
+            key={index}
+            x={chartPadding.left - 5}
+            y={label.y + 3}
+            textAnchor="end"
+            className="text-xs font-medium fill-current text-gray-400"
+          >
+            ${label.value}k
+          </text>
+        ))}
+        
+
+        
+        {/* Modern Gradient Fill */}
         <defs>
           <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgb(59, 130, 246)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="0" />
+            <stop offset="0%" stopColor="rgb(99, 102, 241)" stopOpacity="0.2" />
+            <stop offset="50%" stopColor="rgb(139, 92, 246)" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="rgb(147, 51, 234)" stopOpacity="0" />
+          </linearGradient>
+          
+          {/* Gradient for the line itself */}
+          <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgb(99, 102, 241)" />
+            <stop offset="50%" stopColor="rgb(139, 92, 246)" />
+            <stop offset="100%" stopColor="rgb(147, 51, 234)" />
           </linearGradient>
         </defs>
         
-        {/* Area under line */}
+        {/* Area under line with animation */}
         <path
-          d={`${pathData} L ${points[points.length - 1].x} ${height - 40} L ${points[0].x} ${height - 40} Z`}
+          d={`${pathData} L ${points[points.length - 1].x} ${height - chartPadding.bottom} L ${points[0].x} ${height - chartPadding.bottom} Z`}
           fill="url(#lineGradient)"
-          opacity={animationProgress}
+          opacity={animationProgress * 0.8}
+          className="transition-opacity duration-500"
         />
         
-        {/* Line */}
+        {/* Modern Gradient Line with smooth drawing animation */}
         <path
           d={pathData}
           fill="none"
-          stroke="rgb(59, 130, 246)"
+          stroke="url(#lineStroke)"
           strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeDasharray={animate ? `${animationProgress * 1000} 1000` : 'none'}
-          className="transition-all duration-1000"
+          strokeDasharray={totalLength}
+          strokeDashoffset={totalLength * (1 - animationProgress)}
+          style={{ 
+            filter: hoveredPoint !== null ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))' : 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.1))'
+          }}
         />
         
-        {/* Points */}
+        {/* Modern Data Points with Change Labels */}
+        {points.map((point, index) => {
+          const changePercent = point.change;
+          const hasChange = changePercent !== null;
+          
+          return (
+            <g key={index}>
+              {/* Invisible hover area for better UX */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r="15"
+                className="fill-transparent cursor-pointer"
+                onMouseEnter={() => {
+                  if (hoverTimeout) clearTimeout(hoverTimeout);
+                  setHoveredPoint(index);
+                }}
+                onMouseLeave={() => {
+                  const timeout = setTimeout(() => setHoveredPoint(null), 100);
+                  setHoverTimeout(timeout);
+                }}
+                onClick={() => onPointClick?.(point, index)}
+              />
+              
+              {/* Modern data point with gradient */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={hoveredPoint === index ? "5" : "4"}
+                fill="url(#lineStroke)"
+                className="cursor-pointer transition-all duration-300"
+                opacity={animationProgress}
+                style={{
+                  filter: hoveredPoint === index ? 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))' : 'drop-shadow(0 1px 2px rgba(139, 92, 246, 0.2))',
+                  transform: hoveredPoint === index ? 'scale(1.2)' : 'scale(1)',
+                  transformOrigin: 'center'
+                }}
+              />
+              
+              {/* White center dot for modern look */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={hoveredPoint === index ? "2" : "1.5"}
+                className="fill-white cursor-pointer transition-all duration-300"
+                opacity={animationProgress}
+              />
+              
+              {/* Percentage Change Labels */}
+              {hasChange && (
+                <text
+                  x={point.x}
+                  y={point.y - 18}
+                  textAnchor="middle"
+                  className={`text-xs font-bold transition-all duration-500 ${
+                    changePercent > 0 
+                      ? changePercent > 50 ? 'fill-orange-600' : 'fill-green-600'
+                      : 'fill-red-500'
+                  }`}
+                  opacity={animationProgress}
+                >
+                  {changePercent > 0 ? '+' : ''}{changePercent}%
+                </text>
+              )}
+              
+              {/* Value labels on hover */}
+              {hoveredPoint === index && (
+                <text
+                  x={point.x}
+                  y={point.y - (hasChange ? 35 : 25)}
+                  textAnchor="middle"
+                  className="text-xs font-bold fill-indigo-600 animate-in fade-in duration-200"
+                >
+                  ${point.value}k
+                </text>
+              )}
+            </g>
+          );
+        })}
+        
+        {/* X-Axis Labels */}
         {points.map((point, index) => (
-          <g key={index}>
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r={hoveredPoint === index ? "6" : "4"}
-              className="fill-blue-500 cursor-pointer transition-all duration-200"
-              onMouseEnter={() => setHoveredPoint(index)}
-              onMouseLeave={() => setHoveredPoint(null)}
-              onClick={() => onPointClick?.(point, index)}
-              opacity={animationProgress}
-            />
-            
-            {/* Label */}
-            <text
-              x={point.x}
-              y={height - 20}
-              textAnchor="middle"
-              className="text-xs font-medium fill-current text-gray-500"
-            >
-              {point.label}
-            </text>
-          </g>
+          <text
+            key={index}
+            x={point.x}
+            y={height - chartPadding.bottom + 15}
+            textAnchor="middle"
+            className="text-xs font-medium fill-current text-gray-400"
+          >
+            {point.label}
+          </text>
         ))}
+
       </svg>
       
-      {/* Interactive Tooltip */}
+      {/* Enhanced Interactive Tooltip */}
       {showTooltip && hoveredPoint !== null && (
         <div 
-          className="absolute bg-black/80 text-white text-xs px-3 py-2 rounded-lg pointer-events-none z-50"
+          className="absolute bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white text-sm px-4 py-3 rounded-xl pointer-events-none z-50 shadow-2xl border border-white/10 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
           style={{
-            left: `${points[hoveredPoint].x}px`,
-            top: `${points[hoveredPoint].y - 40}px`,
-            transform: 'translateX(-50%)'
+            left: `${(points[hoveredPoint].x / 600) * 100}%`,
+            top: `${points[hoveredPoint].y - 50}px`,
+            transform: 'translateX(-50%)',
+            minWidth: '150px'
           }}
         >
-          <div className="font-semibold">{points[hoveredPoint].label}</div>
-          <div>Value: {points[hoveredPoint].value}</div>
-          {points[hoveredPoint].details && <div>{points[hoveredPoint].details}</div>}
+          {/* Tooltip Arrow */}
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+          
+          <div className="space-y-2">
+            <div className="font-bold text-blue-300 text-center border-b border-white/20 pb-1">
+              {points[hoveredPoint].label}
+            </div>
+            
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Revenue:</span>
+                <span className="font-semibold text-green-400">${points[hoveredPoint].value}k</span>
+              </div>
+              
+              {points[hoveredPoint].details && (
+                <div className="text-xs text-gray-400 pt-1 border-t border-white/10">
+                  {points[hoveredPoint].details}
+                </div>
+              )}
+              
+              {/* Show change from previous month */}
+              {points[hoveredPoint].change !== null && (
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                  <span className="text-gray-400">Change:</span>
+                  <span className={`font-medium ${
+                    points[hoveredPoint].change > 0 
+                      ? points[hoveredPoint].change > 50 ? 'text-orange-400' : 'text-green-400'
+                      : 'text-red-400'
+                  }`}>
+                    {points[hoveredPoint].change > 0 ? '+' : ''}{points[hoveredPoint].change}%
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -449,7 +752,9 @@ const ChartControls = memo(({
   timeRange, 
   onTimeRangeChange,
   onExport,
-  onRefresh 
+  onRefresh,
+  chartType,
+  onChartTypeChange
 }) => (
   <div className="flex items-center justify-between mb-6">
     <div className="flex items-center space-x-4">
@@ -469,6 +774,38 @@ const ChartControls = memo(({
           </button>
         ))}
       </div>
+
+      {/* Chart Type Toggle */}
+      {onChartTypeChange && (
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => onChartTypeChange('line')}
+            className={`p-2 rounded-md transition-all duration-300 transform hover:scale-110 ${
+              chartType === 'line' 
+                ? 'bg-white text-blue-600 shadow-lg scale-105 ring-2 ring-blue-200' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-md'
+            }`}
+            title="Line Chart"
+          >
+            <svg className={`w-4 h-4 transition-all duration-300 ${chartType === 'line' ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4" />
+            </svg>
+          </button>
+          <button
+            onClick={() => onChartTypeChange('bar')}
+            className={`p-2 rounded-md transition-all duration-300 transform hover:scale-110 ${
+              chartType === 'bar' 
+                ? 'bg-white text-blue-600 shadow-lg scale-105 ring-2 ring-blue-200' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-md'
+            }`}
+            title="Bar Chart"
+          >
+            <svg className={`w-4 h-4 transition-all duration-300 ${chartType === 'bar' ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
     
     {/* Action Buttons */}
@@ -498,7 +835,94 @@ const ChartControls = memo(({
   </div>
 ));
 
+// Chart Container Component with smooth transitions
+const ChartContainer = memo(({ 
+  data, 
+  height = 300, 
+  onPointClick,
+  onBarClick,
+  showTooltip = true,
+  animate = true,
+  className = '',
+  chartType = 'line',
+  onChartTypeChange
+}) => {
+  const [currentChartType, setCurrentChartType] = useState(String(chartType));
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Ensure data is valid
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div className="flex items-center justify-center h-64 text-gray-500">No data available</div>;
+  }
+
+  // Sync with external chartType prop
+  useEffect(() => {
+    const newChartType = String(chartType);
+    if (newChartType !== currentChartType) {
+      setCurrentChartType(newChartType);
+    }
+  }, [chartType, currentChartType]);
+
+  const handleChartTypeChange = (newType) => {
+    const safeNewType = String(newType);
+    if (safeNewType !== currentChartType && !isTransitioning) {
+      setIsTransitioning(true);
+      
+      // Smooth transition effect
+      setTimeout(() => {
+        setCurrentChartType(safeNewType);
+        if (onChartTypeChange && typeof onChartTypeChange === 'function') {
+          onChartTypeChange(safeNewType);
+        }
+        
+        // End transition after chart animation completes
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 500);
+      }, 200);
+    }
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Transition overlay for smooth effect */}
+      {isTransitioning && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex items-center justify-center rounded-lg">
+          <div className="flex items-center space-x-2 text-blue-600">
+            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm font-medium">Switching chart...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Chart Content */}
+      <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+        {currentChartType === 'line' ? (
+          <LineChart
+            data={data}
+            height={height}
+            onPointClick={onPointClick}
+            showTooltip={showTooltip}
+            animate={animate && !isTransitioning}
+            className={className}
+          />
+        ) : (
+          <BarChart
+            data={data}
+            height={height}
+            onBarClick={onBarClick}
+            showTooltip={showTooltip}
+            animate={animate && !isTransitioning}
+            className={className}
+          />
+        )}
+      </div>
+    </div>
+  );
+});
+
 MiniSparkline.displayName = 'MiniSparkline';
 ChartControls.displayName = 'ChartControls';
+ChartContainer.displayName = 'ChartContainer';
 export 
-{ BarChart, LineChart, PieChart, MiniSparkline, ChartControls };
+{ BarChart, LineChart, PieChart, MiniSparkline, ChartControls, ChartContainer };

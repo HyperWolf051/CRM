@@ -5,7 +5,6 @@ import {
   Users, 
   Briefcase, 
   Settings, 
-  LogOut,
   Building2,
   Calendar,
   BarChart3,
@@ -78,7 +77,7 @@ export default function CollapsibleSidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -95,9 +94,7 @@ export default function CollapsibleSidebar() {
     setIsMobileOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    logout();
-  };
+
 
   const handleMouseEnter = () => {
     if (!isMobile) {
@@ -176,28 +173,7 @@ export default function CollapsibleSidebar() {
         </div>
       </div>
 
-      {/* User Profile */}
-      <div className={`p-4 border-b border-slate-200/50 transition-all duration-500 ease-out ${
-        (isExpanded || isMobile) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-      }`}>
-        {(isExpanded || isMobile) && (
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-xs font-semibold text-white">
-                {user?.name?.charAt(0) || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
-                {user?.name || 'User'}
-              </p>
-              <p className="text-xs text-slate-500 truncate">
-                {user?.email || 'user@example.com'}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+
 
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
@@ -256,23 +232,7 @@ export default function CollapsibleSidebar() {
         </div>
       </nav>
 
-      {/* Enhanced Logout Button */}
-      <div className="p-4 border-t border-slate-200/50">
-        <button
-          onClick={handleLogout}
-          className={`w-full flex items-center ${(isExpanded || isMobile) ? 'justify-start' : 'justify-center'} 
-                     px-4 py-3 mx-1 rounded-xl text-sm font-medium 
-                     bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700
-                     shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105
-                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2`}
-          title={!(isExpanded || isMobile) ? 'Logout' : ''}
-        >
-          <LogOut className="w-5 h-5" aria-hidden="true" />
-          {(isExpanded || isMobile) && (
-            <span className="ml-3 font-medium">Logout</span>
-          )}
-        </button>
-      </div>
+
       </div>
     </>
   );

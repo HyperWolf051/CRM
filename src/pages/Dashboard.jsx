@@ -1,65 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  UserPlus,
   Briefcase,
-  Phone,
-  ChevronLeft,
-  ChevronRight,
-  Zap,
-  Download,
-  Filter,
-  Calendar as CalendarIcon,
-  Eye,
-  Edit,
-  Clock,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Users,
-  Target,
-  BarChart3,
-  RefreshCw
+  Target
 } from 'lucide-react';
 
 // Enhanced Components
-import { BarChart, PieChart, ChartControls } from '../components/ui/Chart';
+import { ChartContainer, ChartControls } from '../components/ui/Chart';
 import EnhancedHeader from '../components/dashboard/EnhancedHeader';
 import AdvancedMetricCard from '../components/dashboard/AdvancedMetricCard';
 import DealPipelineStep from '../components/dashboard/DealPipelineStep';
 import InteractiveCalendar from '../components/dashboard/InteractiveCalendar';
 import ActivityTimeline from '../components/dashboard/ActivityTimeline';
-import CandidateCard from '../components/dashboard/CandidateCard';
 import QuickActionsPanel from '../components/dashboard/QuickActionsPanel';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [timeRange, setTimeRange] = useState('30D');
-  const [chartType, setChartType] = useState('bar');
   const [isLoading, setIsLoading] = useState(false);
   const [isDealsLoading, setIsDealsLoading] = useState(false); // Separate loading for deals
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
   const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
+  const [chartType, setChartType] = useState('line'); // Chart type toggle
 
-  // Enhanced chart data with more details
+  // Monthly Revenue Changes data with exact specifications
   const salesData = [
-    { label: 'Jan', value: 45, color: 'fill-blue-500', details: 'Revenue: $45k, Profit: $12k' },
-    { label: 'Feb', value: 58, color: 'fill-blue-600', details: 'Revenue: $58k, Profit: $18k' },
-    { label: 'Mar', value: 38, color: 'fill-blue-400', details: 'Revenue: $38k, Profit: $8k' },
-    { label: 'Apr', value: 72, color: 'fill-blue-700', details: 'Revenue: $72k, Profit: $22k' },
-    { label: 'May', value: 52, color: 'fill-blue-500', details: 'Revenue: $52k, Profit: $15k' },
-    { label: 'Jun', value: 41, color: 'fill-blue-400', details: 'Revenue: $41k, Profit: $11k' }
+    { label: 'Jan', value: 47, details: 'New clients: 12, Profit margin: 27%', change: null },
+    { label: 'Feb', value: 60, details: 'New clients: 18, Profit margin: 31%', change: 29 },
+    { label: 'Mar', value: 46, details: 'New clients: 8, Profit margin: 21%', change: -34 },
+    { label: 'Apr', value: 72, details: 'New clients: 24, Profit margin: 31%', change: 89 },
+    { label: 'May', value: 52, details: 'New clients: 15, Profit margin: 29%', change: -28 },
+    { label: 'Jun', value: 40, details: 'New clients: 11, Profit margin: 27%', change: -23 }
   ];
 
 
 
-  const statusData = [
-    { label: 'Active', value: 45, color: 'text-green-500' },
-    { label: 'Pending', value: 23, color: 'text-yellow-500' },
-    { label: 'Closed', value: 12, color: 'text-blue-500' },
-    { label: 'Lost', value: 8, color: 'text-red-500' }
-  ];
+
 
   // Pipeline steps data
   const pipelineSteps = [
@@ -75,8 +55,8 @@ const Dashboard = () => {
   const activeJobsSparkline = [20, 22, 18, 24, 26, 24, 24];
   const candidatesSparkline = [45, 48, 42, 47, 49, 46, 47];
 
-  // Calendar events data
-  const calendarEvents = [
+  // Calendar events state
+  const [calendarEvents, setCalendarEvents] = useState([
     {
       id: 1,
       title: 'Interview - Sarah Johnson',
@@ -101,47 +81,9 @@ const Dashboard = () => {
       color: 'bg-purple-500',
       type: 'call'
     }
-  ];
+  ]);
 
-  // Enhanced candidate data
-  const candidateDetails = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@email.com',
-      role: 'Senior React Developer',
-      address: 'San Francisco, CA',
-      status: 'Available',
-      skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
-      rating: 4.8,
-      interviews: 2,
-      salary: '$120,000'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      email: 'michael.chen@email.com',
-      role: 'UX/UI Designer',
-      address: 'New York, NY',
-      status: 'Interviewed',
-      skills: ['Figma', 'Adobe XD', 'Prototyping', 'User Research'],
-      rating: 4.6,
-      interviews: 1,
-      salary: '$95,000'
-    },
-    {
-      id: 3,
-      name: 'Emma Wilson',
-      email: 'emma.wilson@email.com',
-      role: 'Backend Engineer',
-      address: 'Austin, TX',
-      status: 'Hired',
-      skills: ['Python', 'Django', 'PostgreSQL', 'Docker'],
-      rating: 4.9,
-      interviews: 3,
-      salary: '$110,000'
-    }
-  ];
+
 
   // Enhanced activity data
   const getTimeAgo = (hoursAgo) => {
@@ -220,8 +162,21 @@ const Dashboard = () => {
     }, 500);
   };
 
+  const handlePointClick = (data, index) => {
+    console.log('Point clicked:', data, index);
+  };
+
   const handleBarClick = (data, index) => {
     console.log('Bar clicked:', data, index);
+  };
+
+  const handleChartTypeChange = (newType) => {
+    setChartType(newType);
+    // Trigger re-animation when chart type changes
+    setShouldAnimateChart(false);
+    setTimeout(() => {
+      setShouldAnimateChart(true);
+    }, 100);
   };
 
 
@@ -240,23 +195,12 @@ const Dashboard = () => {
     console.log('Activity clicked:', activity);
   };
 
-  const handleCandidateAction = (action, candidate) => {
-    console.log(`${action} candidate:`, candidate);
-    switch (action) {
-      case 'view':
-        navigate(`/app/candidates/${candidate.id}`);
-        break;
-      case 'edit':
-        navigate(`/app/candidates/${candidate.id}/edit`);
-        break;
-      case 'contact':
-        // Open email client or contact modal
-        break;
-      case 'schedule':
-        navigate('/app/calendar');
-        break;
-    }
+  const handleEventAdd = (newEvent) => {
+    setCalendarEvents(prevEvents => [...prevEvents, newEvent]);
+    console.log('New event added:', newEvent);
   };
+
+
 
   const handleQuickAction = (action) => {
     console.log('Quick action:', action);
@@ -288,6 +232,19 @@ const Dashboard = () => {
     setTimeout(() => {
       setIsDealsLoading(false);
     }, 1000);
+  };
+
+  const handleTimeRangeChange = (newRange) => {
+    if (newRange !== timeRange) {
+      // Trigger chart re-animation when time range changes
+      setShouldAnimateChart(false);
+      setTimeRange(newRange);
+      
+      // Re-enable animation after a brief delay
+      setTimeout(() => {
+        setShouldAnimateChart(true);
+      }, 100);
+    }
   };
 
   return (
@@ -357,23 +314,24 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Enhanced Charts Row - 2 Column Layout */}
+          {/* Enhanced Charts Row - Graph | Activity Feed | Deal Pipeline */}
           <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* Interactive Monthly Changes Chart */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="lg:col-span-6 bg-white rounded-2xl p-3 shadow-sm border border-gray-200">
                 <ChartControls
                   timeRange={timeRange}
-                  onTimeRangeChange={setTimeRange}
+                  onTimeRangeChange={handleTimeRangeChange}
                   onExport={handleChartExport}
                   onRefresh={handleChartRefresh}
+                  chartType={chartType}
+                  onChartTypeChange={handleChartTypeChange}
                 />
                 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">Monthly Changes</h2>
-                    <p className="text-sm text-gray-500">Revenue trends with smooth growth animations</p>
                   </div>
                   <div className="flex items-center text-sm font-semibold text-green-600">
                     <TrendingUp className="w-4 h-4 mr-1" />
@@ -381,58 +339,62 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                <BarChart 
-                  key={`chart-${shouldAnimateChart}`}
+                <ChartContainer 
+                  key={`chart-${shouldAnimateChart}-${timeRange}-${chartType}`}
                   data={salesData} 
-                  height={250} 
+                  height={280} 
+                  onPointClick={handlePointClick}
                   onBarClick={handleBarClick}
                   animate={shouldAnimateChart}
-                  className="mb-4" 
+                  chartType={chartType}
+                  onChartTypeChange={handleChartTypeChange}
+                  className="mb-2" 
                 />
                 
                 <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
                   <div>
-                    <div className="text-lg font-bold text-blue-600">$306k</div>
+                    <div className="text-xl font-bold text-blue-600">$317k</div>
                     <div className="text-xs text-gray-500">Total Revenue</div>
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-green-600">$86k</div>
+                    <div className="text-xl font-bold text-green-600">$89k</div>
                     <div className="text-xs text-gray-500">Total Profit</div>
                   </div>
                 </div>
               </div>
 
+              {/* Enhanced Activity Timeline - Vertical between Graph and Pipeline */}
+              <div className="lg:col-span-3">
+                <ActivityTimeline
+                  activities={recentActivity}
+                  onActivityClick={handleActivityClick}
+                />
+              </div>
+
               {/* Enhanced Deal Pipeline */}
-              <DealPipelineStep
-                steps={pipelineSteps}
-                currentStep={currentPipelineStep}
-                onStepClick={handlePipelineStepClick}
-                onRefresh={handleDealsRefresh}
-                showCounts={true}
-                loading={isDealsLoading}
-              />
+              <div className="lg:col-span-3">
+                <DealPipelineStep
+                  steps={pipelineSteps}
+                  currentStep={currentPipelineStep}
+                  onStepClick={handlePipelineStepClick}
+                  onRefresh={handleDealsRefresh}
+                  showCounts={true}
+                  loading={isDealsLoading}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Content Row - Calendar and Activity */}
+          {/* Content Row - Calendar */}
           <div className="lg:col-span-8 xl:col-span-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Enhanced Interactive Calendar */}
-              <InteractiveCalendar
-                events={calendarEvents}
-                onEventClick={handleEventClick}
-                onDateClick={handleDateClick}
-                currentDate={currentCalendarDate}
-                onDateChange={setCurrentCalendarDate}
-              />
-
-              {/* Enhanced Activity Timeline */}
-              <ActivityTimeline
-                activities={recentActivity}
-                onActivityClick={handleActivityClick}
-              />
-            </div>
+            <InteractiveCalendar
+              events={calendarEvents}
+              onEventClick={handleEventClick}
+              onDateClick={handleDateClick}
+              onEventAdd={handleEventAdd}
+              currentDate={currentCalendarDate}
+              onDateChange={setCurrentCalendarDate}
+            />
           </div>
 
           {/* Sidebar - Quick Actions */}
@@ -440,56 +402,7 @@ const Dashboard = () => {
             <QuickActionsPanel onActionClick={handleQuickAction} />
           </div>
 
-          {/* Bottom Row - Enhanced Candidate Grid */}
-          <div className="lg:col-span-12 xl:col-span-16">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center">
-                    <Users className="w-5 h-5 mr-2 text-blue-600" />
-                    Top Candidates
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {candidateDetails.length} active candidates in pipeline
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110 group">
-                    <Filter className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                  </button>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-all duration-200 flex items-center shadow-md hover:shadow-lg transform hover:scale-105">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View All
-                  </button>
-                </div>
-              </div>
-              
-              {/* Enhanced Candidate Cards Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {candidateDetails.map(candidate => (
-                  <CandidateCard
-                    key={candidate.id}
-                    candidate={candidate}
-                    onView={() => handleCandidateAction('view', candidate)}
-                    onEdit={() => handleCandidateAction('edit', candidate)}
-                    onContact={() => handleCandidateAction('contact', candidate)}
-                    onSchedule={() => handleCandidateAction('schedule', candidate)}
-                  />
-                ))}
-              </div>
-              
-              {/* Show More Button */}
-              <div className="text-center pt-6 border-t border-gray-200 mt-6">
-                <button 
-                  onClick={() => navigate('/app/candidates')}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  View All Candidates →
-                </button>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
