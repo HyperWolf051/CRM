@@ -8,14 +8,20 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
 const pageTitles = {
   '/app/dashboard': 'Dashboard',
   '/app/candidates': 'Candidates',
+  '/app/candidates/add': 'Add Candidate',
   '/app/contacts': 'Contacts',
   '/app/deals': 'Jobs',
+  '/app/deals/add': 'Post New Job',
   '/app/companies': 'Clients',
+  '/app/companies/add': 'Add Client',
   '/app/calendar': 'Calendar',
   '/app/tasks': 'Tasks',
   '/app/analytics': 'Reports',
   '/app/team': 'Team',
   '/app/settings': 'Settings',
+  '/app/automation': 'Automation',
+  '/app/email-automation': 'Email Automation',
+  '/app/reminders': 'Reminders',
 };
 
 export default function DashboardLayout() {
@@ -30,8 +36,16 @@ export default function DashboardLayout() {
     }
     
     // Check for dynamic routes (e.g., /app/contacts/123)
-    if (location.pathname.startsWith('/app/contacts/')) {
+    if (location.pathname.startsWith('/app/contacts/') && location.pathname !== '/app/contacts/add') {
       return 'Contact Details';
+    }
+    
+    // Check for add routes
+    if (location.pathname.endsWith('/add')) {
+      const basePath = location.pathname.replace('/add', '');
+      if (pageTitles[basePath]) {
+        return `Add ${pageTitles[basePath].slice(0, -1)}`; // Remove 's' from plural
+      }
     }
     
     // Default fallback

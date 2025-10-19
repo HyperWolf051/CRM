@@ -141,7 +141,7 @@ export default function Companies() {
   // Filter companies
   const filteredCompanies = companies.filter(company => {
     const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         company.industry.toLowerCase().includes(searchTerm.toLowerCase());
+      company.industry.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || company.status === selectedStatus;
     const matchesIndustry = selectedIndustry === 'all' || company.industry === selectedIndustry;
     const matchesSize = selectedSize === 'all' || company.size === selectedSize;
@@ -180,7 +180,7 @@ export default function Companies() {
     // In a real app, this would be handled by a state management system
     // For now, we'll just show a success message
     alert('Client added successfully!');
-    
+
     setNewCompany({
       name: '', industry: '', size: '', revenue: '', website: '',
       phone: '', email: '', address: '', notes: ''
@@ -191,296 +191,294 @@ export default function Companies() {
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="space-y-6 animate-fade-in">
-      {/* Header with Metrics */}
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Clients
-            </h1>
-            <p className="text-gray-600 mt-1">Manage your client relationships and accounts</p>
-          </div>
-          <Button
-            variant="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => navigate('/app/companies/add')}
-          >
-            Add Client
-          </Button>
-        </div>
-
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Clients</p>
-                <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-purple-600" />
-              </div>
+        {/* Header with Metrics */}
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Clients
+              </h1>
+              <p className="text-gray-600 mt-1">Manage your client relationships and accounts</p>
             </div>
+            <Button
+              variant="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => navigate('/app/companies/add')}
+            >
+              Add Client
+            </Button>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Contacts</p>
-                <p className="text-2xl font-bold text-gray-900">{totalContacts}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Company Value</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgCompanyValue)}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex flex-col gap-4 mb-6">
-            {/* Status Filters */}
-            <div className="flex flex-wrap gap-2">
-              {companyStatuses.map((status) => (
-                <button
-                  key={status.id}
-                  onClick={() => setSelectedStatus(status.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    selectedStatus === status.id
-                      ? status.color + ' shadow-md'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {status.name} ({status.count})
-                </button>
-              ))}
-            </div>
-            
-            {/* Search and Advanced Filters */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search clients, industries..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 w-full"
-                />
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                    showFilters ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <Filter className="w-4 h-4" />
-                  <span>Filters</span>
-                </button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2">
-                  <Download className="w-4 h-4" />
-                  <span>Export</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Advanced Filters */}
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                  <select
-                    value={selectedIndustry}
-                    onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
-                  >
-                    {industries.map((industry) => (
-                      <option key={industry.id} value={industry.id}>{industry.name}</option>
-                    ))}
-                  </select>
+                  <p className="text-sm font-medium text-gray-600">Total Clients</p>
+                  <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
-                  <select
-                    value={selectedSize}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
-                  >
-                    {companySizes.map((size) => (
-                      <option key={size.id} value={size.id}>{size.name}</option>
-                    ))}
-                  </select>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-purple-600" />
                 </div>
+              </div>
+            </div>
 
-                <div className="flex items-end">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Contacts</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalContacts}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Avg Company Value</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgCompanyValue)}</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters and Search */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex flex-col gap-4 mb-6">
+              {/* Status Filters */}
+              <div className="flex flex-wrap gap-2">
+                {companyStatuses.map((status) => (
                   <button
-                    onClick={() => {
-                      setSelectedIndustry('all');
-                      setSelectedSize('all');
-                      setSearchTerm('');
-                    }}
-                    className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200"
+                    key={status.id}
+                    onClick={() => setSelectedStatus(status.id)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedStatus === status.id
+                        ? status.color + ' shadow-md'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
                   >
-                    Clear Filters
+                    {status.name} ({status.count})
+                  </button>
+                ))}
+              </div>
+
+              {/* Search and Advanced Filters */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search clients, industries..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 w-full"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${showFilters ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span>Filters</span>
+                  </button>
+                  <button className="px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2">
+                    <Download className="w-4 h-4" />
+                    <span>Export</span>
                   </button>
                 </div>
               </div>
+
+              {/* Advanced Filters */}
+              {showFilters && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                    <select
+                      value={selectedIndustry}
+                      onChange={(e) => setSelectedIndustry(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
+                    >
+                      {industries.map((industry) => (
+                        <option key={industry.id} value={industry.id}>{industry.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
+                    >
+                      {companySizes.map((size) => (
+                        <option key={size.id} value={size.id}>{size.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setSelectedIndustry('all');
+                        setSelectedSize('all');
+                        setSearchTerm('');
+                      }}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Clients Table */}
+            {isLoading ? (
+              <SkeletonLoader rows={5} />
+            ) : filteredCompanies.length === 0 ? (
+              <EmptyState
+                icon={<Building2 className="w-16 h-16" />}
+                title="No clients found"
+                description={
+                  searchTerm || selectedStatus !== 'all' || selectedIndustry !== 'all' || selectedSize !== 'all'
+                    ? "No clients match your current filters. Try adjusting your search criteria."
+                    : "You haven't added any clients yet. Start building your client database by adding your first client."
+                }
+                action={
+                  <Button
+                    variant="primary"
+                    icon={<Plus className="w-4 h-4" />}
+                    onClick={() => navigate('/app/companies/add')}
+                  >
+                    Add Your First Client
+                  </Button>
+                }
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Client</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Industry</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Size</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Contacts</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Deals</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCompanies.map((company) => (
+                      <tr
+                        key={company.id}
+                        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => handleCompanyClick(company)}
+                      >
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-3">
+                            <Avatar
+                              src={company.logo}
+                              name={company.name}
+                              size="sm"
+                            />
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-white">{company.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{company.website}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-gray-900 dark:text-white">{company.industry}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-gray-900 dark:text-white">{company.size}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="font-semibold text-green-600 dark:text-green-400">
+                            {formatCurrency(company.revenue)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge
+                            variant={
+                              company.status === 'customer' ? 'success' :
+                                company.status === 'active' ? 'info' :
+                                  company.status === 'prospect' ? 'warning' : 'default'
+                            }
+                          >
+                            {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-gray-900 dark:text-white">{company.contactsCount}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-gray-900 dark:text-white">
+                            {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCompanyClick(company);
+                              }}
+                              className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle edit
+                              }}
+                              className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle delete
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
-
-          {/* Clients Table */}
-          {isLoading ? (
-            <SkeletonLoader rows={5} />
-          ) : filteredCompanies.length === 0 ? (
-            <EmptyState
-              icon={<Building2 className="w-16 h-16" />}
-              title="No clients found"
-              description={
-                searchTerm || selectedStatus !== 'all' || selectedIndustry !== 'all' || selectedSize !== 'all'
-                  ? "No clients match your current filters. Try adjusting your search criteria."
-                  : "You haven't added any clients yet. Start building your client database by adding your first client."
-              }
-              action={
-                <Button
-                  variant="primary"
-                  icon={<Plus className="w-4 h-4" />}
-                  onClick={() => navigate('/app/companies/add')}
-                >
-                  Add Your First Client
-                </Button>
-              }
-            />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Client</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Industry</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Size</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Status</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Contacts</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Deals</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCompanies.map((company) => (
-                    <tr
-                      key={company.id}
-                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                      onClick={() => handleCompanyClick(company)}
-                    >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center space-x-3">
-                          <Avatar
-                            src={company.logo}
-                            name={company.name}
-                            size="sm"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">{company.name}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{company.website}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.industry}</div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.size}</div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="font-semibold text-green-600 dark:text-green-400">
-                          {formatCurrency(company.revenue)}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge
-                          variant={
-                            company.status === 'customer' ? 'success' :
-                            company.status === 'active' ? 'info' :
-                            company.status === 'prospect' ? 'warning' : 'default'
-                          }
-                        >
-                          {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.contactsCount}</div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">
-                          {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCompanyClick(company);
-                            }}
-                            className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle edit
-                            }}
-                            className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle delete
-                            }}
-                            className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
-      </div>
       </div>
 
       {/* Add Company Modal */}
@@ -505,7 +503,7 @@ export default function Companies() {
                     <input
                       type="text"
                       value={newCompany.name}
-                      onChange={(e) => setNewCompany({...newCompany, name: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="Enter client name"
                       required
@@ -516,7 +514,7 @@ export default function Companies() {
                     <label className="block text-sm font-medium text-slate-700 mb-2">Industry *</label>
                     <select
                       value={newCompany.industry}
-                      onChange={(e) => setNewCompany({...newCompany, industry: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, industry: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       required
                     >
@@ -534,7 +532,7 @@ export default function Companies() {
                     <label className="block text-sm font-medium text-slate-700 mb-2">Client Size</label>
                     <select
                       value={newCompany.size}
-                      onChange={(e) => setNewCompany({...newCompany, size: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, size: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                     >
                       <option value="">Select size</option>
@@ -551,7 +549,7 @@ export default function Companies() {
                     <input
                       type="number"
                       value={newCompany.revenue}
-                      onChange={(e) => setNewCompany({...newCompany, revenue: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, revenue: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="Annual revenue in USD"
                     />
@@ -562,7 +560,7 @@ export default function Companies() {
                     <input
                       type="url"
                       value={newCompany.website}
-                      onChange={(e) => setNewCompany({...newCompany, website: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="https://company.com"
                     />
@@ -573,7 +571,7 @@ export default function Companies() {
                     <input
                       type="tel"
                       value={newCompany.phone}
-                      onChange={(e) => setNewCompany({...newCompany, phone: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="Phone number"
                     />
@@ -584,7 +582,7 @@ export default function Companies() {
                     <input
                       type="email"
                       value={newCompany.email}
-                      onChange={(e) => setNewCompany({...newCompany, email: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="contact@client.com"
                     />
@@ -595,7 +593,7 @@ export default function Companies() {
                     <input
                       type="text"
                       value={newCompany.address}
-                      onChange={(e) => setNewCompany({...newCompany, address: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, address: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="Full address"
                     />
@@ -605,7 +603,7 @@ export default function Companies() {
                     <label className="block text-sm font-medium text-slate-700 mb-2">Notes</label>
                     <textarea
                       value={newCompany.notes}
-                      onChange={(e) => setNewCompany({...newCompany, notes: e.target.value})}
+                      onChange={(e) => setNewCompany({ ...newCompany, notes: e.target.value })}
                       rows={3}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 resize-none"
                       placeholder="Additional notes about the client..."
@@ -661,8 +659,8 @@ export default function Companies() {
                 <Badge
                   variant={
                     selectedCompany.status === 'customer' ? 'success' :
-                    selectedCompany.status === 'active' ? 'info' :
-                    selectedCompany.status === 'prospect' ? 'warning' : 'default'
+                      selectedCompany.status === 'active' ? 'info' :
+                        selectedCompany.status === 'prospect' ? 'warning' : 'default'
                   }
                   className="mt-2"
                 >
@@ -707,8 +705,8 @@ export default function Companies() {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-400" />
-                  <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" 
-                     className="text-blue-600 dark:text-blue-400 hover:underline">
+                  <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline">
                     {selectedCompany.website}
                   </a>
                 </div>
