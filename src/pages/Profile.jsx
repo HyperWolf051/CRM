@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { User, Shield, Bell, Camera, MapPin, Phone, Mail, Calendar, Award, Lock, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Shield, Bell, Camera, MapPin, Phone, Mail, Calendar, Award, Lock, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle, Globe, Clock, DollarSign, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Avatar from '@/components/ui/Avatar';
 import Badge from '@/components/ui/Badge';
+import AnimatedStatsHeader from '@/components/profile/AnimatedStatsHeader';
 import { useAuth } from '@/context/AuthContext';
 
 const Profile = () => {
@@ -35,13 +36,13 @@ const Profile = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileTab user={user} />;
+        return <ProfileTab user={user} setActiveTab={setActiveTab} />;
       case 'security':
         return <SecurityTab />;
       case 'notifications':
         return <NotificationsTab />;
       default:
-        return <ProfileTab user={user} />;
+        return <ProfileTab user={user} setActiveTab={setActiveTab} />;
     }
   };
 
@@ -77,24 +78,7 @@ const Profile = () => {
               <p className="text-blue-100 text-lg mb-4">Senior Sales Manager</p>
               
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl font-bold text-white">127</div>
-                  <div className="text-blue-200 text-sm">Deals Closed</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl font-bold text-white">15</div>
-                  <div className="text-blue-200 text-sm">Team Members</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl font-bold text-white">$2.4M</div>
-                  <div className="text-blue-200 text-sm">Revenue</div>
-                </div>
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl font-bold text-white">94%</div>
-                  <div className="text-blue-200 text-sm">Success Rate</div>
-                </div>
-              </div>
+              <AnimatedStatsHeader />
             </div>
           </div>
         </div>
@@ -144,73 +128,449 @@ const Profile = () => {
 };
 
 // Profile Tab Component
-const ProfileTab = ({ user }) => {
+const ProfileTab = ({ user, setActiveTab }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: user?.name || '',
+    email: user?.email || '',
+    phone: '+1 (555) 123-4567',
+    location: 'San Francisco, CA',
+    department: 'Sales & Marketing',
+    jobTitle: 'Senior Sales Manager',
+    bio: 'Experienced sales professional with over 8 years in B2B sales and team management. Passionate about building relationships and driving revenue growth through strategic partnerships and innovative sales approaches.',
+    website: 'https://linkedin.com/in/johndoe',
+    timezone: 'Pacific Standard Time (PST)'
+  });
+  const [formErrors, setFormErrors] = useState({});
+
+  // Animated statistics
+  const [animatedStats, setAnimatedStats] = useState({
+    deals: 0,
+    team: 0,
+    revenue: 0,
+    success: 0
+  });
+
+  const targetStats = {
+    deals: 127,
+    team: 15,
+    revenue: 2.4,
+    success: 94
+  };
+
+  // Animate statistics on component mount
+  React.useEffect(() => {
+    const animateStats = () => {
+      const duration = 2000; // 2 seconds
+      const steps = 60; // 60fps
+      const stepDuration = duration / steps;
+      let currentStep = 0;
+
+      const timer = setInterval(() => {
+        currentStep++;
+        const progress = currentStep / steps;
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+        setAnimatedStats({
+          deals: Math.round(targetStats.deals * easeOutQuart),
+          team: Math.round(targetStats.team * easeOutQuart),
+          revenue: Math.round(targetStats.revenue * easeOutQuart * 10) / 10,
+          success: Math.round(targetStats.success * easeOutQuart)
+        });
+
+        if (currentStep >= steps) {
+          clearInterval(timer);
+          setAnimatedStats(targetStats);
+        }
+      }, stepDuration);
+
+      return () => clearInterval(timer);
+    };
+
+    const timeout = setTimeout(animateStats, 500); // Start animation after 500ms
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.fullName.trim()) {
+      errors.fullName = 'Full name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    }
+    
+    if (!formData.location.trim()) {
+      errors.location = 'Location is required';
+    }
+
+    if (formData.bio.length > 500) {
+      errors.bio = 'Bio must be less than 500 characters';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setSaveSuccess(true);
+      setIsEditing(false);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      fullName: user?.name || '',
+      email: user?.email || '',
+      phone: '+1 (555) 123-4567',
+      location: 'San Francisco, CA',
+      department: 'Sales & Marketing',
+      jobTitle: 'Senior Sales Manager',
+      bio: 'Experienced sales professional with over 8 years in B2B sales and team management. Passionate about building relationships and driving revenue growth through strategic partnerships and innovative sales approaches.',
+      website: 'https://linkedin.com/in/johndoe',
+      timezone: 'Pacific Standard Time (PST)'
+    });
+    setFormErrors({});
+    setIsEditing(false);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Main Profile Information */}
       <div className="lg:col-span-2 space-y-6">
+        {/* Success Message */}
+        {saveSuccess && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-fade-in">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <span className="text-green-800 font-medium">Profile updated successfully!</span>
+          </div>
+        )}
+
         <Card className="shadow-lg">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
-              <Button variant="secondary" size="sm">
-                Edit Profile
-              </Button>
+              <div className="flex gap-3">
+                {isEditing ? (
+                  <>
+                    <Button 
+                      variant="secondary" 
+                      size="sm" 
+                      onClick={handleCancel}
+                      disabled={isSaving}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="min-w-[80px]"
+                    >
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </Button>
+                )}
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Full Name</div>
-                    <div className="font-medium">{user?.name || 'Not specified'}</div>
+            {isEditing ? (
+              // Edit Mode - Form Fields
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    {/* Full Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.fullName}
+                        onChange={(e) => handleInputChange('fullName', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.fullName ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your full name"
+                      />
+                      {formErrors.fullName && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.fullName}</p>
+                      )}
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.email ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your email address"
+                      />
+                      {formErrors.email && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                      )}
+                    </div>
+
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.phone ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your phone number"
+                      />
+                      {formErrors.phone && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
+                      )}
+                    </div>
+
+                    {/* Website */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Website / LinkedIn
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.website}
+                        onChange={(e) => handleInputChange('website', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        placeholder="https://linkedin.com/in/yourname"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* Location */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Location *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.location ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your location"
+                      />
+                      {formErrors.location && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.location}</p>
+                      )}
+                    </div>
+
+                    {/* Job Title */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Job Title
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.jobTitle}
+                        onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        placeholder="Enter your job title"
+                      />
+                    </div>
+
+                    {/* Department */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Department
+                      </label>
+                      <select
+                        value={formData.department}
+                        onChange={(e) => handleInputChange('department', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      >
+                        <option value="Sales & Marketing">Sales & Marketing</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Customer Success">Customer Success</option>
+                      </select>
+                    </div>
+
+                    {/* Timezone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Timezone
+                      </label>
+                      <select
+                        value={formData.timezone}
+                        onChange={(e) => handleInputChange('timezone', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      >
+                        <option value="Pacific Standard Time (PST)">Pacific Standard Time (PST)</option>
+                        <option value="Mountain Standard Time (MST)">Mountain Standard Time (MST)</option>
+                        <option value="Central Standard Time (CST)">Central Standard Time (CST)</option>
+                        <option value="Eastern Standard Time (EST)">Eastern Standard Time (EST)</option>
+                        <option value="Greenwich Mean Time (GMT)">Greenwich Mean Time (GMT)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bio Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    About / Bio
+                  </label>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    rows={4}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
+                      formErrors.bio ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Tell us about yourself..."
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    {formErrors.bio && (
+                      <p className="text-sm text-red-600">{formErrors.bio}</p>
+                    )}
+                    <p className={`text-sm ml-auto ${formData.bio.length > 450 ? 'text-red-600' : 'text-gray-500'}`}>
+                      {formData.bio.length}/500 characters
+                    </p>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              // View Mode - Display Information
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Full Name</div>
+                      <div className="font-medium">{formData.fullName || 'Not specified'}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Email Address</div>
+                      <div className="font-medium">{formData.email || 'Not specified'}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Phone Number</div>
+                      <div className="font-medium">{formData.phone}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Website</div>
+                      <a href={formData.website} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                        {formData.website}
+                      </a>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Email Address</div>
-                    <div className="font-medium">{user?.email || 'Not specified'}</div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Location</div>
+                      <div className="font-medium">{formData.location}</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Phone Number</div>
-                    <div className="font-medium">+1 (555) 123-4567</div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Joined</div>
+                      <div className="font-medium">January 2023</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Award className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Department</div>
+                      <div className="font-medium">{formData.department}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-sm text-gray-500">Timezone</div>
+                      <div className="font-medium">{formData.timezone}</div>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Location</div>
-                    <div className="font-medium">San Francisco, CA</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Joined</div>
-                    <div className="font-medium">January 2023</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Award className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <div className="text-sm text-gray-500">Department</div>
-                    <div className="font-medium">Sales & Marketing</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </Card>
 
@@ -219,9 +579,7 @@ const ProfileTab = ({ user }) => {
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
             <p className="text-gray-600 leading-relaxed">
-              Experienced sales professional with over 8 years in B2B sales and team management. 
-              Passionate about building relationships and driving revenue growth through strategic 
-              partnerships and innovative sales approaches.
+              {formData.bio}
             </p>
           </div>
         </Card>
@@ -229,22 +587,133 @@ const ProfileTab = ({ user }) => {
 
       {/* Sidebar */}
       <div className="space-y-6">
-        {/* Activity Summary */}
+        {/* Performance Statistics */}
+        <Card className="shadow-lg">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Performance Statistics</h3>
+            <div className="space-y-6">
+              {/* Deals Closed */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Deals Closed</div>
+                    <div className="text-2xl font-bold text-gray-900">{animatedStats.deals}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-green-600 font-medium">+12% this month</div>
+                  <div className="w-16 h-2 bg-gray-200 rounded-full mt-1">
+                    <div className="w-3/4 h-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Members */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Team Members</div>
+                    <div className="text-2xl font-bold text-gray-900">{animatedStats.team}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-blue-600 font-medium">+2 this quarter</div>
+                  <div className="w-16 h-2 bg-gray-200 rounded-full mt-1">
+                    <div className="w-4/5 h-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Revenue */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-600 rounded-lg flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Revenue (M)</div>
+                    <div className="text-2xl font-bold text-gray-900">${animatedStats.revenue}M</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-purple-600 font-medium">+18% YoY</div>
+                  <div className="w-16 h-2 bg-gray-200 rounded-full mt-1">
+                    <div className="w-5/6 h-2 bg-gradient-to-r from-purple-500 to-violet-600 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Success Rate */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Success Rate</div>
+                    <div className="text-2xl font-bold text-gray-900">{animatedStats.success}%</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-orange-600 font-medium">+3% this month</div>
+                  <div className="w-16 h-2 bg-gray-200 rounded-full mt-1">
+                    <div className="w-full h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Recent Activity */}
         <Card className="shadow-lg">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-gray-600">Closed deal with Acme Corp</span>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Closed deal with Acme Corp</p>
+                  <p className="text-xs text-gray-500 mt-1">$45,000 • 2 hours ago</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-gray-600">Updated client proposal</span>
+              
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Updated client proposal</p>
+                  <p className="text-xs text-gray-500 mt-1">TechStart Inc • 4 hours ago</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-600">Scheduled team meeting</span>
+              
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Calendar className="w-4 h-4 text-orange-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Scheduled team meeting</p>
+                  <p className="text-xs text-gray-500 mt-1">Q4 Planning • Tomorrow 2:00 PM</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">New team member onboarded</p>
+                  <p className="text-xs text-gray-500 mt-1">Sarah Johnson • Yesterday</p>
+                </div>
               </div>
             </div>
           </div>
@@ -255,17 +724,36 @@ const ProfileTab = ({ user }) => {
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Button variant="secondary" className="w-full justify-start">
+              <Button 
+                variant="secondary" 
+                className="w-full justify-start hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                onClick={() => setIsEditing(true)}
+              >
                 <User className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>
-              <Button variant="secondary" className="w-full justify-start">
+              <Button 
+                variant="secondary" 
+                className="w-full justify-start hover:bg-green-50 hover:text-green-700 transition-colors"
+                onClick={() => setActiveTab('security')}
+              >
                 <Shield className="w-4 h-4 mr-2" />
                 Security Settings
               </Button>
-              <Button variant="secondary" className="w-full justify-start">
+              <Button 
+                variant="secondary" 
+                className="w-full justify-start hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                onClick={() => setActiveTab('notifications')}
+              >
                 <Bell className="w-4 h-4 mr-2" />
                 Notifications
+              </Button>
+              <Button 
+                variant="secondary" 
+                className="w-full justify-start hover:bg-orange-50 hover:text-orange-700 transition-colors"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                View Calendar
               </Button>
             </div>
           </div>

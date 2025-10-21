@@ -54,7 +54,7 @@ const navigationItems = [
     color: 'from-orange-500 to-orange-600'
   },
   {
-    name: 'Reports',
+    name: 'Analytics',
     href: '/app/analytics',
     icon: BarChart3,
     color: 'from-indigo-500 to-indigo-600'

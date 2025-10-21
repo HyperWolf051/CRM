@@ -61,7 +61,7 @@ const AutomationDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate('/app/dashboard')}
@@ -98,10 +98,10 @@ const AutomationDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="w-full space-y-6">
           
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
             <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <Zap className="w-8 h-8 text-blue-600" />
@@ -211,7 +211,7 @@ const AutomationDashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <button 
               onClick={() => navigate('/app/email-automation')}
               className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-lg p-6 hover:shadow-xl transition-all duration-200 text-left group"
