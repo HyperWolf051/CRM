@@ -22,6 +22,7 @@ const pageTitles = {
   '/app/automation': 'Automation',
   '/app/email-automation': 'Email Automation',
   '/app/reminders': 'Reminders',
+  '/app/profile': 'Profile',
 };
 
 export default function DashboardLayout() {
@@ -95,9 +96,9 @@ export default function DashboardLayout() {
           <Topbar title={getPageTitle()} />
         </div>
         
-        {/* Page Content - Scrollable area */}
+        {/* Page Content - Scrollable area with Optimized Spacing */}
         <main className="flex-1 overflow-y-auto bg-gray-50" style={{ zIndex: 10 }}>
-          <div className="p-4 lg:p-6">
+          <div className="p-3 lg:p-4">
             <div className="w-full max-w-none">
               <PageTransition>
                 <Outlet />

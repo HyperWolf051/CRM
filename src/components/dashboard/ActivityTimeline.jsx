@@ -29,9 +29,9 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
       {/* Header with Filters */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <Activity className="w-5 h-5 mr-2 text-blue-600" />
           Activity Feed
@@ -61,7 +61,7 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500"></div>
         
         {/* Activities */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {activities.map((activity, index) => {
             const { icon: Icon, color } = activityIcons[activity.type] || activityIcons.task;
             
@@ -77,7 +77,7 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
                 </div>
                 
                 {/* Activity Content */}
-                <div className="flex-1 min-w-0 pb-6">
+                <div className="flex-1 min-w-0 pb-4">
                   <div className="bg-gray-50 rounded-xl p-4 group-hover:bg-white group-hover:shadow-md transition-all duration-200">
                     {/* Activity Header */}
                     <div className="flex items-center justify-between mb-2">
@@ -126,7 +126,7 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
       </div>
       
       {/* Load More */}
-      <div className="text-center pt-4 border-t border-gray-200 mt-6">
+      <div className="text-center pt-4 border-t border-gray-200 mt-5">
         <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
           Load More Activities
         </button>

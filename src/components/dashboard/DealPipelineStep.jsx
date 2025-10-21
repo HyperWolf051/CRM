@@ -76,9 +76,9 @@ const DealPipelineStep = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
       {/* Enhanced Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <div>
           <h3 className="text-lg font-bold text-gray-900">Deal Pipeline</h3>
           <p className="text-sm text-gray-500">Track deals through your sales process</p>
@@ -106,7 +106,7 @@ const DealPipelineStep = ({
       </div>
       
       {/* Pipeline Steps */}
-      <div className="relative mb-8">
+      <div className="relative mb-6">
         {/* Progress Line */}
         <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200"></div>
         <div 

@@ -21,6 +21,7 @@ const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
 const AddClient = lazy(() => import('@/pages/AddClient'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Profile = lazy(() => import('@/pages/Profile'));
 const Team = lazy(() => import('@/pages/Team'));
 const EmailAutomation = lazy(() => import('@/pages/EmailAutomation'));
 const ReminderSystem = lazy(() => import('@/pages/ReminderSystem'));
@@ -92,6 +93,7 @@ function App() {
                   <Route path="automation" element={<AutomationDashboard />} />
                   <Route path="email-automation" element={<EmailAutomation />} />
                   <Route path="reminders" element={<ReminderSystem />} />
+                  <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
                 

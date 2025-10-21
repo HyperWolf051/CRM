@@ -137,9 +137,9 @@ const QuickActionsPanel = ({ onActionClick }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <Zap className="w-5 h-5 mr-2 text-blue-600" />
           Quick Actions
@@ -150,7 +150,7 @@ const QuickActionsPanel = ({ onActionClick }) => {
       </div>
       
       {/* Category Tabs */}
-      <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+      <div className="flex bg-gray-100 rounded-lg p-1 mb-5">
         {Object.entries(actionCategories).map(([key, category]) => {
           const Icon = category.icon;
           return (
@@ -170,15 +170,15 @@ const QuickActionsPanel = ({ onActionClick }) => {
         })}
       </div>
       
-      {/* Actions Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Actions Grid - Optimized for compact layout */}
+      <div className="grid grid-cols-2 gap-2">
         {actionCategories[activeCategory].actions.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.id}
               onClick={() => onActionClick && onActionClick(action)}
-              className={`group relative p-4 rounded-xl bg-gradient-to-r ${action.color} text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 overflow-hidden`}
+              className={`group relative p-3 rounded-xl bg-gradient-to-r ${action.color} text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 overflow-hidden`}
               title={action.description}
             >
               {/* Background Pattern */}
@@ -202,7 +202,7 @@ const QuickActionsPanel = ({ onActionClick }) => {
       </div>
       
       {/* Recent Actions */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
+      <div className="mt-5 pt-4 border-t border-gray-200">
         <div className="text-sm font-medium text-gray-700 mb-3">Recent Actions</div>
         <div className="space-y-2">
           {[

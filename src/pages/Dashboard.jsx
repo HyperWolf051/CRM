@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase,
-  TrendingUp,
   DollarSign,
   Users,
   Target
 } from 'lucide-react';
 
 // Enhanced Components
-import { ChartContainer, ChartControls } from '../components/ui/Chart';
+// Chart components removed as part of Revenue Trend removal
 import EnhancedHeader from '../components/dashboard/EnhancedHeader';
 import AdvancedMetricCard from '../components/dashboard/AdvancedMetricCard';
 import DealPipelineStep from '../components/dashboard/DealPipelineStep';
@@ -20,22 +19,10 @@ import QuickActionsPanel from '../components/dashboard/QuickActionsPanel';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
-  const [timeRange, setTimeRange] = useState('30D');
-  const [isLoading, setIsLoading] = useState(false);
   const [isDealsLoading, setIsDealsLoading] = useState(false); // Separate loading for deals
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
-  const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
-  const [chartType, setChartType] = useState('line'); // Chart type toggle
 
-  // Monthly Revenue Changes data with exact specifications
-  const salesData = [
-    { label: 'Jan', value: 47, details: 'New clients: 12, Profit margin: 27%', change: null },
-    { label: 'Feb', value: 60, details: 'New clients: 18, Profit margin: 31%', change: 29 },
-    { label: 'Mar', value: 46, details: 'New clients: 8, Profit margin: 21%', change: -34 },
-    { label: 'Apr', value: 72, details: 'New clients: 24, Profit margin: 31%', change: 89 },
-    { label: 'May', value: 52, details: 'New clients: 15, Profit margin: 29%', change: -28 },
-    { label: 'Jun', value: 40, details: 'New clients: 11, Profit margin: 27%', change: -23 }
-  ];
+  // Sales data removed as part of Revenue Trend chart removal
 
 
 
@@ -144,40 +131,7 @@ const Dashboard = () => {
     // Navigate to detailed view
   };
 
-  const handleChartExport = () => {
-    console.log('Exporting chart data...');
-    // Implement export functionality
-  };
-
-  const handleChartRefresh = () => {
-    setIsLoading(true);
-    // Disable animation temporarily, then re-enable to trigger fresh animation
-    // This ensures chart only animates on explicit refresh, not on other data updates
-    setShouldAnimateChart(false);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      // Re-enable animation to trigger the chart animation
-      setShouldAnimateChart(true);
-    }, 500);
-  };
-
-  const handlePointClick = (data, index) => {
-    console.log('Point clicked:', data, index);
-  };
-
-  const handleBarClick = (data, index) => {
-    console.log('Bar clicked:', data, index);
-  };
-
-  const handleChartTypeChange = (newType) => {
-    setChartType(newType);
-    // Trigger re-animation when chart type changes
-    setShouldAnimateChart(false);
-    setTimeout(() => {
-      setShouldAnimateChart(true);
-    }, 100);
-  };
+  // Chart-related handlers removed as part of Revenue Trend chart removal
 
 
 
@@ -234,31 +188,20 @@ const Dashboard = () => {
     }, 1000);
   };
 
-  const handleTimeRangeChange = (newRange) => {
-    if (newRange !== timeRange) {
-      // Trigger chart re-animation when time range changes
-      setShouldAnimateChart(false);
-      setTimeRange(newRange);
-      
-      // Re-enable animation after a brief delay
-      setTimeout(() => {
-        setShouldAnimateChart(true);
-      }, 100);
-    }
-  };
+  // Time range handler removed as part of Revenue Trend chart removal
 
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Enhanced Header */}
       <EnhancedHeader />
       
-      {/* Main Dashboard Content - Full Width (Day 1 & 2 Updates) */}
-      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-none">
-        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-6 auto-rows-min w-full">
+      {/* Main Dashboard Content - Full Width with Optimized Spacing */}
+      <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-none">
+        <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-16 gap-4 lg:gap-6 auto-rows-min w-full">
           
-          {/* Enhanced Metrics Row - Full Width */}
-          <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Enhanced Metrics Row - Full Width with Optimized Spacing */}
+          <div className="lg:col-span-12 xl:col-span-16 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               
               {/* Weekly Balance Card */}
               <AdvancedMetricCard
@@ -270,7 +213,7 @@ const Dashboard = () => {
                 color="from-blue-600 via-blue-700 to-blue-800"
                 onClick={() => handleMetricClick('weekly-balance')}
                 sparklineData={weeklyBalanceSparkline}
-                loading={isLoading}
+                loading={false}
               />
 
               {/* Active Jobs Card */}
@@ -314,65 +257,20 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Enhanced Charts Row - Graph | Activity Feed | Deal Pipeline */}
-          <div className="lg:col-span-12 xl:col-span-16">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Enhanced Charts Row - Activity Feed | Deal Pipeline (2-column layout) */}
+          <div className="lg:col-span-12 xl:col-span-16 mb-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               
-              {/* Interactive Monthly Changes Chart */}
-              <div className="lg:col-span-6 bg-white rounded-2xl p-3 shadow-sm border border-gray-200">
-                <ChartControls
-                  timeRange={timeRange}
-                  onTimeRangeChange={handleTimeRangeChange}
-                  onExport={handleChartExport}
-                  onRefresh={handleChartRefresh}
-                  chartType={chartType}
-                  onChartTypeChange={handleChartTypeChange}
-                />
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900">Monthly Changes</h2>
-                  </div>
-                  <div className="flex items-center text-sm font-semibold text-green-600">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    +12.5%
-                  </div>
-                </div>
-                
-                <ChartContainer 
-                  key={`chart-${shouldAnimateChart}-${timeRange}-${chartType}`}
-                  data={salesData} 
-                  height={280} 
-                  onPointClick={handlePointClick}
-                  onBarClick={handleBarClick}
-                  animate={shouldAnimateChart}
-                  chartType={chartType}
-                  onChartTypeChange={handleChartTypeChange}
-                  className="mb-2" 
-                />
-                
-                <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
-                  <div>
-                    <div className="text-xl font-bold text-blue-600">$317k</div>
-                    <div className="text-xs text-gray-500">Total Revenue</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-bold text-green-600">$89k</div>
-                    <div className="text-xs text-gray-500">Total Profit</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enhanced Activity Timeline - Vertical between Graph and Pipeline */}
-              <div className="lg:col-span-3">
+              {/* Enhanced Activity Timeline - Now spans half the width */}
+              <div className="lg:col-span-1">
                 <ActivityTimeline
                   activities={recentActivity}
                   onActivityClick={handleActivityClick}
                 />
               </div>
 
-              {/* Enhanced Deal Pipeline */}
-              <div className="lg:col-span-3">
+              {/* Enhanced Deal Pipeline - Now spans half the width */}
+              <div className="lg:col-span-1">
                 <DealPipelineStep
                   steps={pipelineSteps}
                   currentStep={currentPipelineStep}
@@ -385,8 +283,8 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Content Row - Calendar */}
-          <div className="lg:col-span-8 xl:col-span-10">
+          {/* Content Row - Wider Calendar (Day 4 Optimization) */}
+          <div className="lg:col-span-8 xl:col-span-11">
             <InteractiveCalendar
               events={calendarEvents}
               onEventClick={handleEventClick}
@@ -397,8 +295,8 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Sidebar - Quick Actions */}
-          <div className="lg:col-span-4 xl:col-span-6">
+          {/* Sidebar - Compact Quick Actions */}
+          <div className="lg:col-span-4 xl:col-span-5">
             <QuickActionsPanel onActionClick={handleQuickAction} />
           </div>
 

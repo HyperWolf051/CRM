@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Settings, LogOut, Crown, Mail, Phone } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -8,6 +9,7 @@ const ProfileAvatar = () => {
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,6 +29,16 @@ const ProfileAvatar = () => {
 
   const handleLogout = () => {
     logout();
+    setIsOpen(false);
+  };
+
+  const handleViewProfile = () => {
+    navigate('/app/profile');
+    setIsOpen(false);
+  };
+
+  const handleSettings = () => {
+    navigate('/app/settings');
     setIsOpen(false);
   };
 
@@ -141,7 +153,9 @@ const ProfileAvatar = () => {
           <div className="p-2">
             {/* Profile Section */}
             <div className="mb-2">
-              <button className="w-full flex items-center space-x-3 p-3 rounded-xl text-left
+              <button 
+                onClick={handleViewProfile}
+                className="w-full flex items-center space-x-3 p-3 rounded-xl text-left
                                hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 
                                hover:shadow-md transition-all duration-300 transform hover:scale-[1.02]
                                group liquid-hover">
@@ -156,7 +170,9 @@ const ProfileAvatar = () => {
                 </div>
               </button>
 
-              <button className="w-full flex items-center space-x-3 p-3 rounded-xl text-left
+              <button 
+                onClick={handleSettings}
+                className="w-full flex items-center space-x-3 p-3 rounded-xl text-left
                                hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50 
                                hover:shadow-md transition-all duration-300 transform hover:scale-[1.02]
                                group liquid-hover">
