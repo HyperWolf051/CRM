@@ -52,9 +52,16 @@ const BarChart = memo(({
   const chartPadding = { top: 15, right: 20, bottom: 25, left: 40 };
   const chartHeight = height - chartPadding.top - chartPadding.bottom;
   
-  // Set Y-axis range from 35k to 75k to match LineChart
-  const minDisplayValue = 35;
-  const maxDisplayValue = 75;
+  // Calculate dynamic Y-axis range based on data
+  const dataValues = data.map(d => d.value);
+  const minDataValue = Math.min(...dataValues);
+  const maxDataValue = Math.max(...dataValues);
+  const dataRange = maxDataValue - minDataValue;
+  
+  // Add 10% padding to the range for better visualization
+  const padding = Math.max(dataRange * 0.1, 5);
+  const minDisplayValue = Math.max(0, minDataValue - padding);
+  const maxDisplayValue = maxDataValue + padding;
   const displayRange = maxDisplayValue - minDisplayValue;
 
   // Calculate bar dimensions once for reuse
@@ -63,6 +70,14 @@ const BarChart = memo(({
   const totalBarsWidth = data.length * barWidth;
   const totalSpacing = chartWidth - totalBarsWidth;
   const spaceBetweenBars = totalSpacing / (data.length + 1);
+
+  // Helper function to format Y-axis labels
+  const formatYAxisLabel = (value) => {
+    if (value >= 1000) {
+      return `${Math.round(value / 1000)}k`;
+    }
+    return Math.round(value).toString();
+  };
 
   return (
     <div className={`relative ${className}`} style={{ height, width: '100%' }}>
@@ -94,7 +109,7 @@ const BarChart = memo(({
                 textAnchor="end"
                 className="text-xs font-medium fill-current text-gray-400"
               >
-                ${label.value}k
+                {formatYAxisLabel(label.value)}
               </text>
             </g>
           ));
@@ -225,7 +240,7 @@ const BarChart = memo(({
                   transformOrigin: 'center'
                 }}
               >
-                ${Math.round(item.value * staggeredProgress)}k
+                {formatYAxisLabel(Math.round(item.value * staggeredProgress))}
               </text>
               
               {/* Category Label */}
@@ -264,7 +279,7 @@ const BarChart = memo(({
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-gray-300">Revenue:</span>
-                <span className="font-semibold text-green-400">${data[hoveredBar].value}k</span>
+                <span className="font-semibold text-green-400">{formatYAxisLabel(data[hoveredBar].value)}</span>
               </div>
               
               {data[hoveredBar].details && (
@@ -355,9 +370,16 @@ const LineChart = memo(({
   const chartPadding = { top: 15, right: 20, bottom: 25, left: 40 };
   const chartHeight = height - chartPadding.top - chartPadding.bottom;
   
-  // Set Y-axis range from 35k to 75k as specified
-  const minDisplayValue = 35;
-  const maxDisplayValue = 75;
+  // Calculate dynamic Y-axis range based on data
+  const dataValues = data.map(d => d.value);
+  const minDataValue = Math.min(...dataValues);
+  const maxDataValue = Math.max(...dataValues);
+  const dataRange = maxDataValue - minDataValue;
+  
+  // Add 10% padding to the range for better visualization
+  const padding = Math.max(dataRange * 0.1, 5);
+  const minDisplayValue = Math.max(0, minDataValue - padding);
+  const maxDisplayValue = maxDataValue + padding;
   const displayRange = maxDisplayValue - minDisplayValue;
   
   const points = data.map((item, index) => {
@@ -379,13 +401,21 @@ const LineChart = memo(({
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
-  // Generate Y-axis labels for 35k to 75k range
+  // Generate Y-axis labels with dynamic range
   const yAxisLabels = [];
   for (let i = 0; i <= 4; i++) {
     const value = minDisplayValue + (displayRange * i / 4);
     const y = chartPadding.top + (chartHeight * (4 - i) / 4);
     yAxisLabels.push({ value: Math.round(value), y });
   }
+
+  // Helper function to format Y-axis labels
+  const formatYAxisLabel = (value) => {
+    if (value >= 1000) {
+      return `${Math.round(value / 1000)}k`;
+    }
+    return Math.round(value).toString();
+  };
 
   // Detect significant changes for highlighting
   const getChangePercentage = (current, previous) => {
@@ -445,7 +475,7 @@ const LineChart = memo(({
             textAnchor="end"
             className="text-xs font-medium fill-current text-gray-400"
           >
-            ${label.value}k
+            {formatYAxisLabel(label.value)}
           </text>
         ))}
         
@@ -563,7 +593,7 @@ const LineChart = memo(({
                   textAnchor="middle"
                   className="text-xs font-bold fill-indigo-600 animate-in fade-in duration-200"
                 >
-                  ${point.value}k
+                  {formatYAxisLabel(point.value)}
                 </text>
               )}
             </g>
@@ -607,7 +637,7 @@ const LineChart = memo(({
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-gray-300">Revenue:</span>
-                <span className="font-semibold text-green-400">${points[hoveredPoint].value}k</span>
+                <span className="font-semibold text-green-400">{formatYAxisLabel(points[hoveredPoint].value)}</span>
               </div>
               
               {points[hoveredPoint].details && (
