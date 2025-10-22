@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase,
-  TrendingUp,
   DollarSign,
   Users,
   Target
@@ -332,7 +331,7 @@ const Dashboard = () => {
                 color="from-blue-600 via-blue-700 to-blue-800"
                 onClick={() => handleMetricClick("weekly-balance")}
                 sparklineData={weeklyBalanceSparkline}
-                loading={isLoading}
+                loading={false}
               />
 
               {/* Active Jobs Card */}
@@ -481,8 +480,8 @@ const Dashboard = () => {
                 />
               </div>
 
-              {/* Enhanced Deal Pipeline */}
-              <div className="lg:col-span-3">
+              {/* Enhanced Deal Pipeline - Now spans half the width */}
+              <div className="lg:col-span-1">
                 <DealPipelineStep
                   steps={pipelineSteps}
                   currentStep={currentPipelineStep}

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, Download, Eye, Edit, Trash2, TrendingUp, Users, DollarSign, Target, MapPin, Briefcase } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 
 export default function Deals() {
+  const navigate = useNavigate();
   // Mock jobs data for CRM
   const [jobs, setJobs] = useState([
     {
@@ -208,7 +210,7 @@ export default function Deals() {
               Table
             </button>
             <button
-              onClick={handleCreateJob}
+              onClick={() => navigate('/app/deals/add')}
               className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
@@ -375,7 +377,7 @@ export default function Deals() {
                 <Button
                   variant="primary"
                   icon={<Plus className="w-4 h-4" />}
-                  onClick={handleCreateJob}
+                  onClick={() => navigate('/app/deals/add')}
                 >
                   Post Your First Job
                 </Button>

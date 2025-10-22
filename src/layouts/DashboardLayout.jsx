@@ -8,14 +8,21 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
 const pageTitles = {
   '/app/dashboard': 'Dashboard',
   '/app/candidates': 'Candidates',
+  '/app/candidates/add': 'Add Candidate',
   '/app/contacts': 'Contacts',
   '/app/deals': 'Jobs',
+  '/app/deals/add': 'Post New Job',
   '/app/companies': 'Clients',
+  '/app/companies/add': 'Add Client',
   '/app/calendar': 'Calendar',
   '/app/tasks': 'Tasks',
-  '/app/analytics': 'Reports',
+  '/app/analytics': 'Analytics Dashboard',
   '/app/team': 'Team',
-  '/app/settings': 'Settings',
+  '/app/settings': 'System Settings',
+  '/app/automation': 'Automation',
+  '/app/email-automation': 'Email Automation',
+  '/app/reminders': 'Reminders',
+  '/app/profile': 'Profile',
 };
 
 export default function DashboardLayout() {
@@ -30,8 +37,16 @@ export default function DashboardLayout() {
     }
     
     // Check for dynamic routes (e.g., /app/contacts/123)
-    if (location.pathname.startsWith('/app/contacts/')) {
+    if (location.pathname.startsWith('/app/contacts/') && location.pathname !== '/app/contacts/add') {
       return 'Contact Details';
+    }
+    
+    // Check for add routes
+    if (location.pathname.endsWith('/add')) {
+      const basePath = location.pathname.replace('/add', '');
+      if (pageTitles[basePath]) {
+        return `Add ${pageTitles[basePath].slice(0, -1)}`; // Remove 's' from plural
+      }
     }
     
     // Default fallback
@@ -81,9 +96,9 @@ export default function DashboardLayout() {
           <Topbar title={getPageTitle()} />
         </div>
         
-        {/* Page Content - Scrollable area */}
+        {/* Page Content - Scrollable area with Optimized Spacing */}
         <main className="flex-1 overflow-y-auto bg-gray-50" style={{ zIndex: 10 }}>
-          <div className="p-4 lg:p-6">
+          <div className="p-3 lg:p-4">
             <div className="w-full max-w-none">
               <PageTransition>
                 <Outlet />

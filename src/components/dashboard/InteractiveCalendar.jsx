@@ -116,9 +116,9 @@ const InteractiveCalendar = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <CalendarIcon className="w-5 h-5 mr-2 text-blue-600" />
           Calendar Overview
@@ -142,8 +142,8 @@ const InteractiveCalendar = ({
         </div>
       </div>
       
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
+      {/* Calendar Grid - Optimized for wider layout */}
+      <div className="grid grid-cols-7 gap-2 mb-4">
         {/* Day Headers */}
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 bg-gray-50 rounded">
@@ -160,7 +160,7 @@ const InteractiveCalendar = ({
           return (
             <div
               key={index}
-              className={`min-h-[80px] p-1 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 ${
+              className={`min-h-[90px] p-2 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 ${
                 isToday ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
               } ${isHovered ? 'shadow-md scale-105' : ''}`}
               onClick={() => {

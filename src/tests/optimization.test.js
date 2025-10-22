@@ -9,13 +9,13 @@ describe('Optimization Tests', () => {
 
   it('should have memoized components', async () => {
     const ContactTable = await import('../components/ContactTable.jsx');
-    const MetricCard = await import('../components/MetricCard.jsx');
+    const AdvancedMetricCard = await import('../components/dashboard/AdvancedMetricCard.jsx');
     const KanbanBoard = await import('../components/KanbanBoard.jsx');
     const DealCard = await import('../components/DealCard.jsx');
     
     // These components should be wrapped with React.memo
     expect(ContactTable.default).toBeDefined();
-    expect(MetricCard.default).toBeDefined();
+    expect(AdvancedMetricCard.default).toBeDefined();
     expect(KanbanBoard.default).toBeDefined();
     expect(DealCard.default).toBeDefined();
   });
