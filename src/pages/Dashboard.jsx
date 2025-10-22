@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Briefcase,
-  DollarSign,
-  Users,
-  Target
-} from "lucide-react";
+import { Briefcase, DollarSign, Users, Target, ArrowUp } from "lucide-react";
 
 // Enhanced Components
 import { ChartContainer, ChartControls } from "../components/ui/Chart";
@@ -70,12 +65,42 @@ const Dashboard = () => {
 
   // Customer Acquisition data for second graph
   const customerData = [
-    { label: 'Jan', value: 28, details: 'New customers: 28, Conversion rate: 12%', change: null },
-    { label: 'Feb', value: 35, details: 'New customers: 35, Conversion rate: 15%', change: 25 },
-    { label: 'Mar', value: 22, details: 'New customers: 22, Conversion rate: 9%', change: -37 },
-    { label: 'Apr', value: 48, details: 'New customers: 48, Conversion rate: 18%', change: 118 },
-    { label: 'May', value: 31, details: 'New customers: 31, Conversion rate: 13%', change: -35 },
-    { label: 'Jun', value: 42, details: 'New customers: 42, Conversion rate: 16%', change: 35 }
+    {
+      label: "Jan",
+      value: 28,
+      details: "New customers: 28, Conversion rate: 12%",
+      change: null,
+    },
+    {
+      label: "Feb",
+      value: 35,
+      details: "New customers: 35, Conversion rate: 15%",
+      change: 25,
+    },
+    {
+      label: "Mar",
+      value: 22,
+      details: "New customers: 22, Conversion rate: 9%",
+      change: -37,
+    },
+    {
+      label: "Apr",
+      value: 48,
+      details: "New customers: 48, Conversion rate: 18%",
+      change: 118,
+    },
+    {
+      label: "May",
+      value: 31,
+      details: "New customers: 31, Conversion rate: 13%",
+      change: -35,
+    },
+    {
+      label: "Jun",
+      value: 42,
+      details: "New customers: 42, Conversion rate: 16%",
+      change: 35,
+    },
   ];
 
   // Pipeline steps data
@@ -228,7 +253,7 @@ const Dashboard = () => {
     setIsLoading(true);
     // Disable animation temporarily, then re-enable to trigger fresh animation
     setShouldAnimateChart2(false);
-    
+
     setTimeout(() => {
       setIsLoading(false);
       // Re-enable animation to trigger the chart animation
@@ -237,11 +262,11 @@ const Dashboard = () => {
   };
 
   const handlePointClick2 = (data, index) => {
-    console.log('Second chart point clicked:', data, index);
+    console.log("Second chart point clicked:", data, index);
   };
 
   const handleBarClick2 = (data, index) => {
-    console.log('Second chart bar clicked:', data, index);
+    console.log("Second chart bar clicked:", data, index);
   };
 
   const handleEventClick = (event) => {
@@ -331,7 +356,7 @@ const Dashboard = () => {
                 color="from-blue-600 via-blue-700 to-blue-800"
                 onClick={() => handleMetricClick("weekly-balance")}
                 sparklineData={weeklyBalanceSparkline}
-                loading={false}
+                loading={isLoading}
               />
 
               {/* Active Jobs Card */}
@@ -396,7 +421,7 @@ const Dashboard = () => {
                     </h2>
                   </div>
                   <div className="flex items-center text-sm font-semibold text-green-600">
-                    <TrendingUp className="w-4 h-4 mr-1" />
+                    <ArrowUp className="w-4 h-4 mr-1" />
                     +12.5%
                   </div>
                 </div>
@@ -442,7 +467,7 @@ const Dashboard = () => {
                       </h2>
                     </div>
                     <div className="flex items-center text-sm font-semibold text-blue-600">
-                      <TrendingUp className="w-4 h-4 mr-1" />
+                      <ArrowUp className="w-4 h-4 mr-1" />
                       +18.2%
                     </div>
                   </div>
@@ -461,12 +486,20 @@ const Dashboard = () => {
 
                   <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
                     <div>
-                      <div className="text-xl font-bold text-purple-600">206</div>
-                      <div className="text-xs text-gray-500">Total Customers</div>
+                      <div className="text-xl font-bold text-purple-600">
+                        206
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Total Customers
+                      </div>
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-orange-600">14.2%</div>
-                      <div className="text-xs text-gray-500">Conversion Rate</div>
+                      <div className="text-xl font-bold text-orange-600">
+                        14.2%
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Conversion Rate
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -480,8 +513,8 @@ const Dashboard = () => {
                 />
               </div>
 
-              {/* Enhanced Deal Pipeline - Now spans half the width */}
-              <div className="lg:col-span-1">
+              {/* Enhanced Deal Pipeline */}
+              <div className="lg:col-span-3">
                 <DealPipelineStep
                   steps={pipelineSteps}
                   currentStep={currentPipelineStep}
