@@ -319,112 +319,8 @@ export default function Companies() {
                     onChange={(e) => setSelectedIndustry(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                   >
-<<<<<<< Updated upstream
                     {industries.map((industry) => (
                       <option key={industry.id} value={industry.id}>{industry.name}</option>
-=======
-                    Add Your First Client
-                  </Button>
-                }
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Client</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Industry</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Size</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Contacts</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Deals</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCompanies.map((company) => (
-                      <tr
-                        key={company.id}
-                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={() => handleCompanyClick(company)}
-                      >
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-3">
-                            <Avatar
-                              src={company.logo}
-                              name={company.name}
-                              size="sm"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900">{company.name}</div>
-                              <div className="text-sm text-gray-500">{company.website}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.industry}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.size}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="font-semibold text-green-600">
-                            {formatCurrency(company.revenue)}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <Badge
-                            variant={
-                              company.status === 'customer' ? 'success' :
-                                company.status === 'active' ? 'info' :
-                                  company.status === 'prospect' ? 'warning' : 'default'
-                            }
-                          >
-                            {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                          </Badge>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.contactsCount}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">
-                            {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCompanyClick(company);
-                              }}
-                              className="p-1 text-gray-400 hover:text-blue-600"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle edit
-                              }}
-                              className="p-1 text-gray-400 hover:text-green-600"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle delete
-                              }}
-                              className="p-1 text-gray-400 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
->>>>>>> Stashed changes
                     ))}
                   </select>
                 </div>
@@ -757,10 +653,10 @@ export default function Companies() {
                 size="lg"
               />
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {selectedCompany.name}
                 </h3>
-                <p className="text-gray-600">{selectedCompany.industry}</p>
+                <p className="text-gray-600 dark:text-gray-400">{selectedCompany.industry}</p>
                 <Badge
                   variant={
                     selectedCompany.status === 'customer' ? 'success' :
@@ -776,74 +672,69 @@ export default function Companies() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Client Size
                 </label>
-                <p className="text-sm text-gray-900">{selectedCompany.size} employees</p>
+                <p className="text-sm text-gray-900 dark:text-white">{selectedCompany.size} employees</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Annual Revenue
                 </label>
-                <p className="text-sm text-gray-900">{formatCurrency(selectedCompany.revenue)}</p>
+                <p className="text-sm text-gray-900 dark:text-white">{formatCurrency(selectedCompany.revenue)}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Contacts
                 </label>
-                <p className="text-sm text-gray-900">{selectedCompany.contactsCount} contacts</p>
+                <p className="text-sm text-gray-900 dark:text-white">{selectedCompany.contactsCount} contacts</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Deals
                 </label>
-                <p className="text-sm text-gray-900">
+                <p className="text-sm text-gray-900 dark:text-white">
                   {selectedCompany.dealsCount} deals ({formatCurrency(selectedCompany.totalDealsValue)})
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Contact Information
               </label>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-400" />
-<<<<<<< Updated upstream
                   <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" 
                      className="text-blue-600 dark:text-blue-400 hover:underline">
-=======
-                  <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline">
->>>>>>> Stashed changes
                     {selectedCompany.website}
                   </a>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-900">{selectedCompany.phone}</span>
+                  <span className="text-gray-900 dark:text-white">{selectedCompany.phone}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-900">{selectedCompany.email}</span>
+                  <span className="text-gray-900 dark:text-white">{selectedCompany.email}</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Address
               </label>
-              <p className="text-sm text-gray-900">{selectedCompany.address}</p>
+              <p className="text-sm text-gray-900 dark:text-white">{selectedCompany.address}</p>
             </div>
 
             {selectedCompany.notes && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Notes
                 </label>
-                <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                   {selectedCompany.notes}
                 </p>
               </div>
