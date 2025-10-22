@@ -422,48 +422,10 @@ export default function Companies() {
                             }}
                             className="p-1 text-gray-400 hover:text-red-600"
                           >
-                            {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                          </Badge>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900 dark:text-white">{company.contactsCount}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900 dark:text-white">
-                            {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCompanyClick(company);
-                              }}
-                              className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle edit
-                              }}
-                              className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle delete
-                              }}
-                              className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
                       </tr>
                     ))}
                   </tbody>
@@ -473,8 +435,9 @@ export default function Companies() {
           </div>
         </div>
       </div>
+    </div>
 
-      {/* Add Company Modal */}
+    {/* Add Company Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
