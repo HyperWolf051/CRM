@@ -319,112 +319,8 @@ export default function Companies() {
                     onChange={(e) => setSelectedIndustry(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                   >
-<<<<<<< Updated upstream
                     {industries.map((industry) => (
                       <option key={industry.id} value={industry.id}>{industry.name}</option>
-=======
-                    Add Your First Client
-                  </Button>
-                }
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Client</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Industry</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Size</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Contacts</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Deals</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCompanies.map((company) => (
-                      <tr
-                        key={company.id}
-                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={() => handleCompanyClick(company)}
-                      >
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-3">
-                            <Avatar
-                              src={company.logo}
-                              name={company.name}
-                              size="sm"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900">{company.name}</div>
-                              <div className="text-sm text-gray-500">{company.website}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.industry}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.size}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="font-semibold text-green-600">
-                            {formatCurrency(company.revenue)}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <Badge
-                            variant={
-                              company.status === 'customer' ? 'success' :
-                                company.status === 'active' ? 'info' :
-                                  company.status === 'prospect' ? 'warning' : 'default'
-                            }
-                          >
-                            {company.status.charAt(0).toUpperCase() + company.status.slice(1)}
-                          </Badge>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">{company.contactsCount}</div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-gray-900">
-                            {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCompanyClick(company);
-                              }}
-                              className="p-1 text-gray-400 hover:text-blue-600"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle edit
-                              }}
-                              className="p-1 text-gray-400 hover:text-green-600"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Handle delete
-                              }}
-                              className="p-1 text-gray-400 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
->>>>>>> Stashed changes
                     ))}
                   </select>
                 </div>
@@ -484,22 +380,22 @@ export default function Companies() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Client</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Industry</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Size</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Status</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Contacts</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Deals</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Client</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Industry</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Size</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Contacts</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Deals</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredCompanies.map((company) => (
                     <tr
                       key={company.id}
-                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                      className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
                       onClick={() => handleCompanyClick(company)}
                     >
                       <td className="py-4 px-4">
@@ -510,19 +406,19 @@ export default function Companies() {
                             size="sm"
                           />
                           <div>
-                            <div className="font-medium text-gray-900 dark:text-white">{company.name}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{company.website}</div>
+                            <div className="font-medium text-gray-900">{company.name}</div>
+                            <div className="text-sm text-gray-500">{company.website}</div>
                           </div>
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.industry}</div>
+                        <div className="text-gray-900">{company.industry}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.size}</div>
+                        <div className="text-gray-900">{company.size}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="font-semibold text-green-600 dark:text-green-400">
+                        <div className="font-semibold text-green-600">
                           {formatCurrency(company.revenue)}
                         </div>
                       </td>
@@ -538,10 +434,10 @@ export default function Companies() {
                         </Badge>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">{company.contactsCount}</div>
+                        <div className="text-gray-900">{company.contactsCount}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-gray-900 dark:text-white">
+                        <div className="text-gray-900">
                           {company.dealsCount} ({formatCurrency(company.totalDealsValue)})
                         </div>
                       </td>
@@ -552,7 +448,7 @@ export default function Companies() {
                               e.stopPropagation();
                               handleCompanyClick(company);
                             }}
-                            className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                            className="p-1 text-gray-400 hover:text-blue-600"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -561,7 +457,7 @@ export default function Companies() {
                               e.stopPropagation();
                               // Handle edit
                             }}
-                            className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+                            className="p-1 text-gray-400 hover:text-green-600"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -570,7 +466,7 @@ export default function Companies() {
                               e.stopPropagation();
                               // Handle delete
                             }}
-                            className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                            className="p-1 text-gray-400 hover:text-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -810,13 +706,8 @@ export default function Companies() {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-400" />
-<<<<<<< Updated upstream
-                  <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" 
-                     className="text-blue-600 dark:text-blue-400 hover:underline">
-=======
                   <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer"
                     className="text-blue-600 hover:underline">
->>>>>>> Stashed changes
                     {selectedCompany.website}
                   </a>
                 </div>
