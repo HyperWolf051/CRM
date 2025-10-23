@@ -172,7 +172,13 @@ export default function CollapsibleSidebar() {
   };
 
   const handleRecruiterToggle = () => {
-    const isDemoUser = user?.isDemo === true || user?.email === 'demo@crm.com';
+    const isDemoUser = user?.isDemo === true;
+    
+    // Debug logging
+    console.log('Sidebar Toggle - User:', user);
+    console.log('Sidebar Toggle - isDemoUser:', isDemoUser);
+    console.log('Sidebar Toggle - user.isDemo:', user?.isDemo);
+    console.log('Sidebar Toggle - user.email:', user?.email);
     
     if (isDemoUser) {
       navigate('/app/recruiter/dashboard');
@@ -272,7 +278,7 @@ export default function CollapsibleSidebar() {
               }`}
             >
               Recruitment
-              {user && !user.isDemo && user.email !== 'demo@crm.com' && (
+              {user && !user.isDemo && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
               )}
             </button>
@@ -302,7 +308,7 @@ export default function CollapsibleSidebar() {
             
             // Check if this is a recruiter route and user has demo access
             const isRecruiterRoute = item.href.startsWith('/app/recruiter');
-            const isDemoUser = user?.isDemo === true || user?.email === 'demo@crm.com';
+            const isDemoUser = user?.isDemo === true;
             const hasAccess = !isRecruiterRoute || isDemoUser;
             
             // If no access, show disabled state

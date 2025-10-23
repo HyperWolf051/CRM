@@ -253,7 +253,7 @@ const Dashboard = () => {
       <EnhancedHeader />
 
       {/* Demo Feature Banner - Only show for non-demo users */}
-      {user && !user.isDemo && user.email !== 'demo@crm.com' && (
+      {user && !user.isDemo && (
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div data-demo-banner className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 shadow-sm">
             <div className="flex items-start space-x-3">
