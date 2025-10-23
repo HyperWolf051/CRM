@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -15,7 +15,6 @@ import {
   Zap
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/context/ToastContext';
 
 const navigationItems = [
   {
@@ -130,9 +129,7 @@ export default function CollapsibleSidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const { showToast } = useToast();
   
   // Determine which navigation to show based on current route
   const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
@@ -171,35 +168,7 @@ export default function CollapsibleSidebar() {
     setIsMobileOpen(!isMobileOpen);
   };
 
-  const handleRecruiterToggle = () => {
-    const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
-    
-    if (hasRecruiterAccess) {
-      navigate('/app/recruiter/dashboard');
-    } else {
-      showToast({
-        type: 'error',
-        title: 'Access Restricted',
-        message: 'You can only access the CRM Dashboard. Dashboard switching is not allowed for your account type.',
-        duration: 5000
-      });
-    }
-  };
 
-  const handleCrmToggle = () => {
-    const hasCrmAccess = user?.dashboardType !== 'recruiter';
-    
-    if (hasCrmAccess) {
-      navigate('/app/dashboard');
-    } else {
-      showToast({
-        type: 'error',
-        title: 'Access Restricted',
-        message: 'You can only access the Recruiter Dashboard. Dashboard switching is not allowed for your account type.',
-        duration: 5000
-      });
-    }
-  };
 
   return (
     <>
@@ -264,39 +233,7 @@ export default function CollapsibleSidebar() {
         </div>
       </div>
       
-      {/* Sector Switcher */}
-      {(isExpanded || isMobile) && (
-        <div className="px-4 py-2 border-b border-slate-200/50">
-          <div className="flex space-x-1 bg-slate-100 rounded-lg p-1">
-            <button
-              onClick={handleCrmToggle}
-              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
-                !isRecruiterSection 
-                  ? 'bg-white text-slate-700 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              CRM
-              {user?.dashboardType === 'recruiter' && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              )}
-            </button>
-            <button
-              onClick={handleRecruiterToggle}
-              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
-                isRecruiterSection 
-                  ? 'bg-white text-slate-700 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Recruitment
-              {user?.dashboardType === 'crm' && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
+
 
 
 
