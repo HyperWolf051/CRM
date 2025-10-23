@@ -237,26 +237,7 @@ export default function CollapsibleSidebar() {
 
 
 
-      {/* Role Badge for Current Section */}
-      {isRecruiterSection && (isExpanded || isMobile) && (
-        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium text-blue-800">Recruiter Dashboard</span>
-          </div>
-          <p className="text-xs text-blue-600 mt-1">Agent/Employee Access</p>
-        </div>
-      )}
-      
-      {!isRecruiterSection && (isExpanded || isMobile) && (
-        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium text-green-800">CRM Dashboard</span>
-          </div>
-          <p className="text-xs text-green-600 mt-1">Company Access</p>
-        </div>
-      )}
+
 
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
