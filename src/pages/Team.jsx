@@ -24,24 +24,57 @@ const Team = () => {
   // Enhanced team data
   const [teamMembers, setTeamMembers] = useState([
     {
-      id: 1, name: 'John Doe', email: 'john.doe@company.com', phone: '+1 (555) 123-4567',
+      id: 1, name: 'Rahul Gupta', email: 'rahul.gupta@company.co.in', phone: '+91 98765 43210',
       role: 'Admin', department: 'Management', status: 'active', avatar: null,
       joinDate: '2024-01-15', lastLogin: '2024-03-15T10:30:00Z', permissions: ['all'],
-      employeeId: 'EMP001', manager: 'Sarah Johnson', location: 'New York, NY',
-      timezone: 'America/New_York', workingHours: { start: '09:00', end: '17:00' },
+      employeeId: 'EMP001', manager: 'Anjali Mehta', location: 'Mumbai, Maharashtra',
+      timezone: 'Asia/Kolkata', workingHours: { start: '09:00', end: '18:00' },
       skills: ['Leadership', 'Management', 'Strategy'], certifications: ['PMP', 'Salesforce Admin'],
-      performanceRating: 4.8, salary: 95000, contractType: 'Full-time'
+      performanceRating: 4.8, salary: 2500000, contractType: 'Full-time'
     },
     {
-      id: 2, name: 'Sarah Johnson', email: 'sarah.johnson@company.com', phone: '+1 (555) 234-5678',
+      id: 2, name: 'Anjali Mehta', email: 'anjali.mehta@company.co.in', phone: '+91 87654 32109',
       role: 'Manager', department: 'Sales', status: 'active', avatar: null,
       joinDate: '2024-02-01', lastLogin: '2024-03-14T16:45:00Z',
       permissions: ['candidates', 'deals', 'companies', 'reports'],
-      employeeId: 'EMP002', manager: 'John Doe', location: 'San Francisco, CA',
-      timezone: 'America/Los_Angeles', workingHours: { start: '08:30', end: '17:30' },
+      employeeId: 'EMP002', manager: 'Rahul Gupta', location: 'Bengaluru, Karnataka',
+      timezone: 'Asia/Kolkata', workingHours: { start: '09:30', end: '18:30' },
       skills: ['Sales', 'Customer Relations', 'Team Management'],
       certifications: ['Salesforce Sales Cloud', 'HubSpot Sales'],
-      performanceRating: 4.6, salary: 78000, contractType: 'Full-time'
+      performanceRating: 4.6, salary: 1800000, contractType: 'Full-time'
+    },
+    {
+      id: 3, name: 'Vikram Singh', email: 'vikram.singh@company.co.in', phone: '+91 76543 21098',
+      role: 'Agent', department: 'Sales', status: 'active', avatar: null,
+      joinDate: '2024-02-15', lastLogin: '2024-03-15T09:15:00Z',
+      permissions: ['candidates', 'deals'],
+      employeeId: 'EMP003', manager: 'Anjali Mehta', location: 'Delhi, NCR',
+      timezone: 'Asia/Kolkata', workingHours: { start: '10:00', end: '19:00' },
+      skills: ['Communication', 'Client Relations', 'Sales'],
+      certifications: ['Google Analytics', 'Digital Marketing'],
+      performanceRating: 4.4, salary: 1200000, contractType: 'Full-time'
+    },
+    {
+      id: 4, name: 'Kavya Nair', email: 'kavya.nair@company.co.in', phone: '+91 65432 10987',
+      role: 'Manager', department: 'HR', status: 'active', avatar: null,
+      joinDate: '2024-01-20', lastLogin: '2024-03-14T14:20:00Z',
+      permissions: ['team', 'reports'],
+      employeeId: 'EMP004', manager: 'Rahul Gupta', location: 'Chennai, Tamil Nadu',
+      timezone: 'Asia/Kolkata', workingHours: { start: '09:00', end: '18:00' },
+      skills: ['HR Management', 'Recruitment', 'Training'],
+      certifications: ['SHRM-CP', 'PHR'],
+      performanceRating: 4.7, salary: 1600000, contractType: 'Full-time'
+    },
+    {
+      id: 5, name: 'Neha Agarwal', email: 'neha.agarwal@company.co.in', phone: '+91 54321 09876',
+      role: 'Agent', department: 'Finance', status: 'active', avatar: null,
+      joinDate: '2024-03-01', lastLogin: '2024-03-15T11:30:00Z',
+      permissions: ['reports'],
+      employeeId: 'EMP005', manager: 'Rahul Gupta', location: 'Pune, Maharashtra',
+      timezone: 'Asia/Kolkata', workingHours: { start: '09:30', end: '18:30' },
+      skills: ['Accounting', 'Financial Analysis', 'Excel'],
+      certifications: ['CA', 'CFA Level 1'],
+      performanceRating: 4.2, salary: 1000000, contractType: 'Full-time'
     }
   ]);
 
@@ -1117,7 +1150,7 @@ const Team = () => {
                     <Button
                       variant="secondary"
                       onClick={() => {
-                        const csvTemplate = "Name,Email,Role,Department,Status,Employee ID,Location,Phone\nJohn Doe,john@example.com,User,Sales,active,EMP001,New York,+1234567890";
+                        const csvTemplate = "Name,Email,Role,Department,Status,Employee ID,Location,Phone\nRahul Sharma,rahul@company.co.in,User,Sales,active,EMP001,Mumbai,+919876543210";
                         downloadCSV(csvTemplate, 'team-import-template.csv');
                       }}
                       className="flex-1"

@@ -503,7 +503,7 @@ const AddCandidate = () => {
                     value={formData.expectedSalary}
                     onChange={(e) => handleInputChange('expectedSalary', e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
-                    placeholder="e.g., $80,000 - $100,000"
+                    placeholder="e.g., ₹12,00,000 - ₹18,00,000"
                   />
                 </div>
 

@@ -5,7 +5,7 @@ import {
   Calendar, 
   MessageSquare, 
   Briefcase, 
-  DollarSign, 
+  Banknote, 
   CheckSquare,
   MapPin,
   Users
@@ -19,7 +19,7 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
     meeting: { icon: Calendar, color: 'bg-blue-500' },
     interview: { icon: MessageSquare, color: 'bg-purple-500' },
     job: { icon: Briefcase, color: 'bg-orange-500' },
-    deal: { icon: DollarSign, color: 'bg-emerald-500' },
+    deal: { icon: Banknote, color: 'bg-emerald-500' },
     task: { icon: CheckSquare, color: 'bg-indigo-500' }
   };
 

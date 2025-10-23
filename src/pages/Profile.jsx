@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Shield, Bell, Camera, MapPin, Phone, Mail, Calendar, Award, Lock, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle, Globe, Clock, DollarSign, Target } from 'lucide-react';
+import { User, Shield, Bell, Camera, MapPin, Phone, Mail, Calendar, Award, Lock, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle, Globe, Clock, Banknote, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Avatar from '@/components/ui/Avatar';
@@ -127,15 +127,15 @@ const ProfileTab = ({ user, setActiveTab }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
+    fullName: user?.name || 'Rahul Sharma',
+    email: user?.email || 'rahul.sharma@talenthub.co.in',
+    phone: '+91 98765 43210',
+    location: 'Mumbai, Maharashtra',
     department: 'Sales & Marketing',
     jobTitle: 'Senior Sales Manager',
-    bio: 'Experienced sales professional with over 8 years in B2B sales and team management. Passionate about building relationships and driving revenue growth through strategic partnerships and innovative sales approaches.',
-    website: 'https://linkedin.com/in/johndoe',
-    timezone: 'Pacific Standard Time (PST)'
+    bio: 'Experienced sales professional with over 8 years in B2B sales and team management across Indian markets. Passionate about building relationships and driving revenue growth through strategic partnerships and innovative sales approaches in the Indian business ecosystem.',
+    website: 'https://linkedin.com/in/rahulsharma',
+    timezone: 'Indian Standard Time (IST)'
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -259,15 +259,15 @@ const ProfileTab = ({ user, setActiveTab }) => {
 
   const handleCancel = () => {
     setFormData({
-      fullName: user?.name || '',
-      email: user?.email || '',
-      phone: '+1 (555) 123-4567',
-      location: 'San Francisco, CA',
+      fullName: user?.name || 'Rahul Sharma',
+      email: user?.email || 'rahul.sharma@talenthub.co.in',
+      phone: '+91 98765 43210',
+      location: 'Mumbai, Maharashtra',
       department: 'Sales & Marketing',
       jobTitle: 'Senior Sales Manager',
       bio: 'Experienced sales professional with over 8 years in B2B sales and team management. Passionate about building relationships and driving revenue growth through strategic partnerships and innovative sales approaches.',
       website: 'https://linkedin.com/in/johndoe',
-      timezone: 'Pacific Standard Time (PST)'
+      timezone: 'Indian Standard Time (IST)'
     });
     setFormErrors({});
     setIsEditing(false);
@@ -372,7 +372,7 @@ const ProfileTab = ({ user, setActiveTab }) => {
                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                           formErrors.phone ? 'border-red-300' : 'border-gray-300'
                         }`}
-                        placeholder="Enter your phone number"
+                        placeholder="+91 98765 43210"
                       />
                       {formErrors.phone && (
                         <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
@@ -457,9 +457,10 @@ const ProfileTab = ({ user, setActiveTab }) => {
                         onChange={(e) => handleInputChange('timezone', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       >
+                        <option value="Indian Standard Time (IST)">Indian Standard Time (IST)</option>
+                        <option value="Gulf Standard Time (GST)">Gulf Standard Time (GST)</option>
+                        <option value="Singapore Time (SGT)">Singapore Time (SGT)</option>
                         <option value="Pacific Standard Time (PST)">Pacific Standard Time (PST)</option>
-                        <option value="Mountain Standard Time (MST)">Mountain Standard Time (MST)</option>
-                        <option value="Central Standard Time (CST)">Central Standard Time (CST)</option>
                         <option value="Eastern Standard Time (EST)">Eastern Standard Time (EST)</option>
                         <option value="Greenwich Mean Time (GMT)">Greenwich Mean Time (GMT)</option>
                       </select>
@@ -628,7 +629,7 @@ const ProfileTab = ({ user, setActiveTab }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-600 rounded-lg flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-white" />
+                    <Banknote className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">Revenue (M)</div>
@@ -675,8 +676,8 @@ const ProfileTab = ({ user, setActiveTab }) => {
                   <CheckCircle className="w-4 h-4 text-green-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">Closed deal with Acme Corp</p>
-                  <p className="text-xs text-gray-500 mt-1">$45,000 • 2 hours ago</p>
+                  <p className="text-sm font-medium text-gray-900">Closed deal with Infosys Technologies</p>
+                  <p className="text-xs text-gray-500 mt-1">₹35L • 2 hours ago</p>
                 </div>
               </div>
               

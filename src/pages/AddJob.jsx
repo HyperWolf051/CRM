@@ -5,7 +5,7 @@ import {
   Briefcase,
   Building2,
   MapPin,
-  DollarSign,
+  Banknote,
   Clock,
   Save,
   AlertCircle,
@@ -25,7 +25,7 @@ const AddJob = () => {
     experienceLevel: 'Mid-level',
     salaryMin: '',
     salaryMax: '',
-    currency: 'USD',
+    currency: 'INR',
     description: '',
     requirements: '',
     benefits: '',
@@ -92,7 +92,7 @@ const AddJob = () => {
 
   const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
   const experienceLevels = ['Entry-level', 'Mid-level', 'Senior-level', 'Executive'];
-  const currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
+  const currencies = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD'];
 
   try {
     return (
@@ -285,7 +285,7 @@ const AddJob = () => {
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Banknote className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                           type="number"
                           value={formData.salaryMin}

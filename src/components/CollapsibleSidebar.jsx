@@ -167,15 +167,15 @@ export default function CollapsibleSidebar() {
       <div className="p-4 border-b border-slate-200/50">
         <div className="flex items-center justify-center">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-lg font-bold text-white">C</span>
+            <span className="text-lg font-bold text-white">T</span>
           </div>
           <div className={`ml-3 transition-all duration-500 ease-out ${
             (isExpanded || isMobile) 
               ? 'opacity-100 translate-x-0' 
               : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
           }`}>
-            <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">CRM Pro</span>
-            <div className="text-xs text-slate-500 whitespace-nowrap">Business Suite</div>
+            <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">TalentHub</span>
+            <div className="text-xs text-slate-500 whitespace-nowrap">Recruitment Suite</div>
           </div>
         </div>
       </div>

@@ -63,7 +63,7 @@ const AnimatedStatsHeader = () => {
       </div>
       <div className="text-center lg:text-left">
         <div className="text-2xl font-bold text-white transition-all duration-300">
-          ${animatedStats.revenue}M
+          ₹${animatedStats.revenue}Cr
         </div>
         <div className="text-blue-200 text-sm">Revenue</div>
       </div>

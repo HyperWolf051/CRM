@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Building2, 
-  Mail, 
-  Globe, 
+import {
+  ArrowLeft,
+  Building2,
+  Mail,
+  Globe,
   Save,
   AlertCircle,
   User
@@ -12,7 +12,7 @@ import {
 
 const AddClient = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     companyName: '',
     industry: '',
@@ -31,7 +31,7 @@ const AddClient = () => {
       ...prev,
       [field]: value
     }));
-    
+
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -42,28 +42,28 @@ const AddClient = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
     if (!formData.industry.trim()) newErrors.industry = 'Industry is required';
     if (!formData.primaryContactName.trim()) newErrors.primaryContactName = 'Primary contact name is required';
     if (!formData.primaryContactEmail.trim()) newErrors.primaryContactEmail = 'Primary contact email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.primaryContactEmail)) newErrors.primaryContactEmail = 'Email is invalid';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      navigate('/app/companies', { 
-        state: { 
+      navigate('/app/companies', {
+        state: {
           message: 'Client added successfully!',
           type: 'success'
         }
@@ -76,8 +76,11 @@ const AddClient = () => {
   };
 
   const industries = [
-    'Technology', 'Healthcare', 'Finance', 'Education', 'Manufacturing',
-    'Retail', 'Real Estate', 'Consulting', 'Marketing', 'Legal'
+    'Information Technology', 'Banking & Financial Services', 'E-commerce',
+    'Manufacturing', 'Pharmaceuticals', 'Telecommunications', 'Automotive',
+    'Textiles', 'Food Technology', 'Real Estate', 'Education', 'Healthcare',
+    'Conglomerate', 'Consulting', 'Media & Entertainment', 'Retail',
+    'Agriculture', 'Energy & Power', 'Logistics', 'Travel & Tourism'
   ];
 
   return (
@@ -99,7 +102,7 @@ const AddClient = () => {
               <p className="text-slate-600 text-sm">Create a comprehensive client company profile</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate('/app/companies')}
@@ -108,7 +111,7 @@ const AddClient = () => {
               Cancel
             </button>
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={isSubmitting}
               className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -129,10 +132,10 @@ const AddClient = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <form onSubmit={handleSubmit} className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-5xl bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-2xl overflow-hidden">
-          <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            
+          <div className="p-8 space-y-8">
+
             {/* Company Information Section */}
             <div className="space-y-6">
               <div className="flex items-center space-x-3 pb-4 border-b border-slate-200">
@@ -154,9 +157,8 @@ const AddClient = () => {
                     type="text"
                     value={formData.companyName}
                     onChange={(e) => handleInputChange('companyName', e.target.value)}
-                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${
-                      errors.companyName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
-                    }`}
+                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.companyName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                      }`}
                     placeholder="Enter company name"
                     aria-describedby={errors.companyName ? 'companyName-error' : undefined}
                   />
@@ -175,9 +177,8 @@ const AddClient = () => {
                   <select
                     value={formData.industry}
                     onChange={(e) => handleInputChange('industry', e.target.value)}
-                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${
-                      errors.industry ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
-                    }`}
+                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.industry ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                      }`}
                     aria-describedby={errors.industry ? 'industry-error' : undefined}
                   >
                     <option value="">Select industry</option>
@@ -204,7 +205,7 @@ const AddClient = () => {
                       value={formData.website}
                       onChange={(e) => handleInputChange('website', e.target.value)}
                       className="w-full pl-10 pr-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
-                      placeholder="https://company.com"
+                      placeholder="https://company.co.in"
                     />
                   </div>
                 </div>
@@ -245,9 +246,8 @@ const AddClient = () => {
                     type="text"
                     value={formData.primaryContactName}
                     onChange={(e) => handleInputChange('primaryContactName', e.target.value)}
-                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${
-                      errors.primaryContactName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
-                    }`}
+                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.primaryContactName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                      }`}
                     placeholder="Enter contact name"
                     aria-describedby={errors.primaryContactName ? 'primaryContactName-error' : undefined}
                   />
@@ -269,10 +269,9 @@ const AddClient = () => {
                       type="email"
                       value={formData.primaryContactEmail}
                       onChange={(e) => handleInputChange('primaryContactEmail', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${
-                        errors.primaryContactEmail ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
-                      }`}
-                      placeholder="Enter email address"
+                      className={`w-full pl-10 pr-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.primaryContactEmail ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                        }`}
+                      placeholder="contact@company.co.in"
                       aria-describedby={errors.primaryContactEmail ? 'primaryContactEmail-error' : undefined}
                     />
                   </div>
@@ -282,6 +281,19 @@ const AddClient = () => {
                       <span>{errors.primaryContactEmail}</span>
                     </p>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.primaryContactPhone}
+                    onChange={(e) => handleInputChange('primaryContactPhone', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="+91 98765 43210"
+                  />
                 </div>
               </div>
             </div>
@@ -295,9 +307,9 @@ const AddClient = () => {
                 </p>
               </div>
             )}
-          </form>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

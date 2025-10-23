@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, Download, Eye, Edit, Trash2, TrendingUp, Users, DollarSign, Target, MapPin, Briefcase } from 'lucide-react';
+import { Plus, Filter, Search, Download, Eye, Edit, Trash2, TrendingUp, Users, Banknote, Target, MapPin, Briefcase } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 
@@ -11,11 +11,11 @@ export default function Deals() {
     {
       id: 1,
       title: 'Senior React Developer',
-      company: 'TechCorp Inc.',
-      location: 'San Francisco, CA',
+      company: 'Infosys Technologies',
+      location: 'Bengaluru, Karnataka',
       type: 'Full-time',
       remote: true,
-      salary: '$120,000 - $150,000',
+      salary: '₹18,00,000 - ₹25,00,000',
       status: 'active',
       applicants: 45,
       posted: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days ago
@@ -27,11 +27,11 @@ export default function Deals() {
     {
       id: 2,
       title: 'UX/UI Designer',
-      company: 'Design Studio',
-      location: 'New York, NY',
+      company: 'Flipkart Internet',
+      location: 'Mumbai, Maharashtra',
       type: 'Full-time',
       remote: false,
-      salary: '$90,000 - $110,000',
+      salary: '₹12,00,000 - ₹16,00,000',
       status: 'active',
       applicants: 32,
       posted: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days ago
@@ -47,7 +47,7 @@ export default function Deals() {
       location: 'Austin, TX',
       type: 'Full-time',
       remote: true,
-      salary: '$130,000 - $160,000',
+      salary: '₹20,00,000 - ₹28,00,000',
       status: 'paused',
       applicants: 28,
       posted: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 10 days ago
@@ -59,11 +59,11 @@ export default function Deals() {
     {
       id: 4,
       title: 'Product Manager',
-      company: 'StartupXYZ',
+      company: 'Zomato Ltd',
       location: 'Remote',
       type: 'Full-time',
       remote: true,
-      salary: '$100,000 - $130,000',
+      salary: '₹15,00,000 - ₹22,00,000',
       status: 'closed',
       applicants: 67,
       posted: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 18 days ago
@@ -117,9 +117,12 @@ export default function Deals() {
   const locations = [
     { id: 'all', name: 'All Locations' },
     { id: 'remote', name: 'Remote' },
-    { id: 'San Francisco, CA', name: 'San Francisco, CA' },
-    { id: 'New York, NY', name: 'New York, NY' },
-    { id: 'Austin, TX', name: 'Austin, TX' }
+    { id: 'Bengaluru, Karnataka', name: 'Bengaluru, Karnataka' },
+    { id: 'Mumbai, Maharashtra', name: 'Mumbai, Maharashtra' },
+    { id: 'Delhi, NCR', name: 'Delhi, NCR' },
+    { id: 'Hyderabad, Telangana', name: 'Hyderabad, Telangana' },
+    { id: 'Chennai, Tamil Nadu', name: 'Chennai, Tamil Nadu' },
+    { id: 'Pune, Maharashtra', name: 'Pune, Maharashtra' }
   ];
 
   // Filter jobs based on search and filters
@@ -264,7 +267,7 @@ export default function Deals() {
                 <p className="text-2xl font-bold text-gray-900">{Math.round(avgApplicants)}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-orange-600" />
+                <Banknote className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           </div>
@@ -407,7 +410,7 @@ export default function Deals() {
                       {job.location} {job.remote && '(Remote)'}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <DollarSign className="w-4 h-4 mr-2" />
+                      <Banknote className="w-4 h-4 mr-2" />
                       {job.salary}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
@@ -615,7 +618,7 @@ export default function Deals() {
                       value={formData.salary}
                       onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="e.g., $120,000 - $150,000"
+                      placeholder="e.g., ₹18,00,000 - ₹25,00,000"
                     />
                   </div>
 
@@ -758,7 +761,7 @@ export default function Deals() {
                         {selectedJob.remote && <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Remote</span>}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4 text-slate-400" />
+                        <Banknote className="w-4 h-4 text-slate-400" />
                         <span className="text-slate-700">{selectedJob.salary}</span>
                       </div>
                       <div className="flex items-center space-x-2">

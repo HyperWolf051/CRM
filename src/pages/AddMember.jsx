@@ -87,8 +87,8 @@ const AddMember = () => {
   ];
 
   const timezones = [
-    'America/New_York', 'America/Los_Angeles', 'America/Chicago', 'America/Denver',
-    'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai',
+    'Asia/Kolkata', 'Asia/Dubai', 'Asia/Singapore', 'Asia/Tokyo', 'Asia/Shanghai',
+    'America/New_York', 'America/Los_Angeles', 'Europe/London', 'Europe/Paris', 
     'Australia/Sydney', 'UTC'
   ];
 

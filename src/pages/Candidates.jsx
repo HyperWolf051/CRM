@@ -1,33 +1,83 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 
 const Candidates = () => {
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([
     {
       id: 1,
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@email.com',
-      phone: '+1 (555) 123-4567',
+      name: 'Priya Sharma',
+      email: 'priya.sharma@gmail.com',
+      phone: '+91 98765 43210',
       position: 'Senior React Developer',
       experience: '5 years',
-      location: 'San Francisco, CA',
-      address: '123 Tech Street, San Francisco, CA 94105',
-      dateOfBirth: '1990-05-15',
-      nationality: 'American',
-      education: 'BS Computer Science - Stanford University',
-      linkedIn: 'https://linkedin.com/in/sarahjohnson',
-      portfolio: 'https://sarahjohnson.dev',
+      location: 'Bengaluru, Karnataka',
+      address: 'HSR Layout, Bengaluru, Karnataka 560102',
+      dateOfBirth: '1992-08-15',
+      nationality: 'Indian',
+      education: 'B.Tech Computer Science - IIT Bombay',
+      linkedIn: 'https://linkedin.com/in/priyasharma',
+      portfolio: 'https://priyasharma.dev',
       status: 'active',
       appliedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      salary: '$120,000',
+      salary: '₹18,00,000',
       skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
       avatar: null,
       rating: 4.8,
       interviews: 2,
       notes: 'Excellent technical skills, great cultural fit. Strong communication skills.',
-      resumeUrl: '/resumes/sarah-johnson.pdf'
+      resumeUrl: '/resumes/priya-sharma.pdf'
+    },
+    {
+      id: 2,
+      name: 'Arjun Patel',
+      email: 'arjun.patel@outlook.com',
+      phone: '+91 87654 32109',
+      position: 'Full Stack Developer',
+      experience: '3 years',
+      location: 'Pune, Maharashtra',
+      address: 'Koregaon Park, Pune, Maharashtra 411001',
+      dateOfBirth: '1994-12-22',
+      nationality: 'Indian',
+      education: 'B.E. Information Technology - Pune University',
+      linkedIn: 'https://linkedin.com/in/arjunpatel',
+      portfolio: 'https://arjunpatel.in',
+      status: 'interviewing',
+      appliedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      salary: '₹12,00,000',
+      skills: ['JavaScript', 'Python', 'Django', 'React'],
+      avatar: null,
+      rating: 4.5,
+      interviews: 1,
+      notes: 'Strong backend skills, good problem-solving abilities.',
+      resumeUrl: '/resumes/arjun-patel.pdf'
+    },
+    {
+      id: 3,
+      name: 'Sneha Reddy',
+      email: 'sneha.reddy@yahoo.com',
+      phone: '+91 76543 21098',
+      position: 'UI/UX Designer',
+      experience: '4 years',
+      location: 'Hyderabad, Telangana',
+      address: 'Gachibowli, Hyderabad, Telangana 500032',
+      dateOfBirth: '1991-03-10',
+      nationality: 'Indian',
+      education: 'M.Des Visual Communication - NID Ahmedabad',
+      linkedIn: 'https://linkedin.com/in/snehareddy',
+      portfolio: 'https://snehareddy.design',
+      status: 'active',
+      appliedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      salary: '₹15,00,000',
+      skills: ['Figma', 'Adobe XD', 'Sketch', 'Prototyping'],
+      avatar: null,
+      rating: 4.9,
+      interviews: 3,
+      notes: 'Creative designer with excellent user experience skills.',
+      resumeUrl: '/resumes/sneha-reddy.pdf'
     }
   ]);
 
@@ -257,7 +307,7 @@ const Candidates = () => {
                         value={newCandidate.phone}
                         onChange={(e) => setNewCandidate({...newCandidate, phone: e.target.value})}
                         className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                        placeholder="+1 (555) 123-4567"
+                        placeholder="+91 98765 43210"
                       />
                     </div>
 
@@ -340,7 +390,7 @@ const Candidates = () => {
                         value={newCandidate.salary}
                         onChange={(e) => setNewCandidate({...newCandidate, salary: e.target.value})}
                         className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                        placeholder="$120,000"
+                        placeholder="₹18,00,000"
                       />
                     </div>
 

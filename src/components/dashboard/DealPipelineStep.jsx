@@ -1,7 +1,7 @@
 import {
   Check,
   TrendingUp,
-  DollarSign,
+  Banknote,
   Clock,
   User,
   RefreshCw,
@@ -18,8 +18,8 @@ const DealPipelineStep = ({
   const dealDetails = [
     {
       id: 1,
-      client: "TechCorp Inc.",
-      value: "$45,000",
+      client: "Infosys Technologies",
+      value: "₹35L",
       stage: "Lead",
       progress: 15,
       daysInStage: 3,
@@ -28,8 +28,8 @@ const DealPipelineStep = ({
     },
     {
       id: 2,
-      client: "StartupXYZ",
-      value: "$32,000",
+      client: "Flipkart Internet",
+      value: "₹25L",
       stage: "Qualified",
       progress: 35,
       daysInStage: 7,
@@ -38,8 +38,8 @@ const DealPipelineStep = ({
     },
     {
       id: 3,
-      client: "Global Tech",
-      value: "$78,000",
+      client: "Tata Consultancy Services",
+      value: "₹60L",
       stage: "Proposal",
       progress: 65,
       daysInStage: 12,
@@ -48,8 +48,8 @@ const DealPipelineStep = ({
     },
     {
       id: 4,
-      client: "Innovate Solutions",
-      value: "$25,000",
+      client: "Zomato Ltd",
+      value: "₹20L",
       stage: "Negotiation",
       progress: 85,
       daysInStage: 5,
@@ -58,8 +58,8 @@ const DealPipelineStep = ({
     },
     {
       id: 5,
-      client: "Future Corp",
-      value: "$55,000",
+      client: "HDFC Bank Ltd",
+      value: "₹42L",
       stage: "Closed",
       progress: 100,
       daysInStage: 0,
@@ -215,7 +215,7 @@ const DealPipelineStep = ({
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-green-600" />
+                  <Banknote className="w-4 h-4 text-green-600" />
                   <span className="font-semibold text-green-600">
                     {deal.value}
                   </span>

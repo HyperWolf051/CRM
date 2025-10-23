@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Briefcase, DollarSign, Users, Target, ArrowUp } from "lucide-react";
+import { Briefcase, Banknote, Users, Target, ArrowUp } from "lucide-react";
 
 // Enhanced Components
 import { ChartContainer, ChartControls } from "../components/ui/Chart";
@@ -84,24 +84,28 @@ const Dashboard = () => {
 
   const recentActivity = [
     {
-      id: 1, message: "Sarah Johnson was added as a candidate", time: getTimeAgo(2),
-      type: "candidate", user: "John Doe", metadata: { location: "San Francisco, CA" }
+      id: 1, message: "Priya Sharma was added as a candidate", time: getTimeAgo(2),
+      type: "candidate", user: "Rahul Gupta", metadata: { location: "Bengaluru, Karnataka" }
     },
     {
-      id: 2, message: "Client call scheduled with TechCorp", time: getTimeAgo(4),
-      type: "meeting", user: "Uroos Khan", metadata: { participants: 3, location: "Virtual" }
+      id: 2, message: "Client call scheduled with Infosys Technologies", time: getTimeAgo(4),
+      type: "meeting", user: "Anjali Mehta", metadata: { participants: 3, location: "Virtual" }
     },
     {
-      id: 3, message: "Interview completed for Michael Chen", time: getTimeAgo(24),
-      type: "interview", user: "Sarah Smith", metadata: { location: "Conference Room A" }
+      id: 3, message: "Interview completed for Arjun Patel", time: getTimeAgo(24),
+      type: "interview", user: "Kavya Nair", metadata: { location: "Conference Room - Cyber City" }
     },
     {
       id: 4, message: "New Senior Developer job posting published", time: getTimeAgo(48),
       type: "job", user: "System"
     },
     {
-      id: 5, message: "Deal closed with StartupXYZ - $50k", time: getTimeAgo(72),
-      type: "deal", user: "Mike Johnson"
+      id: 5, message: "Deal closed with Flipkart - ₹45L", time: getTimeAgo(72),
+      type: "deal", user: "Vikram Singh"
+    },
+    {
+      id: 6, message: "New client onboarded - Zomato Ltd", time: getTimeAgo(96),
+      type: "candidate", user: "Neha Agarwal", metadata: { location: "Gurugram, Haryana" }
     }
   ];
 
@@ -255,10 +259,10 @@ const Dashboard = () => {
               {/* Weekly Balance Card */}
               <AdvancedMetricCard
                 title="Weekly Balance"
-                value="$20k"
+                value="₹15L"
                 trend={12}
-                comparison="vs $17.8k last week"
-                icon={DollarSign}
+                comparison="vs ₹13.2L last week"
+                icon={Banknote}
                 color="from-blue-600 via-blue-700 to-blue-800"
                 onClick={() => handleMetricClick("weekly-balance")}
                 sparklineData={weeklyBalanceSparkline}
@@ -346,11 +350,11 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-gray-200">
                   <div>
-                    <div className="text-xl font-bold text-blue-600">$317k</div>
+                    <div className="text-xl font-bold text-blue-600">₹2.4Cr</div>
                     <div className="text-xs text-gray-500">Total Revenue</div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-green-600">$89k</div>
+                    <div className="text-xl font-bold text-green-600">₹68L</div>
                     <div className="text-xs text-gray-500">Total Profit</div>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Search, Filter, Download, Building2, Users, Banknote, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
@@ -10,79 +11,116 @@ import { formatCurrency } from '../utils/formatters';
 const mockCompanies = [
   {
     id: '1',
-    name: 'TechCorp Inc.',
-    industry: 'Technology',
-    size: '500-1000',
-    revenue: 50000000,
-    website: 'https://techcorp.com',
-    phone: '+1 (555) 123-4567',
-    email: 'contact@techcorp.com',
-    address: '123 Tech Street, San Francisco, CA 94105',
-    status: 'active',
-    contactsCount: 15,
-    dealsCount: 8,
-    totalDealsValue: 450000,
+    name: 'Infosys Technologies Ltd.',
+    industry: 'Information Technology',
+    size: '1000+',
+    revenue: 165000000000, // ₹1650 Cr
+    website: 'https://infosys.com',
+    phone: '+91 80 2852 0261',
+    email: 'contact@infosys.com',
+    address: 'Electronics City, Hosur Road, Bengaluru, Karnataka 560100',
+    status: 'customer',
+    contactsCount: 45,
+    dealsCount: 18,
+    totalDealsValue: 25000000, // ₹2.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Major technology company, potential for large enterprise deals.'
+    notes: 'Leading IT services company, excellent long-term partnership potential.'
   },
   {
     id: '2',
-    name: 'Innovate Solutions',
-    industry: 'Consulting',
-    size: '100-500',
-    revenue: 15000000,
-    website: 'https://innovatesolutions.com',
-    phone: '+1 (555) 987-6543',
-    email: 'hello@innovatesolutions.com',
-    address: '456 Innovation Ave, Austin, TX 78701',
-    status: 'prospect',
-    contactsCount: 8,
-    dealsCount: 3,
-    totalDealsValue: 125000,
+    name: 'Tata Consultancy Services',
+    industry: 'Information Technology',
+    size: '1000+',
+    revenue: 220000000000, // ₹2200 Cr
+    website: 'https://tcs.com',
+    phone: '+91 22 6778 9595',
+    email: 'corporate@tcs.com',
+    address: 'Nirmal Building, Nariman Point, Mumbai, Maharashtra 400021',
+    status: 'active',
+    contactsCount: 52,
+    dealsCount: 22,
+    totalDealsValue: 35000000, // ₹3.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Growing consulting firm, interested in our automation solutions.'
+    notes: 'Largest IT services company in India, multiple ongoing projects.'
   },
   {
     id: '3',
-    name: 'StartupXYZ',
-    industry: 'Fintech',
-    size: '10-50',
-    revenue: 2000000,
-    website: 'https://startupxyz.com',
-    phone: '+1 (555) 456-7890',
-    email: 'team@startupxyz.com',
-    address: '789 Startup Blvd, New York, NY 10001',
-    status: 'lead',
-    contactsCount: 5,
-    dealsCount: 2,
-    totalDealsValue: 75000,
+    name: 'Flipkart Internet Pvt Ltd',
+    industry: 'E-commerce',
+    size: '500-1000',
+    revenue: 62000000000, // ₹620 Cr
+    website: 'https://flipkart.com',
+    phone: '+91 80 4719 2222',
+    email: 'corporate@flipkart.com',
+    address: 'Embassy Tech Village, Outer Ring Road, Bengaluru, Karnataka 560103',
+    status: 'prospect',
+    contactsCount: 28,
+    dealsCount: 8,
+    totalDealsValue: 12000000, // ₹1.2 Cr
     logo: null,
     createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Fast-growing fintech startup, budget-conscious but high potential.'
+    notes: 'Major e-commerce platform, exploring recruitment solutions for rapid expansion.'
   },
   {
     id: '4',
-    name: 'Global Tech',
-    industry: 'Manufacturing',
+    name: 'Reliance Industries Ltd',
+    industry: 'Conglomerate',
     size: '1000+',
-    revenue: 200000000,
-    website: 'https://globaltech.com',
-    phone: '+1 (555) 321-0987',
-    email: 'info@globaltech.com',
-    address: '321 Global Way, Chicago, IL 60601',
-    status: 'customer',
-    contactsCount: 25,
-    dealsCount: 12,
-    totalDealsValue: 850000,
+    revenue: 870000000000, // ₹8700 Cr
+    website: 'https://ril.com',
+    phone: '+91 22 3555 5000',
+    email: 'investor.relations@ril.com',
+    address: '3rd Floor, Maker Chambers IV, Nariman Point, Mumbai, Maharashtra 400021',
+    status: 'lead',
+    contactsCount: 38,
+    dealsCount: 15,
+    totalDealsValue: 45000000, // ₹4.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(),
-    notes: 'Long-term customer, excellent relationship, regular repeat business.'
+    notes: 'Diversified conglomerate, potential for multiple verticals recruitment.'
+  },
+  {
+    id: '5',
+    name: 'Zomato Ltd',
+    industry: 'Food Technology',
+    size: '100-500',
+    revenue: 5400000000, // ₹54 Cr
+    website: 'https://zomato.com',
+    phone: '+91 124 4616 500',
+    email: 'corporate@zomato.com',
+    address: 'Zomato Building, 12th Floor, Tower A, Unitech Cyber Park, Sector 39, Gurugram, Haryana 122001',
+    status: 'customer',
+    contactsCount: 22,
+    dealsCount: 6,
+    totalDealsValue: 8500000, // ₹85 L
+    logo: null,
+    createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: 'Food delivery unicorn, aggressive hiring for tech and operations roles.'
+  },
+  {
+    id: '6',
+    name: 'HDFC Bank Ltd',
+    industry: 'Banking & Financial Services',
+    size: '1000+',
+    revenue: 180000000000, // ₹1800 Cr
+    website: 'https://hdfcbank.com',
+    phone: '+91 22 6160 6161',
+    email: 'corporate@hdfcbank.com',
+    address: 'HDFC Bank House, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra 400013',
+    status: 'active',
+    contactsCount: 41,
+    dealsCount: 19,
+    totalDealsValue: 28000000, // ₹2.8 Cr
+    logo: null,
+    createdAt: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: 'Leading private sector bank, consistent recruitment needs across branches.'
   }
 ];
 
 export default function Companies() {
+  const navigate = useNavigate();
   const [companies] = useState(mockCompanies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -116,12 +154,20 @@ export default function Companies() {
 
   const industries = [
     { id: 'all', name: 'All Industries' },
-    { id: 'Technology', name: 'Technology' },
-    { id: 'Consulting', name: 'Consulting' },
-    { id: 'Fintech', name: 'Fintech' },
+    { id: 'Information Technology', name: 'Information Technology' },
+    { id: 'Banking & Financial Services', name: 'Banking & Financial Services' },
+    { id: 'E-commerce', name: 'E-commerce' },
     { id: 'Manufacturing', name: 'Manufacturing' },
+    { id: 'Pharmaceuticals', name: 'Pharmaceuticals' },
+    { id: 'Telecommunications', name: 'Telecommunications' },
+    { id: 'Automotive', name: 'Automotive' },
+    { id: 'Textiles', name: 'Textiles' },
+    { id: 'Food Technology', name: 'Food Technology' },
+    { id: 'Real Estate', name: 'Real Estate' },
+    { id: 'Education', name: 'Education' },
     { id: 'Healthcare', name: 'Healthcare' },
-    { id: 'Education', name: 'Education' }
+    { id: 'Conglomerate', name: 'Conglomerate' },
+    { id: 'Consulting', name: 'Consulting' }
   ];
 
   const companySizes = [
@@ -225,7 +271,7 @@ export default function Companies() {
                   <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                  <Banknote className="w-6 h-6 text-green-600" />
                 </div>
               </div>
             </div>
@@ -535,7 +581,7 @@ export default function Companies() {
                       value={newCompany.revenue}
                       onChange={(e) => setNewCompany({ ...newCompany, revenue: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Annual revenue in USD"
+                      placeholder="Annual revenue in INR"
                     />
                   </div>
 
@@ -546,7 +592,7 @@ export default function Companies() {
                       value={newCompany.website}
                       onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="https://company.com"
+                      placeholder="https://company.co.in"
                     />
                   </div>
 
@@ -568,7 +614,7 @@ export default function Companies() {
                       value={newCompany.email}
                       onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="contact@client.com"
+                      placeholder="contact@client.co.in"
                     />
                   </div>
 

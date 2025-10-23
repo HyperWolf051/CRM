@@ -16,7 +16,7 @@ vi.mock('../hooks/useDashboard', () => ({
     metrics: {
       totalContacts: 150,
       activeDeals: 25,
-      revenue: 125000,
+      revenue: 9375000, // ₹93.75L
       conversionRate: 15.5,
       contactsTrend: 12,
       dealsTrend: -5,
@@ -33,10 +33,10 @@ vi.mock('../hooks/useContacts', () => ({
     contacts: [
       {
         id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+1234567890',
-        company: 'Acme Corp',
+        name: 'Rahul Sharma',
+        email: 'rahul@talenthub.co.in',
+        phone: '+919876543210',
+        company: 'TalentHub India',
         status: 'active'
       }
     ],

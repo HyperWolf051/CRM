@@ -75,11 +75,11 @@ const Settings = () => {
   
   // System Configuration State
   const [systemConfig, setSystemConfig] = useState({
-    companyName: 'Acme CRM',
-    timezone: 'America/New_York',
-    dateFormat: 'MM/DD/YYYY',
-    currency: 'USD',
-    language: 'en',
+    companyName: 'TalentHub India',
+    timezone: 'Asia/Kolkata',
+    dateFormat: 'DD/MM/YYYY',
+    currency: 'INR',
+    language: 'en-IN',
     autoBackup: true,
     dataRetentionDays: 365,
     sessionTimeout: 30,
@@ -631,11 +631,12 @@ const Settings = () => {
                         value={systemConfig.timezone}
                         onChange={(e) => handleSystemConfigChange('timezone', e.target.value)}
                         options={[
+                          { value: 'Asia/Kolkata', label: 'Indian Standard Time (IST)' },
+                          { value: 'Asia/Dubai', label: 'Gulf Standard Time (GST)' },
+                          { value: 'Asia/Singapore', label: 'Singapore Time (SGT)' },
+                          { value: 'UTC', label: 'UTC' },
                           { value: 'America/New_York', label: 'Eastern Time (ET)' },
-                          { value: 'America/Chicago', label: 'Central Time (CT)' },
-                          { value: 'America/Denver', label: 'Mountain Time (MT)' },
-                          { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-                          { value: 'UTC', label: 'UTC' }
+                          { value: 'Europe/London', label: 'Greenwich Mean Time (GMT)' }
                         ]}
                       />
 
@@ -645,9 +646,10 @@ const Settings = () => {
                         value={systemConfig.dateFormat}
                         onChange={(e) => handleSystemConfigChange('dateFormat', e.target.value)}
                         options={[
+                          { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (Indian)' },
                           { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY (US)' },
-                          { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (EU)' },
-                          { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' }
+                          { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
+                          { value: 'DD-MM-YYYY', label: 'DD-MM-YYYY (Alternative)' }
                         ]}
                       />
                     </div>
@@ -662,10 +664,12 @@ const Settings = () => {
                         value={systemConfig.currency}
                         onChange={(e) => handleSystemConfigChange('currency', e.target.value)}
                         options={[
+                          { value: 'INR', label: '🇮🇳 INR - Indian Rupee' },
                           { value: 'USD', label: '🇺🇸 USD - US Dollar' },
                           { value: 'EUR', label: '🇪🇺 EUR - Euro' },
                           { value: 'GBP', label: '🇬🇧 GBP - British Pound' },
-                          { value: 'CAD', label: '🇨🇦 CAD - Canadian Dollar' }
+                          { value: 'AED', label: '🇦🇪 AED - UAE Dirham' },
+                          { value: 'SGD', label: '🇸🇬 SGD - Singapore Dollar' }
                         ]}
                       />
 

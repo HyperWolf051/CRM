@@ -1,15 +1,15 @@
 /**
- * Formats a number as currency (USD by default)
+ * Formats a number as currency (INR by default for Indian market)
  * @param {number} amount - Amount to format
- * @param {string} currency - Currency code (default: 'USD')
+ * @param {string} currency - Currency code (default: 'INR')
  * @returns {string} - Formatted currency string
  */
-export const formatCurrency = (amount, currency = 'USD') => {
+export const formatCurrency = (amount, currency = 'INR') => {
   if (amount === null || amount === undefined || isNaN(amount)) {
-    return '$0.00';
+    return '₹0.00';
   }
   
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,
@@ -18,7 +18,7 @@ export const formatCurrency = (amount, currency = 'USD') => {
 };
 
 /**
- * Formats a date string or Date object to a readable format
+ * Formats a date string or Date object to a readable format (Indian timezone)
  * @param {string|Date} date - Date to format
  * @param {string} format - Format type: 'short', 'long', 'medium' (default: 'medium')
  * @returns {string} - Formatted date string
@@ -33,16 +33,16 @@ export const formatDate = (date, format = 'medium') => {
   }
   
   const options = {
-    short: { month: 'numeric', day: 'numeric', year: '2-digit' },
-    medium: { month: 'short', day: 'numeric', year: 'numeric' },
-    long: { month: 'long', day: 'numeric', year: 'numeric' },
+    short: { month: 'numeric', day: 'numeric', year: '2-digit', timeZone: 'Asia/Kolkata' },
+    medium: { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'Asia/Kolkata' },
+    long: { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'Asia/Kolkata' },
   };
   
-  return new Intl.DateTimeFormat('en-US', options[format] || options.medium).format(dateObj);
+  return new Intl.DateTimeFormat('en-IN', options[format] || options.medium).format(dateObj);
 };
 
 /**
- * Formats a phone number to a standard format
+ * Formats a phone number to Indian standard format
  * @param {string} phone - Phone number to format
  * @returns {string} - Formatted phone number
  */
@@ -54,11 +54,15 @@ export const formatPhone = (phone) => {
   
   // Format based on length
   if (digitsOnly.length === 10) {
-    // Format as (123) 456-7890
-    return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
-  } else if (digitsOnly.length === 11 && digitsOnly[0] === '1') {
-    // Format as +1 (123) 456-7890
-    return `+1 (${digitsOnly.slice(1, 4)}) ${digitsOnly.slice(4, 7)}-${digitsOnly.slice(7)}`;
+    // Format as +91 98765 43210 (Indian mobile format)
+    return `+91 ${digitsOnly.slice(0, 5)} ${digitsOnly.slice(5)}`;
+  } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
+    // Already has country code
+    return `+91 ${digitsOnly.slice(2, 7)} ${digitsOnly.slice(7)}`;
+  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
+    // Remove leading 0 and format
+    const mobile = digitsOnly.slice(1);
+    return `+91 ${mobile.slice(0, 5)} ${mobile.slice(5)}`;
   }
   
   // Return original if format is unrecognized
@@ -91,7 +95,7 @@ export const formatRelativeTime = (date) => {
 };
 
 /**
- * Formats a number with thousand separators
+ * Formats a number with Indian number system (lakhs, crores)
  * @param {number} num - Number to format
  * @returns {string} - Formatted number string
  */
@@ -100,7 +104,7 @@ export const formatNumber = (num) => {
     return '0';
   }
   
-  return new Intl.NumberFormat('en-US').format(num);
+  return new Intl.NumberFormat('en-IN').format(num);
 };
 
 /**
@@ -116,4 +120,92 @@ export const formatPercentage = (value, isDecimal = false) => {
   
   const percentage = isDecimal ? value * 100 : value;
   return `${percentage.toFixed(1)}%`;
+};
+/**
+ * Formats time to Indian Standard Time (IST)
+ * @param {string|Date} date - Date to format
+ * @returns {string} - Formatted time string in IST
+ */
+export const formatTimeIST = (date) => {
+  if (!date) return '';
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(dateObj.getTime())) {
+    return '';
+  }
+  
+  return new Intl.DateTimeFormat('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Kolkata',
+    hour12: true
+  }).format(dateObj);
+};
+
+/**
+ * Formats date and time to Indian format
+ * @param {string|Date} date - Date to format
+ * @returns {string} - Formatted date and time string
+ */
+export const formatDateTimeIST = (date) => {
+  if (!date) return '';
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(dateObj.getTime())) {
+    return '';
+  }
+  
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Kolkata',
+    hour12: true
+  }).format(dateObj);
+};
+
+/**
+ * Formats number in Indian numbering system with words (lakhs, crores)
+ * @param {number} num - Number to format
+ * @returns {string} - Formatted number with Indian units
+ */
+export const formatIndianNumber = (num) => {
+  if (num === null || num === undefined || isNaN(num)) {
+    return '0';
+  }
+  
+  if (num >= 10000000) { // 1 crore
+    return `${(num / 10000000).toFixed(1)} Cr`;
+  } else if (num >= 100000) { // 1 lakh
+    return `${(num / 100000).toFixed(1)} L`;
+  } else if (num >= 1000) { // 1 thousand
+    return `${(num / 1000).toFixed(1)} K`;
+  }
+  
+  return formatNumber(num);
+};
+
+/**
+ * Formats currency in Indian format with units
+ * @param {number} amount - Amount to format
+ * @returns {string} - Formatted currency with Indian units
+ */
+export const formatIndianCurrency = (amount) => {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '₹0';
+  }
+  
+  if (amount >= 10000000) { // 1 crore
+    return `₹${(amount / 10000000).toFixed(1)} Cr`;
+  } else if (amount >= 100000) { // 1 lakh
+    return `₹${(amount / 100000).toFixed(1)} L`;
+  } else if (amount >= 1000) { // 1 thousand
+    return `₹${(amount / 1000).toFixed(1)} K`;
+  }
+  
+  return formatCurrency(amount);
 };

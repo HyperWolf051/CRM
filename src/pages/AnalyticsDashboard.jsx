@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  DollarSign, 
-  Target, 
-  Calendar, 
-  Download, 
-  Filter, 
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Banknote,
+  Target,
+  Calendar,
+  Download,
+  Filter,
   RefreshCw,
   Eye,
   Share2,
@@ -51,36 +51,36 @@ const AnalyticsDashboard = () => {
   // Analytics data
   const [analyticsData, setAnalyticsData] = useState({
     overview: {
-      totalRevenue: 2450000,
+      totalRevenue: 18500000, // ₹1.85 Cr
       revenueChange: 12.5,
       totalDeals: 156,
       dealsChange: 8.3,
       conversionRate: 24.8,
       conversionChange: -2.1,
-      avgDealSize: 15705,
+      avgDealSize: 118590, // ₹1.18L
       avgDealChange: 5.7
     },
     revenueChart: [
-      { month: 'Jan', revenue: 180000, deals: 12, target: 200000 },
-      { month: 'Feb', revenue: 220000, deals: 15, target: 200000 },
-      { month: 'Mar', revenue: 195000, deals: 13, target: 200000 },
-      { month: 'Apr', revenue: 240000, deals: 16, target: 220000 },
-      { month: 'May', revenue: 280000, deals: 18, target: 220000 },
-      { month: 'Jun', revenue: 310000, deals: 20, target: 250000 }
+      { month: 'Jan', revenue: 1350000, deals: 12, target: 1500000 }, // ₹13.5L
+      { month: 'Feb', revenue: 1650000, deals: 15, target: 1500000 }, // ₹16.5L
+      { month: 'Mar', revenue: 1462500, deals: 13, target: 1500000 }, // ₹14.6L
+      { month: 'Apr', revenue: 1800000, deals: 16, target: 1650000 }, // ₹18L
+      { month: 'May', revenue: 2100000, deals: 18, target: 1650000 }, // ₹21L
+      { month: 'Jun', revenue: 2325000, deals: 20, target: 1875000 }  // ₹23.25L
     ],
     pipelineData: [
-      { stage: 'Lead', count: 45, value: 675000, conversion: 68 },
-      { stage: 'Qualified', count: 32, value: 480000, conversion: 75 },
-      { stage: 'Proposal', count: 18, value: 270000, conversion: 61 },
-      { stage: 'Negotiation', count: 12, value: 180000, conversion: 83 },
-      { stage: 'Closed Won', count: 8, value: 120000, conversion: 100 }
+      { stage: 'Lead', count: 45, value: 5062500, conversion: 68 },      // ₹50.6L
+      { stage: 'Qualified', count: 32, value: 3600000, conversion: 75 }, // ₹36L
+      { stage: 'Proposal', count: 18, value: 2025000, conversion: 61 },  // ₹20.25L
+      { stage: 'Negotiation', count: 12, value: 1350000, conversion: 83 }, // ₹13.5L
+      { stage: 'Closed Won', count: 8, value: 900000, conversion: 100 }   // ₹9L
     ],
     topPerformers: [
-      { id: 1, name: 'Sarah Johnson', revenue: 485000, deals: 23, conversion: 28.5, avatar: null },
-      { id: 2, name: 'Mike Chen', revenue: 420000, deals: 19, conversion: 31.2, avatar: null },
-      { id: 3, name: 'Emily Davis', revenue: 380000, deals: 18, conversion: 26.8, avatar: null },
-      { id: 4, name: 'David Wilson', revenue: 350000, deals: 16, conversion: 24.1, avatar: null },
-      { id: 5, name: 'Lisa Anderson', revenue: 295000, deals: 14, conversion: 22.9, avatar: null }
+      { id: 1, name: 'Priya Sharma', revenue: 3637500, deals: 23, conversion: 28.5, avatar: null }, // ₹36.4L
+      { id: 2, name: 'Arjun Patel', revenue: 3150000, deals: 19, conversion: 31.2, avatar: null },  // ₹31.5L
+      { id: 3, name: 'Sneha Reddy', revenue: 2850000, deals: 18, conversion: 26.8, avatar: null },  // ₹28.5L
+      { id: 4, name: 'Vikram Singh', revenue: 2625000, deals: 16, conversion: 24.1, avatar: null }, // ₹26.25L
+      { id: 5, name: 'Kavya Nair', revenue: 2212500, deals: 14, conversion: 22.9, avatar: null }   // ₹22.1L
     ],
     activityMetrics: {
       totalCalls: 1248,
@@ -154,9 +154,9 @@ const AnalyticsDashboard = () => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
@@ -217,11 +217,10 @@ const AnalyticsDashboard = () => {
                   <button
                     key={period.value}
                     onClick={() => setSelectedPeriod(period.value)}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                      selectedPeriod === period.value
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${selectedPeriod === period.value
                         ? 'bg-blue-600 text-white shadow-sm'
                         : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     {period.label}
                   </button>
@@ -248,7 +247,7 @@ const AnalyticsDashboard = () => {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-6 h-6 text-green-600" />
+                    <Banknote className="w-6 h-6 text-green-600" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-600 mb-1">Total Revenue</p>
@@ -257,11 +256,10 @@ const AnalyticsDashboard = () => {
                     </p>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${
-                  analyticsData.overview.revenueChange > 0 
-                    ? 'bg-green-100 text-green-700' 
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${analyticsData.overview.revenueChange > 0
+                    ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}>
+                  }`}>
                   {getTrendIcon(analyticsData.overview.revenueChange)}
                   {formatPercentage(analyticsData.overview.revenueChange)}
                 </div>
@@ -286,11 +284,10 @@ const AnalyticsDashboard = () => {
                     </p>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${
-                  analyticsData.overview.dealsChange > 0 
-                    ? 'bg-green-100 text-green-700' 
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${analyticsData.overview.dealsChange > 0
+                    ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}>
+                  }`}>
                   {getTrendIcon(analyticsData.overview.dealsChange)}
                   {formatPercentage(analyticsData.overview.dealsChange)}
                 </div>
@@ -315,11 +312,10 @@ const AnalyticsDashboard = () => {
                     </p>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${
-                  analyticsData.overview.conversionChange > 0 
-                    ? 'bg-green-100 text-green-700' 
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${analyticsData.overview.conversionChange > 0
+                    ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}>
+                  }`}>
                   {getTrendIcon(analyticsData.overview.conversionChange)}
                   {formatPercentage(analyticsData.overview.conversionChange)}
                 </div>
@@ -344,11 +340,10 @@ const AnalyticsDashboard = () => {
                     </p>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${
-                  analyticsData.overview.avgDealChange > 0 
-                    ? 'bg-green-100 text-green-700' 
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${analyticsData.overview.avgDealChange > 0
+                    ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}>
+                  }`}>
                   {getTrendIcon(analyticsData.overview.avgDealChange)}
                   {formatPercentage(analyticsData.overview.avgDealChange)}
                 </div>
@@ -381,40 +376,44 @@ const AnalyticsDashboard = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
-                {analyticsData.revenueChart.map((data, index) => (
-                  <div key={data.month} className="border-b border-gray-100 pb-4 last:border-b-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-medium text-gray-900 w-12">{data.month}</span>
-                        <span className="text-sm text-gray-600">{formatCurrency(data.revenue)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Briefcase className="w-3 h-3" />
-                        {data.deals} deals
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <div className="w-full bg-gray-200 rounded h-4">
-                        <div 
-                          className="bg-blue-500 h-4 rounded flex items-center justify-end pr-2"
-                          style={{ width: `${(data.revenue / 320000) * 100}%` }}
-                        >
-                          <span className="text-white text-xs font-medium">
-                            {Math.round((data.revenue / data.target) * 100)}%
-                          </span>
+                {(() => {
+                  const maxRevenue = Math.max(...analyticsData.revenueChart.map(d => Math.max(d.revenue, d.target)));
+                  return analyticsData.revenueChart.map((data, index) => (
+                    <div key={data.month} className="border-b border-gray-100 pb-4 last:border-b-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-4">
+                          <span className="text-sm font-medium text-gray-900 w-12">{data.month}</span>
+                          <span className="text-sm text-gray-600">{formatCurrency(data.revenue)}</span>
                         </div>
-                        <div 
-                          className="absolute top-0 h-4 w-0.5 bg-gray-400"
-                          style={{ left: `${(data.target / 320000) * 100}%` }}
-                        />
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <Briefcase className="w-3 h-3" />
+                          {data.deals} deals
+                        </div>
+                      </div>
+                      <div className="relative" id="revenue-progress-container">
+                        <div className="w-full bg-gray-200 rounded h-4" id="progress-track">
+                          <div
+                            id={`progress-bar-${data.month}`}
+                            className="revenue-progress-bar bg-blue-500 h-4 rounded flex items-center justify-end pr-2"
+                            style={{ width: `${Math.min((data.revenue / maxRevenue) * 100, 100)}%` }}
+                          >
+                            <span className="progress-percentage text-white text-xs font-medium">
+                              {Math.round((data.revenue / data.target) * 100)}%
+                            </span>
+                          </div>
+                          <div
+                            className="progress-target absolute top-0 h-4 w-0.5 bg-gray-400"
+                            style={{ left: `${Math.min((data.target / maxRevenue) * 100, 100)}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
-              
+
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
@@ -431,7 +430,7 @@ const AnalyticsDashboard = () => {
                   </div>
                   <div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {Math.round((analyticsData.revenueChart.reduce((sum, item) => sum + item.revenue, 0) / 
+                      {Math.round((analyticsData.revenueChart.reduce((sum, item) => sum + item.revenue, 0) /
                         analyticsData.revenueChart.reduce((sum, item) => sum + item.target, 0)) * 100)}%
                     </div>
                     <div className="text-xs text-gray-600">Target Achievement</div>
@@ -448,33 +447,31 @@ const AnalyticsDashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Sales Pipeline</h3>
                 <p className="text-sm text-gray-600 mt-1">Deals by stage</p>
               </div>
-              
+
               <div className="space-y-4">
                 {analyticsData.pipelineData.map((stage, index) => (
                   <div key={stage.stage} className="border-b border-gray-100 pb-4 last:border-b-0">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${
-                          index === 0 ? 'bg-red-500' :
-                          index === 1 ? 'bg-orange-500' :
-                          index === 2 ? 'bg-yellow-500' :
-                          index === 3 ? 'bg-blue-500' :
-                          'bg-green-500'
-                        }`}></div>
+                        <div className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-red-500' :
+                            index === 1 ? 'bg-orange-500' :
+                              index === 2 ? 'bg-yellow-500' :
+                                index === 3 ? 'bg-blue-500' :
+                                  'bg-green-500'
+                          }`}></div>
                         <span className="text-sm font-medium text-gray-900">{stage.stage}</span>
                       </div>
                       <span className="text-xs text-gray-500">{stage.count} deals</span>
                     </div>
                     <div className="mb-2">
                       <div className="w-full bg-gray-200 rounded h-2">
-                        <div 
-                          className={`h-2 rounded ${
-                            index === 0 ? 'bg-red-500' :
-                            index === 1 ? 'bg-orange-500' :
-                            index === 2 ? 'bg-yellow-500' :
-                            index === 3 ? 'bg-blue-500' :
-                            'bg-green-500'
-                          }`}
+                        <div
+                          className={`h-2 rounded ${index === 0 ? 'bg-red-500' :
+                              index === 1 ? 'bg-orange-500' :
+                                index === 2 ? 'bg-yellow-500' :
+                                  index === 3 ? 'bg-blue-500' :
+                                    'bg-green-500'
+                            }`}
                           style={{ width: `${stage.conversion}%` }}
                         />
                       </div>
@@ -486,7 +483,7 @@ const AnalyticsDashboard = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-6 pt-4 border-t border-gray-200 text-center">
                 <div className="text-lg font-semibold text-gray-900">
                   {formatCurrency(analyticsData.pipelineData.reduce((sum, stage) => sum + stage.value, 0))}
@@ -512,17 +509,16 @@ const AnalyticsDashboard = () => {
                   View All
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 {analyticsData.topPerformers.map((performer, index) => (
                   <div key={performer.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white ${
-                        index === 0 ? 'bg-yellow-500' :
-                        index === 1 ? 'bg-gray-400' :
-                        index === 2 ? 'bg-orange-500' :
-                        'bg-blue-500'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white ${index === 0 ? 'bg-yellow-500' :
+                          index === 1 ? 'bg-gray-400' :
+                            index === 2 ? 'bg-orange-500' :
+                              'bg-blue-500'
+                        }`}>
                         {index + 1}
                       </div>
                       <div>
@@ -551,7 +547,7 @@ const AnalyticsDashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Sales Activities</h3>
                 <p className="text-sm text-gray-600 mt-1">Team engagement metrics</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <div className="flex items-center gap-2 mb-2">
@@ -565,7 +561,7 @@ const AnalyticsDashboard = () => {
                     {formatPercentage(analyticsData.activityMetrics.callsChange)} from last month
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                   <div className="flex items-center gap-2 mb-2">
                     <Mail className="w-4 h-4 text-green-600" />
@@ -578,7 +574,7 @@ const AnalyticsDashboard = () => {
                     {formatPercentage(analyticsData.activityMetrics.emailsChange)} from last month
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-4 h-4 text-purple-600" />
@@ -591,7 +587,7 @@ const AnalyticsDashboard = () => {
                     {formatPercentage(analyticsData.activityMetrics.meetingsChange)} from last month
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
                   <div className="flex items-center gap-2 mb-2">
                     <Target className="w-4 h-4 text-orange-600" />
@@ -618,18 +614,17 @@ const AnalyticsDashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Geographic Performance</h3>
                 <p className="text-sm text-gray-600 mt-1">Revenue distribution by region</p>
               </div>
-              
+
               <div className="space-y-4">
                 {analyticsData.geographicData.map((region, index) => (
                   <div key={region.region} className="border-b border-gray-100 pb-4 last:border-b-0">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          index === 0 ? 'bg-blue-500' :
-                          index === 1 ? 'bg-green-500' :
-                          index === 2 ? 'bg-purple-500' :
-                          'bg-orange-500'
-                        }`}></div>
+                        <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' :
+                            index === 1 ? 'bg-green-500' :
+                              index === 2 ? 'bg-purple-500' :
+                                'bg-orange-500'
+                          }`}></div>
                         <div>
                           <span className="font-medium text-gray-900">{region.region}</span>
                           <div className="text-xs text-gray-500">{region.deals} deals</div>
@@ -641,20 +636,19 @@ const AnalyticsDashboard = () => {
                       </div>
                     </div>
                     <div className="w-full bg-gray-200 rounded h-2">
-                      <div 
-                        className={`h-2 rounded ${
-                          index === 0 ? 'bg-blue-500' :
-                          index === 1 ? 'bg-green-500' :
-                          index === 2 ? 'bg-purple-500' :
-                          'bg-orange-500'
-                        }`}
+                      <div
+                        className={`h-2 rounded ${index === 0 ? 'bg-blue-500' :
+                            index === 1 ? 'bg-green-500' :
+                              index === 2 ? 'bg-purple-500' :
+                                'bg-orange-500'
+                          }`}
                         style={{ width: `${region.percentage}%` }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
@@ -681,26 +675,24 @@ const AnalyticsDashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Industry Analysis</h3>
                 <p className="text-sm text-gray-600 mt-1">Performance by industry vertical</p>
               </div>
-              
+
               <div className="space-y-4">
                 {analyticsData.industryBreakdown.map((industry, index) => (
                   <div key={industry.industry} className="border-b border-gray-100 pb-4 last:border-b-0">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          index === 0 ? 'bg-indigo-100' :
-                          index === 1 ? 'bg-teal-100' :
-                          index === 2 ? 'bg-rose-100' :
-                          index === 3 ? 'bg-amber-100' :
-                          'bg-slate-100'
-                        }`}>
-                          <Briefcase className={`w-4 h-4 ${
-                            index === 0 ? 'text-indigo-600' :
-                            index === 1 ? 'text-teal-600' :
-                            index === 2 ? 'text-rose-600' :
-                            index === 3 ? 'text-amber-600' :
-                            'text-slate-600'
-                          }`} />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${index === 0 ? 'bg-indigo-100' :
+                            index === 1 ? 'bg-teal-100' :
+                              index === 2 ? 'bg-rose-100' :
+                                index === 3 ? 'bg-amber-100' :
+                                  'bg-slate-100'
+                          }`}>
+                          <Briefcase className={`w-4 h-4 ${index === 0 ? 'text-indigo-600' :
+                              index === 1 ? 'text-teal-600' :
+                                index === 2 ? 'text-rose-600' :
+                                  index === 3 ? 'text-amber-600' :
+                                    'text-slate-600'
+                            }`} />
                         </div>
                         <div>
                           <span className="font-medium text-gray-900">{industry.industry}</span>
@@ -716,14 +708,13 @@ const AnalyticsDashboard = () => {
                       </div>
                     </div>
                     <div className="w-full bg-gray-200 rounded h-2">
-                      <div 
-                        className={`h-2 rounded ${
-                          index === 0 ? 'bg-indigo-500' :
-                          index === 1 ? 'bg-teal-500' :
-                          index === 2 ? 'bg-rose-500' :
-                          index === 3 ? 'bg-amber-500' :
-                          'bg-slate-500'
-                        }`}
+                      <div
+                        className={`h-2 rounded ${index === 0 ? 'bg-indigo-500' :
+                            index === 1 ? 'bg-teal-500' :
+                              index === 2 ? 'bg-rose-500' :
+                                index === 3 ? 'bg-amber-500' :
+                                  'bg-slate-500'
+                          }`}
                         style={{ width: `${(industry.revenue / 1000000) * 100}%` }}
                       />
                     </div>
