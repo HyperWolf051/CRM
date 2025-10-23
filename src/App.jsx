@@ -21,9 +21,15 @@ const AddCandidate = lazy(() => import('@/pages/AddCandidate'));
 const Jobs = lazy(() => import('@/pages/Jobs'));
 const AddJob = lazy(() => import('@/pages/AddJob'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Profile = lazy(() => import('@/pages/Profile'));
 const Team = lazy(() => import('@/pages/Team'));
+const AddMember = lazy(() => import('@/pages/AddMember'));
+const EmailAutomation = lazy(() => import('@/pages/EmailAutomation'));
+const ReminderSystem = lazy(() => import('@/pages/ReminderSystem'));
+const AutomationDashboard = lazy(() => import('@/pages/AutomationDashboard'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
+const AnalyticsDashboard = lazy(() => import('@/pages/AnalyticsDashboard'));
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -79,14 +85,18 @@ function App() {
                   <Route path="companies" element={<Companies />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="tasks" element={<Tasks />} />
-                  <Route path="analytics" element={<ComingSoon title="Analytics" description="Advanced reporting and business insights" />} />
+                  <Route path="analytics" element={<AnalyticsDashboard />} />
                   <Route path="email" element={<ComingSoon title="Email" description="Integrated email management system" />} />
                   <Route path="calls" element={<ComingSoon title="Calls" description="Call tracking and management" />} />
                   <Route path="documents" element={<ComingSoon title="Documents" description="Document storage and management" />} />
                   <Route path="goals" element={<ComingSoon title="Goals" description="Set and track your business goals" />} />
                   <Route path="projects" element={<ComingSoon title="Projects" description="Project management and collaboration" />} />
                   <Route path="team" element={<Team />} />
-                  <Route path="automation" element={<ComingSoon title="Automation" description="Workflow automation and triggers" />} />
+                  <Route path="team/add" element={<AddMember />} />
+                  <Route path="automation" element={<AutomationDashboard />} />
+                  <Route path="email-automation" element={<EmailAutomation />} />
+                  <Route path="reminders" element={<ReminderSystem />} />
+                  <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
 
