@@ -174,12 +174,6 @@ export default function CollapsibleSidebar() {
   const handleRecruiterToggle = () => {
     const isDemoUser = user?.isDemo === true;
     
-    // Debug logging
-    console.log('Sidebar Toggle - User:', user);
-    console.log('Sidebar Toggle - isDemoUser:', isDemoUser);
-    console.log('Sidebar Toggle - user.isDemo:', user?.isDemo);
-    console.log('Sidebar Toggle - user.email:', user?.email);
-    
     if (isDemoUser) {
       navigate('/app/recruiter/dashboard');
     } else {

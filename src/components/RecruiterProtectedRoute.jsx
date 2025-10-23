@@ -24,12 +24,6 @@ const RecruiterProtectedRoute = ({ children }) => {
   // Check if user is using demo credentials (any demo account)
   const isDemoUser = user?.isDemo === true;
 
-  // Debug logging
-  console.log('RecruiterProtectedRoute - User:', user);
-  console.log('RecruiterProtectedRoute - isDemoUser:', isDemoUser);
-  console.log('RecruiterProtectedRoute - user.isDemo:', user?.isDemo);
-  console.log('RecruiterProtectedRoute - user.email:', user?.email);
-
   // If not a demo user, show access denied and redirect
   if (!isDemoUser) {
     // Show toast notification
