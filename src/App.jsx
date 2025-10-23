@@ -37,6 +37,7 @@ const RecruiterDashboard = lazy(() => import('@/pages/recruiter/RecruiterDashboa
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
+import CrmProtectedRoute from '@/components/CrmProtectedRoute';
 import RecruiterProtectedRoute from '@/components/RecruiterProtectedRoute';
 import RootRedirect from '@/components/RootRedirect';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -73,10 +74,12 @@ function App() {
                   <Route path="/login" element={<Login />} />
                 </Route>
                 
-                {/* Protected app routes */}
+                {/* Protected CRM routes */}
                 <Route path="/app" element={
                   <ProtectedRoute>
-                    <DashboardLayout />
+                    <CrmProtectedRoute>
+                      <DashboardLayout />
+                    </CrmProtectedRoute>
                   </ProtectedRoute>
                 }>
                   <Route path="dashboard" element={<Dashboard />} />

@@ -172,16 +172,31 @@ export default function CollapsibleSidebar() {
   };
 
   const handleRecruiterToggle = () => {
-    const isDemoUser = user?.isDemo === true;
+    const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
     
-    if (isDemoUser) {
+    if (hasRecruiterAccess) {
       navigate('/app/recruiter/dashboard');
     } else {
       showToast({
         type: 'error',
         title: 'Access Restricted',
-        message: 'The Recruiter Dashboard is only available for demo accounts. Please login with demo@crm.com to access this feature.',
-        duration: 6000
+        message: 'You can only access the CRM Dashboard. Dashboard switching is not allowed for your account type.',
+        duration: 5000
+      });
+    }
+  };
+
+  const handleCrmToggle = () => {
+    const hasCrmAccess = user?.dashboardType !== 'recruiter';
+    
+    if (hasCrmAccess) {
+      navigate('/app/dashboard');
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Access Restricted',
+        message: 'You can only access the Recruiter Dashboard. Dashboard switching is not allowed for your account type.',
+        duration: 5000
       });
     }
   };
@@ -253,16 +268,19 @@ export default function CollapsibleSidebar() {
       {(isExpanded || isMobile) && (
         <div className="px-4 py-2 border-b border-slate-200/50">
           <div className="flex space-x-1 bg-slate-100 rounded-lg p-1">
-            <Link
-              to="/app/dashboard"
-              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all ${
+            <button
+              onClick={handleCrmToggle}
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
                 !isRecruiterSection 
                   ? 'bg-white text-slate-700 shadow-sm' 
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               CRM
-            </Link>
+              {user?.dashboardType === 'recruiter' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </button>
             <button
               onClick={handleRecruiterToggle}
               className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
@@ -272,8 +290,8 @@ export default function CollapsibleSidebar() {
               }`}
             >
               Recruitment
-              {user && !user.isDemo && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+              {user?.dashboardType === 'crm' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               )}
             </button>
           </div>
@@ -282,14 +300,24 @@ export default function CollapsibleSidebar() {
 
 
 
-      {/* Demo Badge for Recruiter Section */}
+      {/* Role Badge for Current Section */}
       {isRecruiterSection && (isExpanded || isMobile) && (
-        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium text-amber-800">Demo Access Only</span>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-blue-800">Recruiter Dashboard</span>
           </div>
-          <p className="text-xs text-amber-600 mt-1">Use demo@crm.com to access</p>
+          <p className="text-xs text-blue-600 mt-1">Agent/Employee Access</p>
+        </div>
+      )}
+      
+      {!isRecruiterSection && (isExpanded || isMobile) && (
+        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-green-800">CRM Dashboard</span>
+          </div>
+          <p className="text-xs text-green-600 mt-1">Company Access</p>
         </div>
       )}
 
@@ -300,10 +328,10 @@ export default function CollapsibleSidebar() {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
             
-            // Check if this is a recruiter route and user has demo access
+            // Check if this is a recruiter route and user has access
             const isRecruiterRoute = item.href.startsWith('/app/recruiter');
-            const isDemoUser = user?.isDemo === true;
-            const hasAccess = !isRecruiterRoute || isDemoUser;
+            const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
+            const hasAccess = !isRecruiterRoute || hasRecruiterAccess;
             
             // If no access, show disabled state
             if (!hasAccess) {
@@ -328,8 +356,8 @@ export default function CollapsibleSidebar() {
                   }`}>
                     {item.name}
                     {(isExpanded || isMobile) && (
-                      <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                        Demo Only
+                      <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                        Restricted
                       </span>
                     )}
                   </span>
