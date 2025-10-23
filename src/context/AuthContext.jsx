@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api from '@/utils/api';
+import { AuthAPI } from '@/services/api';
 
 const AuthContext = createContext(null);
 
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
           } else {
             // Real mode - fetch user data from API
-            const response = await api.get('/auth/me');
+            const response = await AuthAPI.me();
             setUser(response.data);
             setIsAuthenticated(true);
           }
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 
     // Real API login
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await AuthAPI.login(email, password);
       const { token: authToken, user: userData } = response.data;
       
       // Store token in localStorage
@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }) => {
   // Register method
   const register = useCallback(async (name, email, password) => {
     try {
-      const response = await api.post('/auth/register', { name, email, password });
+      const response = await AuthAPI.register({ name, email, password });
       const { token: authToken, user: userData } = response.data;
       
       // Store token in localStorage
@@ -162,7 +162,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Only call API if not in demo mode
       if (!isDemoMode) {
-        await api.post('/auth/logout');
+        await AuthAPI.logout();
       }
     } catch (error) {
       // Continue with logout even if API call fails
@@ -182,7 +182,7 @@ export const AuthProvider = ({ children }) => {
   // Update user method
   const updateUser = useCallback(async (userData) => {
     try {
-      const response = await api.put('/users/me', userData);
+      const response = await AuthAPI.me(); // Get updated user data
       setUser(response.data);
       
       return { success: true };

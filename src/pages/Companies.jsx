@@ -158,8 +158,18 @@ export default function Companies() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await EmployerAPI.getAll();
-      setCompanies(response.data || []);
+      const result = await EmployerAPI.getAll();
+      
+      if (result.success) {
+        // Successfully got data from API
+        setCompanies(Array.isArray(result.data) ? result.data : []);
+      } else {
+        // API returned an error
+        console.error('API Error:', result.message);
+        setError(result.message || 'Failed to load companies. Please try again.');
+        // Fallback to mock data if API fails
+        setCompanies(mockCompanies);
+      }
     } catch (err) {
       console.error('Error loading companies:', err);
       setError('Failed to load companies. Please try again.');
@@ -235,29 +245,35 @@ export default function Companies() {
 
     try {
       setIsLoading(true);
-      await EmployerAPI.create(newCompany);
+      const result = await EmployerAPI.create(newCompany);
       
-      // Reload companies list
-      await loadCompanies();
-      
-      // Reset form and close modal
-      setNewCompany({
-        name: '',
-        industry: '',
-        websiteUrl: '',
-        contactPerson: '',
-        contactEmail: '',
-        contactPhone: '',
-        gstNumber: '',
-        panNumber: '',
-        tanNumber: '',
-        billingAddress: '',
-        bankAccountNumber: '',
-        ifscCode: '',
-        paymentTerms: ''
-      });
-      setIsCreateModalOpen(false);
-      alert('Client added successfully!');
+      if (result.success) {
+        // Successfully created company
+        await loadCompanies(); // Reload companies list
+        
+        // Reset form and close modal
+        setNewCompany({
+          name: '',
+          industry: '',
+          websiteUrl: '',
+          contactPerson: '',
+          contactEmail: '',
+          contactPhone: '',
+          gstNumber: '',
+          panNumber: '',
+          tanNumber: '',
+          billingAddress: '',
+          bankAccountNumber: '',
+          ifscCode: '',
+          paymentTerms: ''
+        });
+        setIsCreateModalOpen(false);
+        alert('Client added successfully!');
+      } else {
+        // API returned an error
+        console.error('API Error:', result.message);
+        alert(result.message || 'Failed to add client. Please try again.');
+      }
     } catch (err) {
       console.error('Error adding company:', err);
       alert('Failed to add client. Please try again.');
@@ -273,9 +289,15 @@ export default function Companies() {
 
     try {
       setIsLoading(true);
-      await EmployerAPI.delete(companyId);
-      await loadCompanies();
-      alert('Client deleted successfully!');
+      const result = await EmployerAPI.delete(companyId);
+      
+      if (result.success) {
+        await loadCompanies(); // Reload companies list
+        alert('Client deleted successfully!');
+      } else {
+        console.error('API Error:', result.message);
+        alert(result.message || 'Failed to delete client. Please try again.');
+      }
     } catch (err) {
       console.error('Error deleting company:', err);
       alert('Failed to delete client. Please try again.');

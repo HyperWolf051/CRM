@@ -23,18 +23,37 @@ export default function Deals() {
       setError(null);
 
       // Load both jobs and employers
-      const [jobsResponse, employersResponse] = await Promise.all([
+      const [jobsResult, employersResult] = await Promise.all([
         JobAPI.getAll(),
         EmployerAPI.getAll()
       ]);
 
-      setJobs(jobsResponse.data || []);
-      setEmployers(employersResponse.data || []);
+      // Handle jobs response
+      if (jobsResult.success) {
+        setJobs(Array.isArray(jobsResult.data) ? jobsResult.data : []);
+      } else {
+        console.error('Jobs API Error:', jobsResult.message);
+        setJobs(mockJobs); // Fallback to mock data
+      }
+
+      // Handle employers response
+      if (employersResult.success) {
+        setEmployers(Array.isArray(employersResult.data) ? employersResult.data : []);
+      } else {
+        console.error('Employers API Error:', employersResult.message);
+        setEmployers([]); // Empty array as fallback
+      }
+
+      // Set error if both failed
+      if (!jobsResult.success && !employersResult.success) {
+        setError('Failed to load data. Please try again.');
+      }
     } catch (err) {
       console.error('Error loading data:', err);
       setError('Failed to load jobs. Please try again.');
       // Fallback to mock data if API fails
       setJobs(mockJobs);
+      setEmployers([]);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +177,7 @@ export default function Deals() {
 
     try {
       setIsSubmitting(true);
-      await JobAPI.create({
+      const result = await JobAPI.create({
         ...formData,
         minExperienceYears: formData.minExperienceYears ? parseInt(formData.minExperienceYears) : null,
         maxExperienceYears: formData.maxExperienceYears ? parseInt(formData.maxExperienceYears) : null,
@@ -166,25 +185,30 @@ export default function Deals() {
         maxSalary: formData.maxSalary ? parseInt(formData.maxSalary) : null
       });
 
-      // Reload jobs list
-      await loadData();
+      if (result.success) {
+        // Reload jobs list
+        await loadData();
 
-      // Reset form and close modal
-      setFormData({
-        employerId: '',
-        title: '',
-        description: '',
-        location: '',
-        employmentType: 'Full-time',
-        minExperienceYears: '',
-        maxExperienceYears: '',
-        minSalary: '',
-        maxSalary: '',
-        qualification: '',
-        closingDate: ''
-      });
-      setIsCreateModalOpen(false);
-      alert('Job posted successfully!');
+        // Reset form and close modal
+        setFormData({
+          employerId: '',
+          title: '',
+          description: '',
+          location: '',
+          employmentType: 'Full-time',
+          minExperienceYears: '',
+          maxExperienceYears: '',
+          minSalary: '',
+          maxSalary: '',
+          qualification: '',
+          closingDate: ''
+        });
+        setIsCreateModalOpen(false);
+        alert('Job posted successfully!');
+      } else {
+        console.error('API Error:', result.message);
+        alert(result.message || 'Failed to post job. Please try again.');
+      }
     } catch (err) {
       console.error('Error adding job:', err);
       alert('Failed to post job. Please try again.');

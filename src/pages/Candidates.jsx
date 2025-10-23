@@ -20,8 +20,16 @@ const Candidates = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await CandidateAPI.getAll();
-      setCandidates(response.data || []);
+      const result = await CandidateAPI.getAll();
+      
+      if (result.success) {
+        setCandidates(Array.isArray(result.data) ? result.data : []);
+      } else {
+        console.error('API Error:', result.message);
+        setError(result.message || 'Failed to load candidates. Please try again.');
+        // Fallback to mock data if API fails
+        setCandidates(mockCandidates);
+      }
     } catch (err) {
       console.error('Error loading candidates:', err);
       setError('Failed to load candidates. Please try again.');
