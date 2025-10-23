@@ -37,6 +37,7 @@ const RecruiterDashboard = lazy(() => import('@/pages/recruiter/RecruiterDashboa
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
+import RecruiterProtectedRoute from '@/components/RecruiterProtectedRoute';
 import RootRedirect from '@/components/RootRedirect';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import NetworkStatus from '@/components/NetworkStatus';
@@ -104,11 +105,11 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                 </Route>
                 
-                {/* Recruiter routes */}
+                {/* Recruiter routes - Demo access only */}
                 <Route path="/app/recruiter" element={
-                  <ProtectedRoute>
+                  <RecruiterProtectedRoute>
                     <RecruiterLayout />
-                  </ProtectedRoute>
+                  </RecruiterProtectedRoute>
                 }>
                   <Route index element={<RecruiterDashboard />} />
                   <Route path="dashboard" element={<RecruiterDashboard />} />

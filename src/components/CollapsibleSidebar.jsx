@@ -261,12 +261,60 @@ export default function CollapsibleSidebar() {
 
 
 
+      {/* Demo Badge for Recruiter Section */}
+      {isRecruiterSection && (isExpanded || isMobile) && (
+        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-amber-800">Demo Access Only</span>
+          </div>
+          <p className="text-xs text-amber-600 mt-1">Use demo@crm.com to access</p>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
         <div className="space-y-1">
           {currentNavigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
+            
+            // Check if this is a recruiter route and user has demo access
+            const isRecruiterRoute = item.href.startsWith('/app/recruiter');
+            const isDemoUser = user?.isDemo === true || user?.email === 'demo@crm.com';
+            const hasAccess = !isRecruiterRoute || isDemoUser;
+            
+            // If no access, show disabled state
+            if (!hasAccess) {
+              return (
+                <div
+                  key={item.name}
+                  className={`
+                    group flex items-center ${(isExpanded || isMobile) ? 'justify-start' : 'justify-center'} 
+                    px-4 py-3 mx-1 rounded-xl text-sm font-medium 
+                    transition-all duration-300 cursor-not-allowed opacity-50
+                    text-slate-400 bg-slate-50
+                  `}
+                  title={!(isExpanded || isMobile) ? `${item.name} (Demo Only)` : 'Demo Access Required'}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-200">
+                    <Icon className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                  </div>
+                  <span className={`ml-4 transition-all duration-500 ease-out whitespace-nowrap font-medium ${
+                    (isExpanded || isMobile) 
+                      ? 'opacity-100 translate-x-0' 
+                      : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
+                  }`}>
+                    {item.name}
+                    {(isExpanded || isMobile) && (
+                      <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                        Demo Only
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            }
             
             return (
               <Link
