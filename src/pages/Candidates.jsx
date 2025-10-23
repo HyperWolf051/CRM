@@ -1,12 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
+import { CandidateAPI } from '../services/api';
 
 const Candidates = () => {
   const navigate = useNavigate();
-  const [candidates, setCandidates] = useState([
+  const [candidates, setCandidates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Load candidates from API
+  useEffect(() => {
+    loadCandidates();
+  }, []);
+
+  const loadCandidates = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await CandidateAPI.getAll();
+      setCandidates(response.data || []);
+    } catch (err) {
+      console.error('Error loading candidates:', err);
+      setError('Failed to load candidates. Please try again.');
+      // Fallback to mock data if API fails
+      setCandidates(mockCandidates);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock data as fallback
+  const mockCandidates = [
     {
       id: 1,
       name: 'Priya Sharma',
@@ -15,71 +42,9 @@ const Candidates = () => {
       position: 'Senior React Developer',
       experience: '5 years',
       location: 'Bengaluru, Karnataka',
-      address: 'HSR Layout, Bengaluru, Karnataka 560102',
-      dateOfBirth: '1992-08-15',
-      nationality: 'Indian',
-      education: 'B.Tech Computer Science - IIT Bombay',
-      linkedIn: 'https://linkedin.com/in/priyasharma',
-      portfolio: 'https://priyasharma.dev',
-      status: 'active',
-      appliedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      salary: '₹18,00,000',
-      skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
-      avatar: null,
-      rating: 4.8,
-      interviews: 2,
-      notes: 'Excellent technical skills, great cultural fit. Strong communication skills.',
-      resumeUrl: '/resumes/priya-sharma.pdf'
-    },
-    {
-      id: 2,
-      name: 'Arjun Patel',
-      email: 'arjun.patel@outlook.com',
-      phone: '+91 87654 32109',
-      position: 'Full Stack Developer',
-      experience: '3 years',
-      location: 'Pune, Maharashtra',
-      address: 'Koregaon Park, Pune, Maharashtra 411001',
-      dateOfBirth: '1994-12-22',
-      nationality: 'Indian',
-      education: 'B.E. Information Technology - Pune University',
-      linkedIn: 'https://linkedin.com/in/arjunpatel',
-      portfolio: 'https://arjunpatel.in',
-      status: 'interviewing',
-      appliedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      salary: '₹12,00,000',
-      skills: ['JavaScript', 'Python', 'Django', 'React'],
-      avatar: null,
-      rating: 4.5,
-      interviews: 1,
-      notes: 'Strong backend skills, good problem-solving abilities.',
-      resumeUrl: '/resumes/arjun-patel.pdf'
-    },
-    {
-      id: 3,
-      name: 'Sneha Reddy',
-      email: 'sneha.reddy@yahoo.com',
-      phone: '+91 76543 21098',
-      position: 'UI/UX Designer',
-      experience: '4 years',
-      location: 'Hyderabad, Telangana',
-      address: 'Gachibowli, Hyderabad, Telangana 500032',
-      dateOfBirth: '1991-03-10',
-      nationality: 'Indian',
-      education: 'M.Des Visual Communication - NID Ahmedabad',
-      linkedIn: 'https://linkedin.com/in/snehareddy',
-      portfolio: 'https://snehareddy.design',
-      status: 'active',
-      appliedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      salary: '₹15,00,000',
-      skills: ['Figma', 'Adobe XD', 'Sketch', 'Prototyping'],
-      avatar: null,
-      rating: 4.9,
-      interviews: 3,
-      notes: 'Creative designer with excellent user experience skills.',
-      resumeUrl: '/resumes/sneha-reddy.pdf'
+      skills: ['React', 'TypeScript', 'Node.js', 'AWS']
     }
-  ]);
+  ];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -101,32 +66,58 @@ const Candidates = () => {
     notes: ''
   });
 
-  const handleAddCandidate = () => {
-    if (!newCandidate.name || !newCandidate.email || !newCandidate.position) {
-      alert('Please fill in all required fields (Name, Email, Position)');
+  const handleAddCandidate = async () => {
+    if (!newCandidate.name || !newCandidate.email) {
+      alert('Please fill in the required fields (Name and Email)');
       return;
     }
 
-    const candidate = {
-      id: Math.max(...candidates.map(c => c.id), 0) + 1,
-      ...newCandidate,
-      skills: newCandidate.skills ? newCandidate.skills.split(',').map(s => s.trim()) : [],
-      status: 'active',
-      appliedDate: new Date().toISOString().split('T')[0],
-      avatar: null,
-      rating: 0,
-      interviews: 0,
-      resumeUrl: null
-    };
+    try {
+      setIsLoading(true);
+      
+      // Prepare candidate data for API
+      const candidateData = {
+        ...newCandidate,
+        skills: newCandidate.skills ? newCandidate.skills.split(',').map(s => s.trim()) : []
+      };
+      
+      await CandidateAPI.create(candidateData);
+      
+      // Reload candidates list
+      await loadCandidates();
+      
+      // Reset form and close modal
+      setNewCandidate({
+        name: '', email: '', phone: '', position: '', experience: '', location: '',
+        address: '', dateOfBirth: '', nationality: '', education: '', linkedIn: '',
+        portfolio: '', salary: '', skills: '', notes: ''
+      });
+      setShowAddModal(false);
+      alert('Candidate added successfully!');
+    } catch (err) {
+      console.error('Error adding candidate:', err);
+      alert('Failed to add candidate. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    setCandidates([...candidates, candidate]);
-    
-    setNewCandidate({
-      name: '', email: '', phone: '', position: '', experience: '', location: '',
-      address: '', dateOfBirth: '', nationality: '', education: '', linkedIn: '',
-      portfolio: '', salary: '', skills: '', notes: ''
-    });
-    setShowAddModal(false);
+  const handleDeleteCandidate = async (candidateId) => {
+    if (!window.confirm('Are you sure you want to delete this candidate?')) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await CandidateAPI.delete(candidateId);
+      await loadCandidates();
+      alert('Candidate deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting candidate:', err);
+      alert('Failed to delete candidate. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -221,7 +212,9 @@ const Candidates = () => {
                                               transform scale-0 group-hover:scale-100 
                                               transition-transform duration-200 ease-out rounded-lg"></div>
                             </button>
-                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
+                            <button 
+                              onClick={() => handleDeleteCandidate(candidate.id)}
+                              className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
                                                overflow-hidden group hover:shadow-md">
                               <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
                               <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 

@@ -79,12 +79,61 @@ const navigationItems = [
   },
 ];
 
+const recruiterNavigationItems = [
+  {
+    name: 'Dashboard',
+    href: '/app/recruiter/dashboard',
+    icon: LayoutDashboard,
+    color: 'from-blue-500 to-blue-600'
+  },
+  {
+    name: 'Candidates',
+    href: '/app/recruiter/candidates',
+    icon: Users,
+    color: 'from-green-500 to-green-600'
+  },
+  {
+    name: 'Jobs',
+    href: '/app/recruiter/jobs',
+    icon: Briefcase,
+    color: 'from-purple-500 to-purple-600'
+  },
+  {
+    name: 'Calendar',
+    href: '/app/recruiter/calendar',
+    icon: Calendar,
+    color: 'from-pink-500 to-rose-600'
+  },
+  {
+    name: 'Analytics',
+    href: '/app/recruiter/analytics',
+    icon: BarChart3,
+    color: 'from-indigo-500 to-indigo-600'
+  },
+  {
+    name: 'Reports',
+    href: '/app/recruiter/reports',
+    icon: CheckSquare,
+    color: 'from-cyan-500 to-blue-600'
+  },
+  {
+    name: 'Settings',
+    href: '/app/settings',
+    icon: Settings,
+    color: 'from-gray-500 to-gray-600'
+  },
+];
+
 export default function CollapsibleSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  
+  // Determine which navigation to show based on current route
+  const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
+  const currentNavigationItems = isRecruiterSection ? recruiterNavigationItems : navigationItems;
 
   useEffect(() => {
     const checkMobile = () => {
@@ -175,17 +224,47 @@ export default function CollapsibleSidebar() {
               : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
           }`}>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">TalentHub</span>
-            <div className="text-xs text-slate-500 whitespace-nowrap">Recruitment Suite</div>
+            <div className="text-xs text-slate-500 whitespace-nowrap">
+              {isRecruiterSection ? 'Recruitment Suite' : 'Business CRM'}
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Sector Switcher */}
+      {(isExpanded || isMobile) && (
+        <div className="px-4 py-2 border-b border-slate-200/50">
+          <div className="flex space-x-1 bg-slate-100 rounded-lg p-1">
+            <Link
+              to="/app/dashboard"
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all ${
+                !isRecruiterSection 
+                  ? 'bg-white text-slate-700 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              CRM
+            </Link>
+            <Link
+              to="/app/recruiter/dashboard"
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all ${
+                isRecruiterSection 
+                  ? 'bg-white text-slate-700 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Recruitment
+            </Link>
+          </div>
+        </div>
+      )}
 
 
 
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
         <div className="space-y-1">
-          {navigationItems.map((item) => {
+          {currentNavigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
             

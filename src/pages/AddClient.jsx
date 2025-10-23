@@ -9,18 +9,25 @@ import {
   AlertCircle,
   User
 } from 'lucide-react';
+import { EmployerAPI } from '../services/api';
 
 const AddClient = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    companyName: '',
+    name: '',
     industry: '',
-    website: '',
-    primaryContactName: '',
-    primaryContactEmail: '',
-    primaryContactPhone: '',
-    description: ''
+    websiteUrl: '',
+    contactPerson: '',
+    contactEmail: '',
+    contactPhone: '',
+    gstNumber: '',
+    panNumber: '',
+    tanNumber: '',
+    billingAddress: '',
+    bankAccountNumber: '',
+    ifscCode: '',
+    paymentTerms: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -43,11 +50,10 @@ const AddClient = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
-    if (!formData.industry.trim()) newErrors.industry = 'Industry is required';
-    if (!formData.primaryContactName.trim()) newErrors.primaryContactName = 'Primary contact name is required';
-    if (!formData.primaryContactEmail.trim()) newErrors.primaryContactEmail = 'Primary contact email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.primaryContactEmail)) newErrors.primaryContactEmail = 'Email is invalid';
+    if (!formData.name.trim()) newErrors.name = 'Company name is required';
+    if (formData.contactEmail && !/\S+@\S+\.\S+/.test(formData.contactEmail)) {
+      newErrors.contactEmail = 'Email is invalid';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -61,7 +67,7 @@ const AddClient = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await EmployerAPI.create(formData);
       navigate('/app/companies', {
         state: {
           message: 'Client added successfully!',
@@ -69,6 +75,7 @@ const AddClient = () => {
         }
       });
     } catch (error) {
+      console.error('Error adding client:', error);
       setErrors({ submit: 'Failed to add client. Please try again.' });
     } finally {
       setIsSubmitting(false);
@@ -155,17 +162,17 @@ const AddClient = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.companyName}
-                    onChange={(e) => handleInputChange('companyName', e.target.value)}
-                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.companyName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.name ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
                       }`}
                     placeholder="Enter company name"
-                    aria-describedby={errors.companyName ? 'companyName-error' : undefined}
+                    aria-describedby={errors.name ? 'name-error' : undefined}
                   />
-                  {errors.companyName && (
-                    <p id="companyName-error" className="text-red-500 text-xs mt-1 flex items-center space-x-1">
+                  {errors.name && (
+                    <p id="name-error" className="text-red-500 text-xs mt-1 flex items-center space-x-1">
                       <AlertCircle className="w-3 h-3" />
-                      <span>{errors.companyName}</span>
+                      <span>{errors.name}</span>
                     </p>
                   )}
                 </div>
@@ -196,14 +203,14 @@ const AddClient = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Website
+                    Website URL
                   </label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="url"
-                      value={formData.website}
-                      onChange={(e) => handleInputChange('website', e.target.value)}
+                      value={formData.websiteUrl}
+                      onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
                       className="w-full pl-10 pr-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
                       placeholder="https://company.co.in"
                     />
@@ -211,16 +218,82 @@ const AddClient = () => {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">GST Number</label>
+                  <input
+                    type="text"
+                    value={formData.gstNumber}
+                    onChange={(e) => handleInputChange('gstNumber', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="GST Number"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">PAN Number</label>
+                  <input
+                    type="text"
+                    value={formData.panNumber}
+                    onChange={(e) => handleInputChange('panNumber', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="PAN Number"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">TAN Number</label>
+                  <input
+                    type="text"
+                    value={formData.tanNumber}
+                    onChange={(e) => handleInputChange('tanNumber', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="TAN Number"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Bank Account Number</label>
+                  <input
+                    type="text"
+                    value={formData.bankAccountNumber}
+                    onChange={(e) => handleInputChange('bankAccountNumber', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="Bank Account Number"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">IFSC Code</label>
+                  <input
+                    type="text"
+                    value={formData.ifscCode}
+                    onChange={(e) => handleInputChange('ifscCode', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="IFSC Code"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Company Description
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Billing Address</label>
                 <textarea
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  rows={4}
+                  value={formData.billingAddress}
+                  onChange={(e) => handleInputChange('billingAddress', e.target.value)}
+                  rows={3}
                   className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 resize-none"
-                  placeholder="Brief description of the company's business and services..."
+                  placeholder="Full billing address..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Payment Terms</label>
+                <textarea
+                  value={formData.paymentTerms}
+                  onChange={(e) => handleInputChange('paymentTerms', e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 resize-none"
+                  placeholder="Payment terms and conditions..."
                 />
               </div>
             </div>
@@ -240,57 +313,49 @@ const AddClient = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Contact Name *
+                    Contact Person
                   </label>
                   <input
                     type="text"
-                    value={formData.primaryContactName}
-                    onChange={(e) => handleInputChange('primaryContactName', e.target.value)}
-                    className={`w-full px-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.primaryContactName ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
-                      }`}
-                    placeholder="Enter contact name"
-                    aria-describedby={errors.primaryContactName ? 'primaryContactName-error' : undefined}
+                    value={formData.contactPerson}
+                    onChange={(e) => handleInputChange('contactPerson', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
+                    placeholder="Enter contact person name"
                   />
-                  {errors.primaryContactName && (
-                    <p id="primaryContactName-error" className="text-red-500 text-xs mt-1 flex items-center space-x-1">
-                      <AlertCircle className="w-3 h-3" />
-                      <span>{errors.primaryContactName}</span>
-                    </p>
-                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address *
+                    Contact Email
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="email"
-                      value={formData.primaryContactEmail}
-                      onChange={(e) => handleInputChange('primaryContactEmail', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.primaryContactEmail ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
+                      value={formData.contactEmail}
+                      onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 bg-slate-50/80 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200 ${errors.contactEmail ? 'border-red-300 bg-red-50/50' : 'border-slate-200/50'
                         }`}
                       placeholder="contact@company.co.in"
-                      aria-describedby={errors.primaryContactEmail ? 'primaryContactEmail-error' : undefined}
+                      aria-describedby={errors.contactEmail ? 'contactEmail-error' : undefined}
                     />
                   </div>
-                  {errors.primaryContactEmail && (
-                    <p id="primaryContactEmail-error" className="text-red-500 text-xs mt-1 flex items-center space-x-1">
+                  {errors.contactEmail && (
+                    <p id="contactEmail-error" className="text-red-500 text-xs mt-1 flex items-center space-x-1">
                       <AlertCircle className="w-3 h-3" />
-                      <span>{errors.primaryContactEmail}</span>
+                      <span>{errors.contactEmail}</span>
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Phone Number
+                    Contact Phone
                   </label>
                   <input
                     type="tel"
-                    value={formData.primaryContactPhone}
-                    onChange={(e) => handleInputChange('primaryContactPhone', e.target.value)}
+                    value={formData.contactPhone}
+                    onChange={(e) => handleInputChange('contactPhone', e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 transition-all duration-200"
                     placeholder="+91 98765 43210"
                   />

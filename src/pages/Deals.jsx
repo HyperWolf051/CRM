@@ -1,78 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, Download, Eye, Edit, Trash2, TrendingUp, Users, Banknote, Target, MapPin, Briefcase } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
+import { JobAPI, EmployerAPI } from '../services/api';
 
 export default function Deals() {
   const navigate = useNavigate();
-  // Mock jobs data for CRM
-  const [jobs, setJobs] = useState([
+  const [jobs, setJobs] = useState([]);
+  const [employers, setEmployers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Load jobs and employers from API
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Load both jobs and employers
+      const [jobsResponse, employersResponse] = await Promise.all([
+        JobAPI.getAll(),
+        EmployerAPI.getAll()
+      ]);
+      
+      setJobs(jobsResponse.data || []);
+      setEmployers(employersResponse.data || []);
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError('Failed to load jobs. Please try again.');
+      // Fallback to mock data if API fails
+      setJobs(mockJobs);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock data as fallback
+  const mockJobs = [
     {
       id: 1,
       title: 'Senior React Developer',
-      company: 'Infosys Technologies',
+      employerId: 1,
       location: 'Bengaluru, Karnataka',
-      type: 'Full-time',
-      remote: true,
-      salary: '₹18,00,000 - ₹25,00,000',
-      status: 'active',
-      applicants: 45,
-      posted: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days ago
-      deadline: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 15 days from now
+      employmentType: 'Full-time',
+      minSalary: 1800000,
+      maxSalary: 2500000,
       description: 'We are looking for a Senior React Developer to join our growing team...',
-      requirements: ['5+ years React experience', 'TypeScript', 'Node.js', 'AWS'],
-      benefits: ['Health Insurance', 'Remote Work', '401k', 'Stock Options']
-    },
-    {
-      id: 2,
-      title: 'UX/UI Designer',
-      company: 'Flipkart Internet',
-      location: 'Mumbai, Maharashtra',
-      type: 'Full-time',
-      remote: false,
-      salary: '₹12,00,000 - ₹16,00,000',
-      status: 'active',
-      applicants: 32,
-      posted: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days ago
-      deadline: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 12 days from now
-      description: 'Join our creative team as a UX/UI Designer...',
-      requirements: ['3+ years UX/UI experience', 'Figma', 'Adobe Creative Suite', 'Prototyping'],
-      benefits: ['Health Insurance', 'Flexible Hours', 'Professional Development']
-    },
-    {
-      id: 3,
-      title: 'DevOps Engineer',
-      company: 'CloudTech Solutions',
-      location: 'Austin, TX',
-      type: 'Full-time',
-      remote: true,
-      salary: '₹20,00,000 - ₹28,00,000',
-      status: 'paused',
-      applicants: 28,
-      posted: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 10 days ago
-      deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 10 days from now
-      description: 'We need a DevOps Engineer to manage our cloud infrastructure...',
-      requirements: ['AWS/Azure experience', 'Kubernetes', 'Docker', 'CI/CD'],
-      benefits: ['Health Insurance', 'Remote Work', 'Stock Options', 'Learning Budget']
-    },
-    {
-      id: 4,
-      title: 'Product Manager',
-      company: 'Zomato Ltd',
-      location: 'Remote',
-      type: 'Full-time',
-      remote: true,
-      salary: '₹15,00,000 - ₹22,00,000',
-      status: 'closed',
-      applicants: 67,
-      posted: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 18 days ago
-      deadline: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 day ago (expired)
-      description: 'Lead product strategy and development for our fintech platform...',
-      requirements: ['5+ years product management', 'Agile/Scrum', 'Analytics', 'Leadership'],
-      benefits: ['Health Insurance', 'Remote Work', 'Equity', 'Unlimited PTO']
+      qualification: '5+ years React experience, TypeScript, Node.js, AWS',
+      closingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
-  ]);
+  ];
 
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -84,16 +66,17 @@ export default function Deals() {
   const [selectedLocation, setSelectedLocation] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [formData, setFormData] = useState({
+    employerId: '',
     title: '',
-    company: '',
-    location: '',
-    type: 'Full-time',
-    remote: false,
-    salary: '',
     description: '',
-    requirements: '',
-    benefits: '',
-    deadline: ''
+    location: '',
+    employmentType: 'Full-time',
+    minExperienceYears: '',
+    maxExperienceYears: '',
+    minSalary: '',
+    maxSalary: '',
+    qualification: '',
+    closingDate: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,15 +110,15 @@ export default function Deals() {
 
   // Filter jobs based on search and filters
   const filteredJobs = jobs.filter(job => {
+    const employer = employers.find(e => e.id === job.employerId);
+    const companyName = employer?.name || 'Unknown Company';
+    
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || job.status === selectedStatus;
-    const matchesType = selectedType === 'all' || job.type === selectedType;
-    const matchesLocation = selectedLocation === 'all' ||
-      (selectedLocation === 'remote' && job.remote) ||
-      job.location === selectedLocation;
-    return matchesSearch && matchesStatus && matchesType && matchesLocation;
+    const matchesType = selectedType === 'all' || job.employmentType === selectedType;
+    const matchesLocation = selectedLocation === 'all' || job.location === selectedLocation;
+    return matchesSearch && matchesType && matchesLocation;
   });
 
   // Calculate metrics
@@ -151,19 +134,81 @@ export default function Deals() {
 
   const handleCreateJob = () => {
     setFormData({
+      employerId: '',
       title: '',
-      company: '',
-      location: '',
-      type: 'Full-time',
-      remote: false,
-      salary: '',
       description: '',
-      requirements: '',
-      benefits: '',
-      deadline: ''
+      location: '',
+      employmentType: 'Full-time',
+      minExperienceYears: '',
+      maxExperienceYears: '',
+      minSalary: '',
+      maxSalary: '',
+      qualification: '',
+      closingDate: ''
     });
     setFormErrors({});
     setIsCreateModalOpen(true);
+  };
+
+  const handleAddJob = async () => {
+    if (!formData.title || !formData.employerId) {
+      alert('Please fill in the required fields (Title and Employer)');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await JobAPI.create({
+        ...formData,
+        minExperienceYears: formData.minExperienceYears ? parseInt(formData.minExperienceYears) : null,
+        maxExperienceYears: formData.maxExperienceYears ? parseInt(formData.maxExperienceYears) : null,
+        minSalary: formData.minSalary ? parseInt(formData.minSalary) : null,
+        maxSalary: formData.maxSalary ? parseInt(formData.maxSalary) : null
+      });
+      
+      // Reload jobs list
+      await loadData();
+      
+      // Reset form and close modal
+      setFormData({
+        employerId: '',
+        title: '',
+        description: '',
+        location: '',
+        employmentType: 'Full-time',
+        minExperienceYears: '',
+        maxExperienceYears: '',
+        minSalary: '',
+        maxSalary: '',
+        qualification: '',
+        closingDate: ''
+      });
+      setIsCreateModalOpen(false);
+      alert('Job posted successfully!');
+    } catch (err) {
+      console.error('Error adding job:', err);
+      alert('Failed to post job. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm('Are you sure you want to delete this job posting?')) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await JobAPI.delete(jobId);
+      await loadData();
+      alert('Job deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting job:', err);
+      alert('Failed to delete job. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -388,7 +433,14 @@ export default function Deals() {
             />
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.map((job) => (
+              {filteredJobs.map((job) => {
+                const employer = employers.find(e => e.id === job.employerId);
+                const companyName = employer?.name || 'Unknown Company';
+                const salaryRange = job.minSalary && job.maxSalary 
+                  ? `₹${(job.minSalary / 100000).toFixed(1)}L - ₹${(job.maxSalary / 100000).toFixed(1)}L`
+                  : 'Salary not specified';
+                
+                return (
                 <div
                   key={job.id}
                   onClick={() => handleJobClick(job)}
@@ -397,45 +449,45 @@ export default function Deals() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">{job.title}</h3>
-                      <p className="text-gray-600 text-sm">{job.company}</p>
+                      <p className="text-gray-600 text-sm">{companyName}</p>
                     </div>
-                    <span className={`px-2 py-1 rounded-lg border text-xs font-medium ${getStatusColor(job.status)}`}>
-                      {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                    </span>
                   </div>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="w-4 h-4 mr-2" />
-                      {job.location} {job.remote && '(Remote)'}
+                      {job.location || 'Location not specified'}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <Banknote className="w-4 h-4 mr-2" />
-                      {job.salary}
+                      {salaryRange}
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Users className="w-4 h-4 mr-2" />
-                      {job.applicants} applicants
-                    </div>
+                    {job.minExperienceYears && job.maxExperienceYears && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="w-4 h-4 mr-2" />
+                        {job.minExperienceYears}-{job.maxExperienceYears} years experience
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>Posted: {new Date(job.posted).toLocaleDateString()}</span>
-                    <span>Deadline: {new Date(job.deadline).toLocaleDateString()}</span>
-                  </div>
+                  {job.closingDate && (
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>Deadline: {new Date(job.closingDate).toLocaleDateString()}</span>
+                    </div>
+                  )}
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">{job.type}</span>
+                      <span className="text-xs text-gray-500">{job.employmentType}</span>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Handle edit
+                            handleDeleteJob(job.id);
                           }}
-                          className="p-1 text-gray-400 hover:text-blue-600"
+                          className="p-1 text-gray-400 hover:text-red-600"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={(e) => {
@@ -450,7 +502,7 @@ export default function Deals() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )}))}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -574,34 +626,36 @@ export default function Deals() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Company *</label>
-                    <input
-                      type="text"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Employer *</label>
+                    <select
+                      value={formData.employerId}
+                      onChange={(e) => setFormData({ ...formData, employerId: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Company name"
                       required
-                    />
+                    >
+                      <option value="">Select employer</option>
+                      {employers.map(employer => (
+                        <option key={employer.id} value={employer.id}>{employer.name}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Location</label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="City, State or Remote"
-                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Job Type</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Employment Type</label>
                     <select
-                      value={formData.type}
-                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      value={formData.employmentType}
+                      onChange={(e) => setFormData({ ...formData, employmentType: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                     >
                       <option value="Full-time">Full-time</option>
@@ -612,20 +666,102 @@ export default function Deals() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Salary Range</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Min Experience (Years)</label>
                     <input
-                      type="text"
-                      value={formData.salary}
-                      onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                      type="number"
+                      value={formData.minExperienceYears}
+                      onChange={(e) => setFormData({ ...formData, minExperienceYears: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="e.g., ₹18,00,000 - ₹25,00,000"
+                      placeholder="e.g., 2"
+                      min="0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Application Deadline</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Max Experience (Years)</label>
+                    <input
+                      type="number"
+                      value={formData.maxExperienceYears}
+                      onChange={(e) => setFormData({ ...formData, maxExperienceYears: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="e.g., 5"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Min Salary (₹)</label>
+                    <input
+                      type="number"
+                      value={formData.minSalary}
+                      onChange={(e) => setFormData({ ...formData, minSalary: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="e.g., 1800000"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Max Salary (₹)</label>
+                    <input
+                      type="number"
+                      value={formData.maxSalary}
+                      onChange={(e) => setFormData({ ...formData, maxSalary: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="e.g., 2500000"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Qualification</label>
+                    <input
+                      type="text"
+                      value={formData.qualification}
+                      onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="Required qualifications and skills"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Closing Date</label>
                     <input
                       type="date"
+                      value={formData.closingDate}
+                      onChange={(e) => setFormData({ ...formData, closingDate: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Job Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={4}
+                    className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 resize-none"
+                    placeholder="Describe the role, responsibilities, and what you're looking for..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-6 mt-6 border-t border-slate-200">
+                <button
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddJob}
+                  disabled={isSubmitting}
+                  className="px-6 py-2 text-white font-medium rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Posting...' : 'Post Job'}
+                </button>
+              </div>
                       value={formData.deadline}
                       onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"

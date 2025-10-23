@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Download, Building2, Users, Banknote, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
@@ -8,13 +8,14 @@ import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
 import { formatCurrency } from '../utils/formatters';
+import { EmployerAPI } from '../services/api';
 const mockCompanies = [
   {
     id: '1',
     name: 'Infosys Technologies Ltd.',
     industry: 'Information Technology',
     size: '1000+',
-    revenue: 165000000000, // ₹1650 Cr
+    revenue: 16, // ₹16 Cr
     website: 'https://infosys.com',
     phone: '+91 80 2852 0261',
     email: 'contact@infosys.com',
@@ -22,7 +23,7 @@ const mockCompanies = [
     status: 'customer',
     contactsCount: 45,
     dealsCount: 18,
-    totalDealsValue: 25000000, // ₹2.5 Cr
+    totalDealsValue: 2.5, // ₹2.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Leading IT services company, excellent long-term partnership potential.'
@@ -32,7 +33,7 @@ const mockCompanies = [
     name: 'Tata Consultancy Services',
     industry: 'Information Technology',
     size: '1000+',
-    revenue: 220000000000, // ₹2200 Cr
+    revenue: 2200, // ₹2200 Cr
     website: 'https://tcs.com',
     phone: '+91 22 6778 9595',
     email: 'corporate@tcs.com',
@@ -40,7 +41,7 @@ const mockCompanies = [
     status: 'active',
     contactsCount: 52,
     dealsCount: 22,
-    totalDealsValue: 35000000, // ₹3.5 Cr
+    totalDealsValue: 3.5, // ₹3.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Largest IT services company in India, multiple ongoing projects.'
@@ -50,7 +51,7 @@ const mockCompanies = [
     name: 'Flipkart Internet Pvt Ltd',
     industry: 'E-commerce',
     size: '500-1000',
-    revenue: 62000000000, // ₹620 Cr
+    revenue: 620, // ₹620 Cr
     website: 'https://flipkart.com',
     phone: '+91 80 4719 2222',
     email: 'corporate@flipkart.com',
@@ -58,7 +59,7 @@ const mockCompanies = [
     status: 'prospect',
     contactsCount: 28,
     dealsCount: 8,
-    totalDealsValue: 12000000, // ₹1.2 Cr
+    totalDealsValue: 1.2, // ₹1.2 Cr
     logo: null,
     createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Major e-commerce platform, exploring recruitment solutions for rapid expansion.'
@@ -68,7 +69,7 @@ const mockCompanies = [
     name: 'Reliance Industries Ltd',
     industry: 'Conglomerate',
     size: '1000+',
-    revenue: 870000000000, // ₹8700 Cr
+    revenue: 870, // ₹870 Cr
     website: 'https://ril.com',
     phone: '+91 22 3555 5000',
     email: 'investor.relations@ril.com',
@@ -86,7 +87,7 @@ const mockCompanies = [
     name: 'Zomato Ltd',
     industry: 'Food Technology',
     size: '100-500',
-    revenue: 5400000000, // ₹54 Cr
+    revenue: 504, // ₹504 Cr
     website: 'https://zomato.com',
     phone: '+91 124 4616 500',
     email: 'corporate@zomato.com',
@@ -104,7 +105,7 @@ const mockCompanies = [
     name: 'HDFC Bank Ltd',
     industry: 'Banking & Financial Services',
     size: '1000+',
-    revenue: 180000000000, // ₹1800 Cr
+    revenue: 100, // ₹100Cr
     website: 'https://hdfcbank.com',
     phone: '+91 22 6160 6161',
     email: 'corporate@hdfcbank.com',
@@ -121,7 +122,7 @@ const mockCompanies = [
 
 export default function Companies() {
   const navigate = useNavigate();
-  const [companies] = useState(mockCompanies);
+  const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -130,18 +131,44 @@ export default function Companies() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [newCompany, setNewCompany] = useState({
     name: '',
     industry: '',
-    size: '',
-    revenue: '',
-    website: '',
-    phone: '',
-    email: '',
-    address: '',
-    notes: ''
+    websiteUrl: '',
+    contactPerson: '',
+    contactEmail: '',
+    contactPhone: '',
+    gstNumber: '',
+    panNumber: '',
+    tanNumber: '',
+    billingAddress: '',
+    bankAccountNumber: '',
+    ifscCode: '',
+    paymentTerms: ''
   });
+
+  // Load companies from API
+  useEffect(() => {
+    loadCompanies();
+  }, []);
+
+  const loadCompanies = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await EmployerAPI.getAll();
+      setCompanies(response.data || []);
+    } catch (err) {
+      console.error('Error loading companies:', err);
+      setError('Failed to load companies. Please try again.');
+      // Fallback to mock data if API fails
+      setCompanies(mockCompanies);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Company statuses and filters
   const companyStatuses = [
@@ -200,33 +227,61 @@ export default function Companies() {
     setIsDetailsModalOpen(true);
   };
 
-  const handleAddCompany = () => {
-    if (!newCompany.name || !newCompany.industry) {
-      alert('Please fill in all required fields');
+  const handleAddCompany = async () => {
+    if (!newCompany.name) {
+      alert('Please fill in the company name (required field)');
       return;
     }
 
-    const company = {
-      id: (Math.max(...companies.map(c => parseInt(c.id))) + 1).toString(),
-      ...newCompany,
-      revenue: parseInt(newCompany.revenue) || 0,
-      status: 'lead',
-      contactsCount: 0,
-      dealsCount: 0,
-      totalDealsValue: 0,
-      logo: null,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      setIsLoading(true);
+      await EmployerAPI.create(newCompany);
+      
+      // Reload companies list
+      await loadCompanies();
+      
+      // Reset form and close modal
+      setNewCompany({
+        name: '',
+        industry: '',
+        websiteUrl: '',
+        contactPerson: '',
+        contactEmail: '',
+        contactPhone: '',
+        gstNumber: '',
+        panNumber: '',
+        tanNumber: '',
+        billingAddress: '',
+        bankAccountNumber: '',
+        ifscCode: '',
+        paymentTerms: ''
+      });
+      setIsCreateModalOpen(false);
+      alert('Client added successfully!');
+    } catch (err) {
+      console.error('Error adding company:', err);
+      alert('Failed to add client. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // In a real app, this would be handled by a state management system
-    // For now, we'll just show a success message
-    alert('Client added successfully!');
+  const handleDeleteCompany = async (companyId) => {
+    if (!window.confirm('Are you sure you want to delete this client?')) {
+      return;
+    }
 
-    setNewCompany({
-      name: '', industry: '', size: '', revenue: '', website: '',
-      phone: '', email: '', address: '', notes: ''
-    });
-    setIsCreateModalOpen(false);
+    try {
+      setIsLoading(true);
+      await EmployerAPI.delete(companyId);
+      await loadCompanies();
+      alert('Client deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting company:', err);
+      alert('Failed to delete client. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -400,10 +455,10 @@ export default function Companies() {
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Client</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Industry</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Size</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue(Cr)</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Contacts</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">Deals</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Deals(Cr)</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
                   </tr>
                 </thead>
@@ -423,7 +478,7 @@ export default function Companies() {
                           />
                           <div>
                             <div className="font-medium text-gray-900">{company.name}</div>
-                            <div className="text-sm text-gray-500">{company.website}</div>
+                            <div className="text-sm text-gray-500">{company.websiteUrl || 'No website'}</div>
                           </div>
                         </div>
                       </td>
@@ -488,7 +543,7 @@ export default function Companies() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              // Handle delete
+                              handleDeleteCompany(company.id);
                             }}
                             className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-all duration-200 
                                        overflow-hidden group hover:shadow-md hover:scale-110"
@@ -529,114 +584,153 @@ export default function Companies() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Client Name *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
                     <input
                       type="text"
                       value={newCompany.name}
                       onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Enter client name"
+                      placeholder="Enter company name"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Industry *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Industry</label>
                     <select
                       value={newCompany.industry}
                       onChange={(e) => setNewCompany({ ...newCompany, industry: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      required
                     >
                       <option value="">Select industry</option>
-                      <option value="Technology">Technology</option>
-                      <option value="Consulting">Consulting</option>
-                      <option value="Fintech">Fintech</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Banking & Financial Services">Banking & Financial Services</option>
+                      <option value="E-commerce">E-commerce</option>
                       <option value="Manufacturing">Manufacturing</option>
                       <option value="Healthcare">Healthcare</option>
                       <option value="Education">Education</option>
+                      <option value="Consulting">Consulting</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Client Size</label>
-                    <select
-                      value={newCompany.size}
-                      onChange={(e) => setNewCompany({ ...newCompany, size: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                    >
-                      <option value="">Select size</option>
-                      <option value="1-10">1-10 employees</option>
-                      <option value="10-50">10-50 employees</option>
-                      <option value="100-500">100-500 employees</option>
-                      <option value="500-1000">500-1000 employees</option>
-                      <option value="1000+">1000+ employees</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Annual Revenue</label>
-                    <input
-                      type="number"
-                      value={newCompany.revenue}
-                      onChange={(e) => setNewCompany({ ...newCompany, revenue: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Annual revenue in INR"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Website URL</label>
                     <input
                       type="url"
-                      value={newCompany.website}
-                      onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
+                      value={newCompany.websiteUrl}
+                      onChange={(e) => setNewCompany({ ...newCompany, websiteUrl: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="https://company.co.in"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Contact Person</label>
+                    <input
+                      type="text"
+                      value={newCompany.contactPerson}
+                      onChange={(e) => setNewCompany({ ...newCompany, contactPerson: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="Contact person name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Contact Email</label>
+                    <input
+                      type="email"
+                      value={newCompany.contactEmail}
+                      onChange={(e) => setNewCompany({ ...newCompany, contactEmail: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="contact@company.co.in"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Contact Phone</label>
                     <input
                       type="tel"
-                      value={newCompany.phone}
-                      onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
+                      value={newCompany.contactPhone}
+                      onChange={(e) => setNewCompany({ ...newCompany, contactPhone: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
                       placeholder="Phone number"
                     />
                   </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={newCompany.email}
-                      onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="contact@client.co.in"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">GST Number</label>
                     <input
                       type="text"
-                      value={newCompany.address}
-                      onChange={(e) => setNewCompany({ ...newCompany, address: e.target.value })}
+                      value={newCompany.gstNumber}
+                      onChange={(e) => setNewCompany({ ...newCompany, gstNumber: e.target.value })}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
-                      placeholder="Full address"
+                      placeholder="GST Number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">PAN Number</label>
+                    <input
+                      type="text"
+                      value={newCompany.panNumber}
+                      onChange={(e) => setNewCompany({ ...newCompany, panNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="PAN Number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">TAN Number</label>
+                    <input
+                      type="text"
+                      value={newCompany.tanNumber}
+                      onChange={(e) => setNewCompany({ ...newCompany, tanNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="TAN Number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Bank Account Number</label>
+                    <input
+                      type="text"
+                      value={newCompany.bankAccountNumber}
+                      onChange={(e) => setNewCompany({ ...newCompany, bankAccountNumber: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="Bank Account Number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">IFSC Code</label>
+                    <input
+                      type="text"
+                      value={newCompany.ifscCode}
+                      onChange={(e) => setNewCompany({ ...newCompany, ifscCode: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
+                      placeholder="IFSC Code"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Billing Address</label>
                     <textarea
-                      value={newCompany.notes}
-                      onChange={(e) => setNewCompany({ ...newCompany, notes: e.target.value })}
+                      value={newCompany.billingAddress}
+                      onChange={(e) => setNewCompany({ ...newCompany, billingAddress: e.target.value })}
                       rows={3}
                       className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 resize-none"
-                      placeholder="Additional notes about the client..."
+                      placeholder="Full billing address"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Payment Terms</label>
+                    <textarea
+                      value={newCompany.paymentTerms}
+                      onChange={(e) => setNewCompany({ ...newCompany, paymentTerms: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 resize-none"
+                      placeholder="Payment terms and conditions..."
                     />
                   </div>
                 </div>
@@ -647,8 +741,19 @@ export default function Companies() {
                   onClick={() => {
                     setIsCreateModalOpen(false);
                     setNewCompany({
-                      name: '', industry: '', size: '', revenue: '', website: '',
-                      phone: '', email: '', address: '', notes: ''
+                      name: '',
+                      industry: '',
+                      websiteUrl: '',
+                      contactPerson: '',
+                      contactEmail: '',
+                      contactPhone: '',
+                      gstNumber: '',
+                      panNumber: '',
+                      tanNumber: '',
+                      billingAddress: '',
+                      bankAccountNumber: '',
+                      ifscCode: '',
+                      paymentTerms: ''
                     });
                   }}
                   className="relative px-4 py-2 text-slate-600 hover:text-white font-medium rounded-xl 
