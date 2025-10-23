@@ -6,6 +6,7 @@ import { ToastProvider } from '@/context/ToastContext';
 // Layouts (keep these as regular imports since they're used immediately)
 import AuthLayout from '@/layouts/AuthLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
+import RecruiterLayout from '@/layouts/RecruiterLayout';
 
 // Lazy load pages for code splitting
 const Login = lazy(() => import('@/pages/Login'));
@@ -31,8 +32,13 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 const AnalyticsDashboard = lazy(() => import('@/pages/AnalyticsDashboard'));
 
+// Recruiter pages
+const RecruiterDashboard = lazy(() => import('@/pages/recruiter/RecruiterDashboard'));
+
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
+import CrmProtectedRoute from '@/components/CrmProtectedRoute';
+import RecruiterProtectedRoute from '@/components/RecruiterProtectedRoute';
 import RootRedirect from '@/components/RootRedirect';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import NetworkStatus from '@/components/NetworkStatus';
@@ -68,10 +74,12 @@ function App() {
                   <Route path="/login" element={<Login />} />
                 </Route>
                 
-                {/* Protected app routes */}
+                {/* Protected CRM routes */}
                 <Route path="/app" element={
                   <ProtectedRoute>
-                    <DashboardLayout />
+                    <CrmProtectedRoute>
+                      <DashboardLayout />
+                    </CrmProtectedRoute>
                   </ProtectedRoute>
                 }>
                   <Route path="dashboard" element={<Dashboard />} />
@@ -98,6 +106,21 @@ function App() {
                   <Route path="reminders" element={<ReminderSystem />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />
+                </Route>
+                
+                {/* Recruiter routes - Demo access only */}
+                <Route path="/app/recruiter" element={
+                  <RecruiterProtectedRoute>
+                    <RecruiterLayout />
+                  </RecruiterProtectedRoute>
+                }>
+                  <Route index element={<RecruiterDashboard />} />
+                  <Route path="dashboard" element={<RecruiterDashboard />} />
+                  <Route path="candidates" element={<ComingSoon title="Candidates" description="Candidate management system" />} />
+                  <Route path="jobs" element={<ComingSoon title="Jobs" description="Job posting and management" />} />
+                  <Route path="calendar" element={<ComingSoon title="Calendar" description="Interview scheduling system" />} />
+                  <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />
+                  <Route path="reports" element={<ComingSoon title="Reports" description="Daily reporting system" />} />
                 </Route>
                 
                 {/* 404 Not Found */}

@@ -57,9 +57,9 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password) => {
     // Check for demo credentials first
     const demoCredentials = [
-      { email: 'admin@crm.com', password: 'admin123', name: 'Admin User', role: 'admin' },
-      { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' },
-      { email: 'demo@crm.com', password: 'demo123', name: 'Demo User', role: 'user' }
+      { email: 'admin@crm.com', password: 'admin123', name: 'Company Admin', role: 'admin', dashboardType: 'crm' },
+      { email: 'sales@crm.com', password: 'sales123', name: 'Sales User', role: 'user' }, // No restriction
+      { email: 'demo@crm.com', password: 'demo123', name: 'Recruiter Agent', role: 'recruiter', dashboardType: 'recruiter' }
     ];
 
     const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         email: demoUser.email,
         avatar: null,
         role: demoUser.role,
+        dashboardType: demoUser.dashboardType,
         isDemo: true
       };
       

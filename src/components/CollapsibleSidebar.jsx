@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -15,6 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 const navigationItems = [
   {
@@ -79,12 +80,63 @@ const navigationItems = [
   },
 ];
 
+const recruiterNavigationItems = [
+  {
+    name: 'Dashboard',
+    href: '/app/recruiter/dashboard',
+    icon: LayoutDashboard,
+    color: 'from-blue-500 to-blue-600'
+  },
+  {
+    name: 'Candidates',
+    href: '/app/recruiter/candidates',
+    icon: Users,
+    color: 'from-green-500 to-green-600'
+  },
+  {
+    name: 'Jobs',
+    href: '/app/recruiter/jobs',
+    icon: Briefcase,
+    color: 'from-purple-500 to-purple-600'
+  },
+  {
+    name: 'Calendar',
+    href: '/app/recruiter/calendar',
+    icon: Calendar,
+    color: 'from-pink-500 to-rose-600'
+  },
+  {
+    name: 'Analytics',
+    href: '/app/recruiter/analytics',
+    icon: BarChart3,
+    color: 'from-indigo-500 to-indigo-600'
+  },
+  {
+    name: 'Reports',
+    href: '/app/recruiter/reports',
+    icon: CheckSquare,
+    color: 'from-cyan-500 to-blue-600'
+  },
+  {
+    name: 'Settings',
+    href: '/app/settings',
+    icon: Settings,
+    color: 'from-gray-500 to-gray-600'
+  },
+];
+
 export default function CollapsibleSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
+  
+  // Determine which navigation to show based on current route
+  const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
+  const currentNavigationItems = isRecruiterSection ? recruiterNavigationItems : navigationItems;
 
   useEffect(() => {
     const checkMobile = () => {
@@ -117,6 +169,36 @@ export default function CollapsibleSidebar() {
 
   const toggleMobileMenu = () => {
     setIsMobileOpen(!isMobileOpen);
+  };
+
+  const handleRecruiterToggle = () => {
+    const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
+    
+    if (hasRecruiterAccess) {
+      navigate('/app/recruiter/dashboard');
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Access Restricted',
+        message: 'You can only access the CRM Dashboard. Dashboard switching is not allowed for your account type.',
+        duration: 5000
+      });
+    }
+  };
+
+  const handleCrmToggle = () => {
+    const hasCrmAccess = user?.dashboardType !== 'recruiter';
+    
+    if (hasCrmAccess) {
+      navigate('/app/dashboard');
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Access Restricted',
+        message: 'You can only access the Recruiter Dashboard. Dashboard switching is not allowed for your account type.',
+        duration: 5000
+      });
+    }
   };
 
   return (
@@ -175,19 +257,113 @@ export default function CollapsibleSidebar() {
               : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
           }`}>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">TalentHub</span>
-            <div className="text-xs text-slate-500 whitespace-nowrap">Recruitment Suite</div>
+            <div className="text-xs text-slate-500 whitespace-nowrap">
+              {isRecruiterSection ? 'Recruitment Suite' : 'Business CRM'}
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Sector Switcher */}
+      {(isExpanded || isMobile) && (
+        <div className="px-4 py-2 border-b border-slate-200/50">
+          <div className="flex space-x-1 bg-slate-100 rounded-lg p-1">
+            <button
+              onClick={handleCrmToggle}
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
+                !isRecruiterSection 
+                  ? 'bg-white text-slate-700 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              CRM
+              {user?.dashboardType === 'recruiter' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </button>
+            <button
+              onClick={handleRecruiterToggle}
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
+                isRecruiterSection 
+                  ? 'bg-white text-slate-700 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Recruitment
+              {user?.dashboardType === 'crm' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
 
+
+      {/* Role Badge for Current Section */}
+      {isRecruiterSection && (isExpanded || isMobile) && (
+        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-blue-800">Recruiter Dashboard</span>
+          </div>
+          <p className="text-xs text-blue-600 mt-1">Agent/Employee Access</p>
+        </div>
+      )}
+      
+      {!isRecruiterSection && (isExpanded || isMobile) && (
+        <div className="px-4 py-2 mx-2 mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-medium text-green-800">CRM Dashboard</span>
+          </div>
+          <p className="text-xs text-green-600 mt-1">Company Access</p>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 p-2 overflow-y-auto" aria-label="Main navigation">
         <div className="space-y-1">
-          {navigationItems.map((item) => {
+          {currentNavigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
+            
+            // Check if this is a recruiter route and user has access
+            const isRecruiterRoute = item.href.startsWith('/app/recruiter');
+            const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
+            const hasAccess = !isRecruiterRoute || hasRecruiterAccess;
+            
+            // If no access, show disabled state
+            if (!hasAccess) {
+              return (
+                <div
+                  key={item.name}
+                  className={`
+                    group flex items-center ${(isExpanded || isMobile) ? 'justify-start' : 'justify-center'} 
+                    px-4 py-3 mx-1 rounded-xl text-sm font-medium 
+                    transition-all duration-300 cursor-not-allowed opacity-50
+                    text-slate-400 bg-slate-50
+                  `}
+                  title={!(isExpanded || isMobile) ? `${item.name} (Demo Only)` : 'Demo Access Required'}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-200">
+                    <Icon className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                  </div>
+                  <span className={`ml-4 transition-all duration-500 ease-out whitespace-nowrap font-medium ${
+                    (isExpanded || isMobile) 
+                      ? 'opacity-100 translate-x-0' 
+                      : 'opacity-0 -translate-x-4 w-0 overflow-hidden'
+                  }`}>
+                    {item.name}
+                    {(isExpanded || isMobile) && (
+                      <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                        Restricted
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            }
             
             return (
               <Link
