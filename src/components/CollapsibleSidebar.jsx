@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -15,6 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 const navigationItems = [
   {
@@ -129,7 +130,9 @@ export default function CollapsibleSidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
   
   // Determine which navigation to show based on current route
   const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
@@ -166,6 +169,21 @@ export default function CollapsibleSidebar() {
 
   const toggleMobileMenu = () => {
     setIsMobileOpen(!isMobileOpen);
+  };
+
+  const handleRecruiterToggle = () => {
+    const isDemoUser = user?.isDemo === true || user?.email === 'demo@crm.com';
+    
+    if (isDemoUser) {
+      navigate('/app/recruiter/dashboard');
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Access Restricted',
+        message: 'The Recruiter Dashboard is only available for demo accounts. Please login with demo@crm.com to access this feature.',
+        duration: 6000
+      });
+    }
   };
 
   return (
@@ -245,16 +263,19 @@ export default function CollapsibleSidebar() {
             >
               CRM
             </Link>
-            <Link
-              to="/app/recruiter/dashboard"
-              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all ${
+            <button
+              onClick={handleRecruiterToggle}
+              className={`flex-1 text-center py-2 px-3 rounded-md text-xs font-medium transition-all relative ${
                 isRecruiterSection 
                   ? 'bg-white text-slate-700 shadow-sm' 
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               Recruitment
-            </Link>
+              {user && !user.isDemo && user.email !== 'demo@crm.com' && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+              )}
+            </button>
           </div>
         </div>
       )}
