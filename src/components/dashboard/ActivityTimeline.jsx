@@ -43,13 +43,19 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
             <button
               key={period}
               onClick={() => handleFilterChange(period)}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 capitalize ${
+              className={`relative px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 capitalize 
+                         overflow-hidden group ${
                 filter === period 
                   ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-white'
               }`}
             >
-              {period}
+              <span className="relative z-10">{period}</span>
+              {filter !== period && (
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                transform -translate-x-full group-hover:translate-x-0 
+                                transition-transform duration-200 ease-out"></div>
+              )}
             </button>
           ))}
         </div>
@@ -127,8 +133,12 @@ const ActivityTimeline = ({ activities = [], onActivityClick, onFilterChange }) 
       
       {/* Load More */}
       <div className="text-center pt-4 border-t border-gray-200 mt-5">
-        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-          Load More Activities
+        <button className="relative text-sm text-blue-600 hover:text-white font-medium px-4 py-2 rounded-lg 
+                           transition-all duration-200 overflow-hidden group border border-blue-200 hover:border-blue-500">
+          <span className="relative z-10">Load More Activities</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                          transform -translate-y-full group-hover:translate-y-0 
+                          transition-transform duration-200 ease-out"></div>
         </button>
       </div>
     </div>

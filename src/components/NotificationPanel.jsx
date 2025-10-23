@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, X, Clock, User, Briefcase, Calendar, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Bell, X, Clock, User, Briefcase, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
 
 const demoNotifications = [
   {
@@ -108,49 +108,30 @@ const NotificationPanel = () => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'success':
-        return 'text-green-500';
-      case 'warning':
-        return 'text-yellow-500';
-      case 'error':
-        return 'text-red-500';
-      default:
-        return 'text-blue-500';
-    }
-  };
-
-  const getNotificationBg = (type) => {
-    switch (type) {
-      case 'success':
-        return 'from-green-50 to-emerald-50 border-green-200';
-      case 'warning':
-        return 'from-yellow-50 to-amber-50 border-yellow-200';
-      case 'error':
-        return 'from-red-50 to-rose-50 border-red-200';
-      default:
-        return 'from-blue-50 to-indigo-50 border-blue-200';
-    }
+  const getNotificationStyles = (type) => {
+    const styles = {
+      success: { icon: 'text-green-500', bg: 'from-green-50 to-emerald-50 border-green-200' },
+      warning: { icon: 'text-yellow-500', bg: 'from-yellow-50 to-amber-50 border-yellow-200' },
+      error: { icon: 'text-red-500', bg: 'from-red-50 to-rose-50 border-red-200' },
+      default: { icon: 'text-blue-500', bg: 'from-blue-50 to-indigo-50 border-blue-200' }
+    };
+    return styles[type] || styles.default;
   };
 
   return (
     <div className="relative">
-      {/* Notification Bell Button */}
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-3 rounded-xl bg-white/80 backdrop-blur-sm border border-slate-200/50 
                    hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 
                    hover:border-blue-300/50 hover:shadow-lg hover:scale-110
-                   transition-all duration-300 transform group
+                   transition-all duration-200 transform group
                    focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         title="Notifications"
       >
-        <Bell className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-all duration-300 
-                        notification-bell-hover" />
+        <Bell className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors duration-200" />
         
-        {/* Notification Badge */}
         {unreadCount > 0 && (
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-500 to-pink-500 
                           rounded-full flex items-center justify-center shadow-lg animate-pulse">
@@ -160,9 +141,8 @@ const NotificationPanel = () => {
           </div>
         )}
 
-        {/* Hover Glow Effect */}
         <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm"></div>
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-200 -z-10 blur-sm"></div>
       </button>
 
       {/* Notification Panel - Fixed positioning to appear on top */}
@@ -185,17 +165,25 @@ const NotificationPanel = () => {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium 
-                               hover:bg-blue-50 px-2 py-1 rounded-lg transition-colors duration-200"
+                    className="relative text-xs text-blue-600 hover:text-white font-medium 
+                               px-3 py-2 rounded-lg transition-all duration-200 overflow-hidden group
+                               border border-blue-200 hover:border-blue-500"
                   >
-                    Mark all read
+                    <span className="relative z-10">Mark all read</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                    transform -translate-x-full group-hover:translate-x-0 
+                                    transition-transform duration-200 ease-out"></div>
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                  className="relative p-2 rounded-lg transition-all duration-200 overflow-hidden group
+                             hover:shadow-md"
                 >
-                  <X className="w-4 h-4 text-slate-500" />
+                  <X className="w-4 h-4 text-slate-500 group-hover:text-white relative z-10 transition-colors duration-200" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-400 to-slate-500 
+                                  transform scale-0 group-hover:scale-100 
+                                  transition-transform duration-200 ease-out rounded-lg"></div>
                 </button>
               </div>
             </div>
@@ -212,36 +200,32 @@ const NotificationPanel = () => {
               <div className="p-2 stagger-fade-in">
                 {notifications.map((notification) => {
                   const IconComponent = notification.icon;
+                  const styles = getNotificationStyles(notification.type);
                   return (
                     <div
                       key={notification.id}
                       className={`
-                        group relative p-3 mb-2 rounded-xl border transition-all duration-300
-                        hover:shadow-md hover:scale-[1.02] cursor-pointer liquid-hover
+                        group relative p-3 mb-2 rounded-xl border transition-all duration-200
+                        hover:shadow-md hover:scale-[1.02] cursor-pointer
                         ${notification.unread 
-                          ? `bg-gradient-to-r ${getNotificationBg(notification.type)} shadow-sm` 
+                          ? `bg-gradient-to-r ${styles.bg} shadow-sm` 
                           : 'bg-slate-50/50 border-slate-200/50 hover:bg-slate-100/50'
                         }
                       `}
                       onClick={() => markAsRead(notification.id)}
                     >
-                      {/* Unread Indicator */}
                       {notification.unread && (
                         <div className="absolute left-1 top-1/2 transform -translate-y-1/2 w-2 h-2 
                                         bg-blue-500 rounded-full animate-pulse"></div>
                       )}
 
                       <div className="flex items-start space-x-3 ml-2">
-                        {/* Icon */}
-                        <div className={`
-                          w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
-                          bg-white/80 backdrop-blur-sm border border-slate-200/50
-                          group-hover:scale-110 transition-transform duration-300 icon-wiggle
-                        `}>
-                          <IconComponent className={`w-4 h-4 ${getNotificationIcon(notification.type)}`} />
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
+                                        bg-white/80 backdrop-blur-sm border border-slate-200/50
+                                        group-hover:scale-110 transition-transform duration-200">
+                          <IconComponent className={`w-4 h-4 ${styles.icon}`} />
                         </div>
 
-                        {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <h4 className="text-sm font-medium text-slate-900 truncate">
@@ -284,9 +268,13 @@ const NotificationPanel = () => {
 
           {/* Footer */}
           <div className="p-3 border-t border-slate-200/50 bg-slate-50/50">
-            <button className="w-full text-sm text-white font-medium 
-                               py-2 rounded-lg btn-primary-slide">
-              View all notifications
+            <button className="relative w-full text-sm text-white font-medium 
+                               py-3 rounded-lg transition-all duration-200 overflow-hidden group
+                               bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-lg hover:scale-[1.02]">
+              <span className="relative z-10">View all notifications</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 
+                              transform translate-y-full group-hover:translate-y-0 
+                              transition-transform duration-200 ease-out"></div>
             </button>
           </div>
         </div>

@@ -64,13 +64,10 @@ const InteractiveCalendar = ({
     setDraggedEvent(null);
   };
 
+  const defaultForm = { title: '', time: '10:00 AM', date: new Date(), type: 'meeting' };
+
   const handleQuickAdd = () => {
-    setQuickAddForm({
-      title: '',
-      time: '10:00 AM',
-      date: new Date(),
-      type: 'meeting'
-    });
+    setQuickAddForm(defaultForm);
     setShowQuickAdd(true);
   };
 
@@ -78,7 +75,7 @@ const InteractiveCalendar = ({
     e.preventDefault();
     if (quickAddForm.title.trim() && onEventAdd) {
       const newEvent = {
-        id: Date.now(), // Simple ID generation
+        id: Date.now(),
         title: quickAddForm.title.trim(),
         date: quickAddForm.date,
         time: quickAddForm.time,
@@ -88,12 +85,7 @@ const InteractiveCalendar = ({
       
       onEventAdd(newEvent);
       setShowQuickAdd(false);
-      setQuickAddForm({
-        title: '',
-        time: '10:00 AM',
-        date: new Date(),
-        type: 'meeting'
-      });
+      setQuickAddForm(defaultForm);
     }
   };
 
@@ -117,7 +109,6 @@ const InteractiveCalendar = ({
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
-      {/* Calendar Header */}
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <CalendarIcon className="w-5 h-5 mr-2 text-blue-600" />
@@ -126,18 +117,24 @@ const InteractiveCalendar = ({
         <div className="flex items-center space-x-2">
           <button 
             onClick={() => onDateChange && onDateChange(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
-            className="p-2 hover:bg-blue-100 rounded-lg transition-all duration-200"
+            className="relative p-2 rounded-lg transition-all duration-200 overflow-hidden group hover:shadow-md"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 text-gray-600 group-hover:text-white relative z-10 transition-colors duration-200" />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                            transform scale-0 group-hover:scale-100 
+                            transition-transform duration-200 ease-out rounded-lg"></div>
           </button>
           <span className="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-lg">
             {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </span>
           <button 
             onClick={() => onDateChange && onDateChange(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
-            className="p-2 hover:bg-blue-100 rounded-lg transition-all duration-200"
+            className="relative p-2 rounded-lg transition-all duration-200 overflow-hidden group hover:shadow-md"
           >
-            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-white relative z-10 transition-colors duration-200" />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                            transform scale-0 group-hover:scale-100 
+                            transition-transform duration-200 ease-out rounded-lg"></div>
           </button>
         </div>
       </div>
@@ -219,10 +216,14 @@ const InteractiveCalendar = ({
         </div>
         <button 
           onClick={handleQuickAdd}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2"
+          className="relative px-4 py-2 bg-blue-600 text-white rounded-lg text-sm transition-all duration-200 
+                     flex items-center space-x-2 overflow-hidden group hover:shadow-lg hover:scale-105"
         >
-          <Plus className="w-4 h-4" />
-          <span>Quick Add</span>
+          <Plus className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">Quick Add</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-600 
+                          transform translate-x-full group-hover:translate-x-0 
+                          transition-transform duration-200 ease-out"></div>
         </button>
       </div>
 
@@ -309,16 +310,24 @@ const InteractiveCalendar = ({
                 <button
                   type="button"
                   onClick={() => setShowQuickAdd(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="relative px-4 py-2 text-gray-600 hover:text-white transition-all duration-200 
+                             rounded-lg overflow-hidden group border border-gray-300 hover:border-gray-500"
                 >
-                  Cancel
+                  <span className="relative z-10">Cancel</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-500 to-gray-600 
+                                  transform -translate-x-full group-hover:translate-x-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                  className="relative px-6 py-2 bg-blue-600 text-white rounded-lg transition-all duration-200 
+                             flex items-center space-x-2 overflow-hidden group hover:shadow-lg hover:scale-105"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Add Event</span>
+                  <Plus className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">Add Event</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-600 
+                                  transform translate-y-full group-hover:translate-y-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
               </div>
             </form>

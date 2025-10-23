@@ -1,21 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Plus, 
-  Mail, 
-  Phone, 
-  Eye,
-  Edit,
-  Trash2,
-  Users,
-  X
-} from 'lucide-react';
+import { useState } from 'react';
+import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 
 const Candidates = () => {
-  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([
     {
       id: 1,
@@ -169,14 +157,26 @@ const Candidates = () => {
                             <p className="text-slate-600 font-medium">{candidate.position}</p>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <button className="p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110">
-                              <Eye className="w-4 h-4 text-slate-400 hover:text-blue-600" />
+                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
+                                               overflow-hidden group hover:shadow-md">
+                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                              transform scale-0 group-hover:scale-100 
+                                              transition-transform duration-200 ease-out rounded-lg"></div>
                             </button>
-                            <button className="p-2 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110">
-                              <Edit className="w-4 h-4 text-slate-400 hover:text-green-600" />
+                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
+                                               overflow-hidden group hover:shadow-md">
+                              <Edit className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 
+                                              transform scale-0 group-hover:scale-100 
+                                              transition-transform duration-200 ease-out rounded-lg"></div>
                             </button>
-                            <button className="p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110">
-                              <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-600" />
+                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
+                                               overflow-hidden group hover:shadow-md">
+                              <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 
+                                              transform scale-0 group-hover:scale-100 
+                                              transition-transform duration-200 ease-out rounded-lg"></div>
                             </button>
                           </div>
                         </div>
@@ -212,9 +212,12 @@ const Candidates = () => {
                 </h2>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                  className="relative p-2 rounded-lg transition-all duration-200 overflow-hidden group hover:shadow-md"
                 >
-                  <X className="w-5 h-5 text-slate-500" />
+                  <X className="w-5 h-5 text-slate-500 group-hover:text-white relative z-10 transition-colors duration-200" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-400 to-slate-500 
+                                  transform scale-0 group-hover:scale-100 
+                                  transition-transform duration-200 ease-out rounded-lg"></div>
                 </button>
               </div>
 
@@ -409,15 +412,24 @@ const Candidates = () => {
                       portfolio: '', salary: '', skills: '', notes: ''
                     });
                   }}
-                  className="px-6 py-3 text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-all duration-200"
+                  className="relative px-6 py-3 text-slate-600 hover:text-white font-medium rounded-xl 
+                             transition-all duration-200 overflow-hidden group border border-slate-300 hover:border-slate-500"
                 >
-                  Cancel
+                  <span className="relative z-10">Cancel</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-slate-600 
+                                  transform -translate-x-full group-hover:translate-x-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
                 <button
                   onClick={handleAddCandidate}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="relative px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium 
+                             rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 
+                             overflow-hidden group"
                 >
-                  Add Candidate
+                  <span className="relative z-10">Add Candidate</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-blue-700 
+                                  transform translate-y-full group-hover:translate-y-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
               </div>
             </div>

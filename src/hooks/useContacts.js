@@ -8,7 +8,6 @@ const useContacts = () => {
   const [error, setError] = useState(null);
   const { handleError, executeWithErrorHandling } = useApiError();
 
-  // Fetch all contacts
   const fetchContacts = useCallback(async () => {
     try {
       setLoading(true);
@@ -24,7 +23,6 @@ const useContacts = () => {
     }
   }, [handleError]);
 
-  // Create a new contact
   const createContact = useCallback(async (contactData) => {
     try {
       const response = await executeWithErrorHandling(
@@ -36,17 +34,13 @@ const useContacts = () => {
         }
       );
       const newContact = response.data;
-      
-      // Add to local state
       setContacts(prev => [newContact, ...prev]);
-      
       return { success: true, data: newContact };
     } catch (err) {
       return { success: false, error: err.userMessage || err.message };
     }
   }, [executeWithErrorHandling]);
 
-  // Update an existing contact
   const updateContact = useCallback(async (contactId, contactData) => {
     try {
       const response = await executeWithErrorHandling(
@@ -58,21 +52,15 @@ const useContacts = () => {
         }
       );
       const updatedContact = response.data;
-      
-      // Update local state
-      setContacts(prev => 
-        prev.map(contact => 
-          contact.id === contactId ? updatedContact : contact
-        )
-      );
-      
+      setContacts(prev => prev.map(contact => 
+        contact.id === contactId ? updatedContact : contact
+      ));
       return { success: true, data: updatedContact };
     } catch (err) {
       return { success: false, error: err.userMessage || err.message };
     }
   }, [executeWithErrorHandling]);
 
-  // Delete a contact
   const deleteContact = useCallback(async (contactId) => {
     try {
       await executeWithErrorHandling(
@@ -83,17 +71,13 @@ const useContacts = () => {
           enableRetry: true
         }
       );
-      
-      // Remove from local state
       setContacts(prev => prev.filter(contact => contact.id !== contactId));
-      
       return { success: true };
     } catch (err) {
       return { success: false, error: err.userMessage || err.message };
     }
   }, [executeWithErrorHandling]);
 
-  // Get a single contact by ID
   const getContact = useCallback(async (contactId) => {
     try {
       const response = await api.get(`/contacts/${contactId}`);
@@ -105,14 +89,11 @@ const useContacts = () => {
     }
   }, []);
 
-  // Search/filter contacts
   const searchContacts = useCallback(async (query) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/contacts', {
-        params: { search: query }
-      });
+      const response = await api.get('/contacts', { params: { search: query } });
       setContacts(response.data);
     } catch (err) {
       const errorMessage = err.userMessage || err.message || 'Failed to search contacts';
@@ -123,7 +104,6 @@ const useContacts = () => {
     }
   }, [handleError]);
 
-  // Initial fetch on mount
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);

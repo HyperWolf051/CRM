@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Download, Building2, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, Phone, Mail, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
@@ -7,10 +6,7 @@ import Badge from '../components/ui/Badge';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
-
 import { formatCurrency } from '../utils/formatters';
-
-// Mock companies data
 const mockCompanies = [
   {
     id: '1',
@@ -27,7 +23,7 @@ const mockCompanies = [
     dealsCount: 8,
     totalDealsValue: 450000,
     logo: null,
-    createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(), // 45 days ago
+    createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Major technology company, potential for large enterprise deals.'
   },
   {
@@ -45,7 +41,7 @@ const mockCompanies = [
     dealsCount: 3,
     totalDealsValue: 125000,
     logo: null,
-    createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(), // 42 days ago
+    createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Growing consulting firm, interested in our automation solutions.'
   },
   {
@@ -63,7 +59,7 @@ const mockCompanies = [
     dealsCount: 2,
     totalDealsValue: 75000,
     logo: null,
-    createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(), // 40 days ago
+    createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Fast-growing fintech startup, budget-conscious but high potential.'
   },
   {
@@ -81,13 +77,12 @@ const mockCompanies = [
     dealsCount: 12,
     totalDealsValue: 850000,
     logo: null,
-    createdAt: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(), // 48 days ago
+    createdAt: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Long-term customer, excellent relationship, regular repeat business.'
   }
 ];
 
 export default function Companies() {
-  const navigate = useNavigate();
   const [companies] = useState(mockCompanies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -269,12 +264,19 @@ export default function Companies() {
                   <button
                     key={status.id}
                     onClick={() => setSelectedStatus(status.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedStatus === status.id
-                        ? status.color + ' shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+                               overflow-hidden group ${
+                      selectedStatus === status.id
+                        ? status.color + ' shadow-md border'
+                        : 'bg-gray-100 text-gray-600 hover:text-white border border-gray-300'
+                    }`}
                   >
-                    {status.name} ({status.count})
+                    <span className="relative z-10">{status.name} ({status.count})</span>
+                    {selectedStatus !== status.id && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 
+                                      transform -translate-y-full group-hover:translate-y-0 
+                                      transition-transform duration-200 ease-out"></div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -295,15 +297,29 @@ export default function Companies() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${showFilters ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+                               flex items-center space-x-2 overflow-hidden group
+                               ${showFilters 
+                                 ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+                                 : 'bg-gray-100 text-gray-600 hover:text-white border border-gray-300'
+                               }`}
                   >
-                    <Filter className="w-4 h-4" />
-                    <span>Filters</span>
+                    <Filter className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Filters</span>
+                    {!showFilters && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                      transform -translate-x-full group-hover:translate-x-0 
+                                      transition-transform duration-200 ease-out"></div>
+                    )}
                   </button>
-                  <button className="px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Export</span>
+                  <button className="relative px-4 py-2 bg-gray-100 text-gray-600 hover:text-white rounded-lg 
+                                     text-sm font-medium transition-all duration-200 flex items-center space-x-2
+                                     overflow-hidden group border border-gray-300 hover:border-green-500">
+                    <Download className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Export</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 
+                                    transform -translate-x-full group-hover:translate-x-0 
+                                    transition-transform duration-200 ease-out"></div>
                   </button>
                 </div>
               </div>
@@ -402,27 +418,39 @@ export default function Companies() {
                               e.stopPropagation();
                               handleCompanyClick(company);
                             }}
-                            className="p-1 text-gray-400 hover:text-blue-600"
+                            className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-all duration-200 
+                                       overflow-hidden group hover:shadow-md hover:scale-110"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4 relative z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                            transform scale-0 group-hover:scale-100 
+                                            transition-transform duration-200 ease-out rounded-lg"></div>
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               // Handle edit
                             }}
-                            className="p-1 text-gray-400 hover:text-green-600"
+                            className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-all duration-200 
+                                       overflow-hidden group hover:shadow-md hover:scale-110"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-4 h-4 relative z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 
+                                            transform scale-0 group-hover:scale-100 
+                                            transition-transform duration-200 ease-out rounded-lg"></div>
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               // Handle delete
                             }}
-                            className="p-1 text-gray-400 hover:text-red-600"
+                            className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-all duration-200 
+                                       overflow-hidden group hover:shadow-md hover:scale-110"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 relative z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 
+                                            transform scale-0 group-hover:scale-100 
+                                            transition-transform duration-200 ease-out rounded-lg"></div>
                           </button>
                         </div>
                       </td>
@@ -577,15 +605,23 @@ export default function Companies() {
                       phone: '', email: '', address: '', notes: ''
                     });
                   }}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-all duration-200"
+                  className="relative px-4 py-2 text-slate-600 hover:text-white font-medium rounded-xl 
+                             transition-all duration-200 overflow-hidden group border border-slate-300 hover:border-slate-500"
                 >
-                  Cancel
+                  <span className="relative z-10">Cancel</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-slate-600 
+                                  transform -translate-x-full group-hover:translate-x-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
                 <button
                   onClick={handleAddCompany}
-                  className="px-6 py-2 text-white font-medium rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
+                  className="relative px-6 py-2 text-white font-medium rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 
+                             transition-all duration-200 overflow-hidden group hover:shadow-lg hover:scale-105"
                 >
-                  Add Client
+                  <span className="relative z-10">Add Client</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 
+                                  transform translate-y-full group-hover:translate-y-0 
+                                  transition-transform duration-200 ease-out"></div>
                 </button>
               </div>
             </div>

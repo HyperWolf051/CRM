@@ -157,14 +157,20 @@ const QuickActionsPanel = ({ onActionClick }) => {
             <button
               key={key}
               onClick={() => setActiveCategory(key)}
-              className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+              className={`relative flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium 
+                         transition-all duration-200 overflow-hidden group ${
                 activeCategory === key
                   ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-white'
               }`}
             >
-              <Icon className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">{category.label}</span>
+              <Icon className="w-4 h-4 mr-2 relative z-10" />
+              <span className="hidden sm:inline relative z-10">{category.label}</span>
+              {activeCategory !== key && (
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                transform -translate-y-full group-hover:translate-y-0 
+                                transition-transform duration-200 ease-out"></div>
+              )}
             </button>
           );
         })}

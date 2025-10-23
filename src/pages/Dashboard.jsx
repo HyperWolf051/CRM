@@ -16,187 +16,93 @@ const Dashboard = () => {
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [timeRange, setTimeRange] = useState("30D");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDealsLoading, setIsDealsLoading] = useState(false); // Separate loading for deals
+  const [isDealsLoading, setIsDealsLoading] = useState(false);
   const [currentPipelineStep, setCurrentPipelineStep] = useState(2);
-  const [shouldAnimateChart, setShouldAnimateChart] = useState(true); // Control chart animations
-  const [chartType, setChartType] = useState("line"); // Chart type toggle
-  const [shouldAnimateChart2, setShouldAnimateChart2] = useState(true); // Control second chart animations
-  const [chartType2, setChartType2] = useState("line"); // Second chart type toggle
+  const [shouldAnimateChart, setShouldAnimateChart] = useState(true);
+  const [chartType, setChartType] = useState("line");
+  const [shouldAnimateChart2, setShouldAnimateChart2] = useState(true);
+  const [chartType2, setChartType2] = useState("bar");
 
-  // Monthly Revenue Changes data with exact specifications
   const salesData = [
-    {
-      label: "Jan",
-      value: 47,
-      details: "New clients: 12, Profit margin: 27%",
-      change: null,
-    },
-    {
-      label: "Feb",
-      value: 60,
-      details: "New clients: 18, Profit margin: 31%",
-      change: 29,
-    },
-    {
-      label: "Mar",
-      value: 46,
-      details: "New clients: 8, Profit margin: 21%",
-      change: -34,
-    },
-    {
-      label: "Apr",
-      value: 72,
-      details: "New clients: 24, Profit margin: 31%",
-      change: 89,
-    },
-    {
-      label: "May",
-      value: 52,
-      details: "New clients: 15, Profit margin: 29%",
-      change: -28,
-    },
-    {
-      label: "Jun",
-      value: 40,
-      details: "New clients: 11, Profit margin: 27%",
-      change: -23,
-    },
+    { label: "Jan", value: 47, details: "New clients: 12, Profit margin: 27%", change: null },
+    { label: "Feb", value: 60, details: "New clients: 18, Profit margin: 31%", change: 29 },
+    { label: "Mar", value: 46, details: "New clients: 8, Profit margin: 21%", change: -34 },
+    { label: "Apr", value: 72, details: "New clients: 24, Profit margin: 31%", change: 89 },
+    { label: "May", value: 52, details: "New clients: 15, Profit margin: 29%", change: -28 },
+    { label: "Jun", value: 40, details: "New clients: 11, Profit margin: 27%", change: -23 }
   ];
 
-  // Customer Acquisition data for second graph
   const customerData = [
-    {
-      label: "Jan",
-      value: 28,
-      details: "New customers: 28, Conversion rate: 12%",
-      change: null,
-    },
-    {
-      label: "Feb",
-      value: 35,
-      details: "New customers: 35, Conversion rate: 15%",
-      change: 25,
-    },
-    {
-      label: "Mar",
-      value: 22,
-      details: "New customers: 22, Conversion rate: 9%",
-      change: -37,
-    },
-    {
-      label: "Apr",
-      value: 48,
-      details: "New customers: 48, Conversion rate: 18%",
-      change: 118,
-    },
-    {
-      label: "May",
-      value: 31,
-      details: "New customers: 31, Conversion rate: 13%",
-      change: -35,
-    },
-    {
-      label: "Jun",
-      value: 42,
-      details: "New customers: 42, Conversion rate: 16%",
-      change: 35,
-    },
+    { label: "Jan", value: 28, details: "New customers: 28, Conversion rate: 12%", change: null },
+    { label: "Feb", value: 35, details: "New customers: 35, Conversion rate: 15%", change: 25 },
+    { label: "Mar", value: 22, details: "New customers: 22, Conversion rate: 9%", change: -37 },
+    { label: "Apr", value: 48, details: "New customers: 48, Conversion rate: 18%", change: 118 },
+    { label: "May", value: 31, details: "New customers: 31, Conversion rate: 13%", change: -35 },
+    { label: "Jun", value: 42, details: "New customers: 42, Conversion rate: 16%", change: 35 }
   ];
 
-  // Pipeline steps data
   const pipelineSteps = [
     { label: "Lead", count: 45 },
     { label: "Qualified", count: 32 },
     { label: "Proposal", count: 18 },
     { label: "Negotiation", count: 12 },
-    { label: "Closed", count: 8 },
+    { label: "Closed", count: 8 }
   ];
 
-  // Sparkline data for metric cards
   const weeklyBalanceSparkline = [15, 18, 12, 20, 25, 22, 20];
   const activeJobsSparkline = [20, 22, 18, 24, 26, 24, 24];
   const candidatesSparkline = [45, 48, 42, 47, 49, 46, 47];
 
-  // Calendar events state
   const [calendarEvents, setCalendarEvents] = useState([
     {
-      id: 1,
-      title: "Interview - Sarah Johnson",
+      id: 1, title: "Interview - Sarah Johnson", 
       date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-      time: "2:00 PM",
-      color: "bg-blue-500",
-      type: "interview",
+      time: "2:00 PM", color: "bg-blue-500", type: "interview"
     },
     {
-      id: 2,
-      title: "Team Meeting",
+      id: 2, title: "Team Meeting",
       date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-      time: "10:00 AM",
-      color: "bg-green-500",
-      type: "meeting",
+      time: "10:00 AM", color: "bg-green-500", type: "meeting"
     },
     {
-      id: 3,
-      title: "Client Call",
+      id: 3, title: "Client Call",
       date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      time: "3:30 PM",
-      color: "bg-purple-500",
-      type: "call",
-    },
+      time: "3:30 PM", color: "bg-purple-500", type: "call"
+    }
   ]);
 
-  // Enhanced activity data
   const getTimeAgo = (hoursAgo) => {
     const now = new Date();
     const activityTime = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
     const diffInHours = Math.floor((now - activityTime) / (1000 * 60 * 60));
 
     if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   };
 
   const recentActivity = [
     {
-      id: 1,
-      message: "Sarah Johnson was added as a candidate",
-      time: getTimeAgo(2),
-      type: "candidate",
-      user: "John Doe",
-      metadata: { location: "San Francisco, CA" },
+      id: 1, message: "Sarah Johnson was added as a candidate", time: getTimeAgo(2),
+      type: "candidate", user: "John Doe", metadata: { location: "San Francisco, CA" }
     },
     {
-      id: 2,
-      message: "Client call scheduled with TechCorp",
-      time: getTimeAgo(4),
-      type: "meeting",
-      user: "Uroos Khan",
-      metadata: { participants: 3, location: "Virtual" },
+      id: 2, message: "Client call scheduled with TechCorp", time: getTimeAgo(4),
+      type: "meeting", user: "Uroos Khan", metadata: { participants: 3, location: "Virtual" }
     },
     {
-      id: 3,
-      message: "Interview completed for Michael Chen",
-      time: getTimeAgo(24),
-      type: "interview",
-      user: "Sarah Smith",
-      metadata: { location: "Conference Room A" },
+      id: 3, message: "Interview completed for Michael Chen", time: getTimeAgo(24),
+      type: "interview", user: "Sarah Smith", metadata: { location: "Conference Room A" }
     },
     {
-      id: 4,
-      message: "New Senior Developer job posting published",
-      time: getTimeAgo(48),
-      type: "job",
-      user: "System",
+      id: 4, message: "New Senior Developer job posting published", time: getTimeAgo(48),
+      type: "job", user: "System"
     },
     {
-      id: 5,
-      message: "Deal closed with StartupXYZ - $50k",
-      time: getTimeAgo(72),
-      type: "deal",
-      user: "Mike Johnson",
-    },
+      id: 5, message: "Deal closed with StartupXYZ - $50k", time: getTimeAgo(72),
+      type: "deal", user: "Mike Johnson"
+    }
   ];
 
   // Event handlers

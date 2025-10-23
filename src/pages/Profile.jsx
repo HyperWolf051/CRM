@@ -11,26 +11,10 @@ const Profile = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
-  // Tab configuration
   const tabs = [
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: User,
-      description: 'Personal information and settings'
-    },
-    {
-      id: 'security',
-      label: 'Security',
-      icon: Shield,
-      description: 'Password and security settings'
-    },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      icon: Bell,
-      description: 'Notification preferences'
-    }
+    { id: 'profile', label: 'Profile', icon: User, description: 'Personal information and settings' },
+    { id: 'security', label: 'Security', icon: Shield, description: 'Password and security settings' },
+    { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Notification preferences' }
   ];
 
   const renderTabContent = () => {
@@ -62,8 +46,12 @@ const Profile = () => {
                 size="2xl"
                 className="ring-4 ring-white/20 shadow-xl"
               />
-              <button className="absolute -bottom-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow duration-200 group">
-                <Camera className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
+              <button className="absolute -bottom-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl 
+                                 transition-all duration-200 group overflow-hidden hover:scale-110">
+                <Camera className="w-4 h-4 text-gray-600 group-hover:text-white relative z-10 transition-colors duration-200" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                                transform scale-0 group-hover:scale-100 
+                                transition-transform duration-200 ease-out rounded-full"></div>
               </button>
             </div>
 
@@ -98,19 +86,25 @@ const Profile = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                    className={`relative flex items-center gap-3 py-3 px-4 border-b-2 font-medium text-sm 
+                               transition-all duration-200 rounded-t-lg overflow-hidden group ${
                       isActive
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-blue-500 text-blue-600 bg-blue-50'
+                        : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-blue-300'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <div className="text-left">
+                    <Icon className="w-5 h-5 relative z-10" />
+                    <div className="text-left relative z-10">
                       <div className="font-medium">{tab.label}</div>
-                      <div className="text-xs text-gray-400 hidden lg:block">
+                      <div className="text-xs text-gray-400 hidden lg:block group-hover:text-gray-600">
                         {tab.description}
                       </div>
                     </div>
+                    {!isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100 
+                                      transform -translate-y-full group-hover:translate-y-0 
+                                      transition-transform duration-200 ease-out"></div>
+                    )}
                   </button>
                 );
               })}
@@ -726,31 +720,35 @@ const ProfileTab = ({ user, setActiveTab }) => {
             <div className="space-y-3">
               <Button 
                 variant="secondary" 
-                className="w-full justify-start hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                className="w-full justify-start animate-fade-in"
                 onClick={() => setIsEditing(true)}
+                style={{ animationDelay: '0.1s' }}
               >
                 <User className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>
               <Button 
                 variant="secondary" 
-                className="w-full justify-start hover:bg-green-50 hover:text-green-700 transition-colors"
+                className="w-full justify-start animate-fade-in"
                 onClick={() => setActiveTab('security')}
+                style={{ animationDelay: '0.2s' }}
               >
                 <Shield className="w-4 h-4 mr-2" />
                 Security Settings
               </Button>
               <Button 
                 variant="secondary" 
-                className="w-full justify-start hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                className="w-full justify-start animate-fade-in"
                 onClick={() => setActiveTab('notifications')}
+                style={{ animationDelay: '0.3s' }}
               >
                 <Bell className="w-4 h-4 mr-2" />
                 Notifications
               </Button>
               <Button 
                 variant="secondary" 
-                className="w-full justify-start hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                className="w-full justify-start animate-fade-in"
+                style={{ animationDelay: '0.4s' }}
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 View Calendar
@@ -896,7 +894,8 @@ const SecurityTab = () => {
                   <button
                     type="button"
                     onClick={() => togglePasswordVisibility('current')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 
+                               transition-colors duration-200 p-1 rounded hover:bg-blue-50"
                   >
                     {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -920,7 +919,8 @@ const SecurityTab = () => {
                   <button
                     type="button"
                     onClick={() => togglePasswordVisibility('new')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 
+                               transition-colors duration-200 p-1 rounded hover:bg-blue-50"
                   >
                     {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -967,7 +967,8 @@ const SecurityTab = () => {
                   <button
                     type="button"
                     onClick={() => togglePasswordVisibility('confirm')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 
+                               transition-colors duration-200 p-1 rounded hover:bg-blue-50"
                   >
                     {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>

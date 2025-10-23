@@ -843,22 +843,30 @@ const ChartControls = memo(({
       {onRefresh && (
         <button
           onClick={onRefresh}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+          className="relative p-2 text-gray-600 hover:text-white rounded-lg transition-all duration-200 
+                     overflow-hidden group hover:shadow-md hover:scale-110"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
+                          transform scale-0 group-hover:scale-100 
+                          transition-transform duration-200 ease-out rounded-lg"></div>
         </button>
       )}
       {onExport && (
         <button
           onClick={onExport}
-          className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2"
+          className="relative px-3 py-2 bg-blue-600 text-white rounded-lg text-sm transition-all duration-200 
+                     flex items-center space-x-2 overflow-hidden group hover:shadow-lg hover:scale-105"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span>Export</span>
+          <span className="relative z-10">Export</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 
+                          transform translate-x-full group-hover:translate-x-0 
+                          transition-transform duration-200 ease-out"></div>
         </button>
       )}
     </div>
