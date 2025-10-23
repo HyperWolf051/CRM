@@ -21,13 +21,13 @@ export default function Deals() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Load both jobs and employers
       const [jobsResponse, employersResponse] = await Promise.all([
         JobAPI.getAll(),
         EmployerAPI.getAll()
       ]);
-      
+
       setJobs(jobsResponse.data || []);
       setEmployers(employersResponse.data || []);
     } catch (err) {
@@ -112,7 +112,7 @@ export default function Deals() {
   const filteredJobs = jobs.filter(job => {
     const employer = employers.find(e => e.id === job.employerId);
     const companyName = employer?.name || 'Unknown Company';
-    
+
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -165,10 +165,10 @@ export default function Deals() {
         minSalary: formData.minSalary ? parseInt(formData.minSalary) : null,
         maxSalary: formData.maxSalary ? parseInt(formData.maxSalary) : null
       });
-      
+
       // Reload jobs list
       await loadData();
-      
+
       // Reset form and close modal
       setFormData({
         employerId: '',
@@ -421,10 +421,10 @@ export default function Deals() {
                 {filteredJobs.map((job) => {
                   const employer = employers.find(e => e.id === job.employerId);
                   const companyName = employer?.name || 'Unknown Company';
-                  const salaryRange = job.minSalary && job.maxSalary 
+                  const salaryRange = job.minSalary && job.maxSalary
                     ? `₹${(job.minSalary / 100000).toFixed(1)}L - ₹${(job.maxSalary / 100000).toFixed(1)}L`
                     : 'Salary not specified';
-                  
+
                   return (
                     <div
                       key={job.id}
@@ -507,10 +507,10 @@ export default function Deals() {
                     {filteredJobs.map((job) => {
                       const employer = employers.find(e => e.id === job.employerId);
                       const companyName = employer?.name || 'Unknown Company';
-                      const salaryRange = job.minSalary && job.maxSalary 
+                      const salaryRange = job.minSalary && job.maxSalary
                         ? `₹${(job.minSalary / 100000).toFixed(1)}L - ₹${(job.maxSalary / 100000).toFixed(1)}L`
                         : 'Not specified';
-                      
+
                       return (
                         <tr
                           key={job.id}
