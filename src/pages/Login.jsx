@@ -233,7 +233,7 @@ const Login = () => {
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <div className="font-semibold text-blue-900 text-sm">Admin User</div>
+                      <div className="font-semibold text-blue-900 text-sm">Admin Dashboard</div>
                       <div className="text-blue-700 text-xs">Full access to all features</div>
                     </div>
                     <Button
@@ -270,7 +270,7 @@ const Login = () => {
                 <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <div className="font-semibold text-green-900 text-sm">Demo User</div>
+                      <div className="font-semibold text-green-900 text-sm">Recuiter Dashboard</div>
                       <div className="text-green-700 text-xs">Limited access for testing</div>
                     </div>
                     <Button

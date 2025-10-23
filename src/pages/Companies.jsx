@@ -77,7 +77,7 @@ const mockCompanies = [
     status: 'lead',
     contactsCount: 38,
     dealsCount: 15,
-    totalDealsValue: 45000000, // ₹4.5 Cr
+    totalDealsValue: 4.5, // ₹4.5 Cr
     logo: null,
     createdAt: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Diversified conglomerate, potential for multiple verticals recruitment.'
@@ -95,7 +95,7 @@ const mockCompanies = [
     status: 'customer',
     contactsCount: 22,
     dealsCount: 6,
-    totalDealsValue: 8500000, // ₹85 L
+    totalDealsValue: 85, // ₹85 Cr
     logo: null,
     createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Food delivery unicorn, aggressive hiring for tech and operations roles.'
@@ -113,7 +113,7 @@ const mockCompanies = [
     status: 'active',
     contactsCount: 41,
     dealsCount: 19,
-    totalDealsValue: 28000000, // ₹2.8 Cr
+    totalDealsValue: 2.8, // ₹2.8 Cr
     logo: null,
     createdAt: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Leading private sector bank, consistent recruitment needs across branches.'
