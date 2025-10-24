@@ -235,19 +235,35 @@ const ContactTable = ({
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Dropdown
-                    trigger={
-                      <button 
-                        className="text-gray-400 hover:text-gray-600 transition-all duration-150 p-1 rounded hover:bg-gray-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Actions for ${contact.name}`}
-                      >
-                        <MoreHorizontal size={20} aria-hidden="true" />
-                      </button>
-                    }
-                    items={createActionItems(contact)}
-                    align="right"
-                  />
+                  {/* Replace dropdown with native select for improved accessibility and mobile UX */}
+                  <label className="sr-only" htmlFor={`actions-select-${contact.id}`}>Actions for {contact.name}</label>
+                  <select
+                    id={`actions-select-${contact.id}`}
+                    className="border border-gray-200 rounded px-2 py-1 text-sm text-gray-700 bg-white hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    onClick={(e) => e.stopPropagation()} /* prevent row click */
+                    onKeyDown={(e) => e.stopPropagation()}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      const value = e.target.value;
+                      // reset select back to placeholder after action
+                      if (value === 'edit') {
+                        onEditContact?.(contact);
+                        e.target.selectedIndex = 0;
+                      } else if (value === 'delete') {
+                        onDeleteContact?.(contact);
+                        e.target.selectedIndex = 0;
+                      } else {
+                        // placeholder or unknown
+                        e.target.selectedIndex = 0;
+                      }
+                    }}
+                    aria-label={`Actions for ${contact.name}`}
+                    defaultValue=""
+                  >
+                    <option value="" disabled hidden>Actions</option>
+                    <option value="edit">Edit</option>
+                    <option value="delete">Delete</option>
+                  </select>
                 </td>
               </tr>
             ))}

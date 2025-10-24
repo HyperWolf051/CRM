@@ -209,3 +209,35 @@ export const formatIndianCurrency = (amount) => {
   
   return formatCurrency(amount);
 };
+
+/**
+ * Formats a number as a compact currency string (e.g., 2.5M, 1.2K).
+ * Uses Intl.NumberFormat with the 'compact' notation where supported.
+ * @param {number} amount - Amount to format
+ * @param {string} currency - Currency code (default: 'INR')
+ * @param {string} locale - Locale to format for (default: 'en-IN')
+ * @returns {string} - Compact formatted currency
+ */
+export const formatCompactCurrency = (amount, currency = 'INR', locale = 'en-IN') => {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    // fallback similar to other formatters
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(0);
+    } catch (e) {
+      return currency === 'INR' ? '₹0' : `0 ${currency}`;
+    }
+  }
+
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      notation: 'compact',
+      compactDisplay: 'short',
+      maximumFractionDigits: 1,
+    }).format(amount);
+  } catch (e) {
+    // If compact notation isn't supported in the environment, fall back to regular formatting
+    return formatCurrency(amount, currency);
+  }
+};
