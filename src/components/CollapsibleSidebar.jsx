@@ -31,7 +31,7 @@ const navigationItems = [
   },
   {
     name: 'Jobs',
-    href: '/app/deals',
+    href: '/app/jobs',
     icon: Briefcase,
     color: 'from-purple-500 to-purple-600'
   },

@@ -13,7 +13,7 @@ const Login = lazy(() => import('@/pages/Login'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Contacts = lazy(() => import('@/pages/Contacts'));
 const ContactDetails = lazy(() => import('@/pages/ContactDetails'));
-const Deals = lazy(() => import('@/pages/Deals'));
+const Jobs = lazy(() => import('@/pages/Jobs'));
 const Companies = lazy(() => import('@/pages/Companies'));
 const Calendar = lazy(() => import('@/pages/Calendar'));
 const Tasks = lazy(() => import('@/pages/Tasks'));
@@ -87,8 +87,8 @@ function App() {
                   <Route path="candidates/add" element={<AddCandidate />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="contacts/:id" element={<ContactDetails />} />
-                  <Route path="deals" element={<Deals />} />
-                  <Route path="deals/add" element={<AddJob />} />
+                  <Route path="jobs" element={<Jobs />} />
+                  <Route path="jobs/add" element={<AddJob />} />
                   <Route path="companies" element={<Companies />} />
                   <Route path="companies/add" element={<AddClient />} />
                   <Route path="calendar" element={<Calendar />} />

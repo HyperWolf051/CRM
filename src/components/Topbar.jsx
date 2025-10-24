@@ -18,8 +18,8 @@ export default function Topbar({ title = 'Dashboard' }) {
     switch (location.pathname) {
       case '/app/candidates':
         return 'Search candidates...';
-      case '/app/deals':
-        return 'Search jobs and deals...';
+      case '/app/jobs':
+        return 'Search jobs...';
       case '/app/companies':
         return 'Search clients...';
       case '/app/calendar':

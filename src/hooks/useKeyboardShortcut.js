@@ -6,10 +6,10 @@ import { useEffect, useRef } from 'react';
  * Available shortcuts in the CRM application:
  * - "/" - Focus search input on Contacts page
  * - "c" - Open Add Contact modal on Contacts page
- * - "d" - Open Add Deal modal on Deals page
+ * - "d" - Open Add Job modal on Jobs page
  * - "1" - Navigate to Dashboard
  * - "2" - Navigate to Contacts
- * - "3" - Navigate to Deals
+ * - "3" - Navigate to Jobs
  * - "4" - Navigate to Settings
  * - "Escape" - Close modals (handled by Modal component)
  * 
