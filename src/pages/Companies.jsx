@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, Filter, Download, Building2, Users, DollarSign,
-  MoreVertical, Eye, Edit, Trash2, Phone, Mail, Globe, ExternalLink,
-  Copy, Star, Grid3X3, List, Target, ChevronDown, X, MapPin, TrendingUp
+  MoreVertical, Eye, Edit, Phone, Mail, Globe, ExternalLink,
+  Star, Grid3X3, List, Target, ChevronDown, X, MapPin, TrendingUp
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
-import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import { formatCurrency, formatCompactCurrency } from '../utils/formatters';
 
@@ -99,22 +98,10 @@ export default function Companies() {
   const [viewMode, setViewMode] = useState('cards');
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [newCompany, setNewCompany] = useState({
-    name: '',
-    industry: '',
-    size: '',
-    revenue: '',
-    location: '',
-    website: '',
-    phone: '',
-    email: '',
-    address: '',
-    notes: '',
-    description: ''
-  });
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -194,41 +181,7 @@ export default function Companies() {
     }
   };
 
-  const handleAddCompany = () => {
-    if (!newCompany.name || !newCompany.industry) {
-      alert('Please fill in all required fields');
-      return;
-    }
 
-    const company = {
-      id: (Math.max(...companies.map(c => parseInt(c.id))) + 1).toString(),
-      ...newCompany,
-      revenue: parseInt(newCompany.revenue) || 0,
-      status: 'prospect',
-      contactsCount: 0,
-      dealsCount: 0,
-      totalDealsValue: 0,
-      logo: null,
-      createdAt: new Date().toISOString()
-    };
-
-    alert('Client added successfully!');
-    setIsCreateModalOpen(false);
-
-    setNewCompany({
-      name: '',
-      industry: '',
-      size: '',
-      revenue: '',
-      location: '',
-      website: '',
-      phone: '',
-      email: '',
-      address: '',
-      notes: '',
-      description: ''
-    });
-  };
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -270,7 +223,7 @@ export default function Companies() {
                 variant="primary"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
                 icon={<Plus className="w-4 h-4" />}
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => navigate('/app/companies/add')}
               >
                 Add Client
               </Button>
@@ -461,7 +414,7 @@ export default function Companies() {
                   variant="primary"
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   icon={<Plus className="w-4 h-4" />}
-                  onClick={() => setIsCreateModalOpen(true)}
+                  onClick={() => navigate('/app/companies/add')}
                 >
                   Add Your First Client
                 </Button>
@@ -716,111 +669,7 @@ export default function Companies() {
         )}
       </div>
 
-      {/* Create Company Modal */}
-      {isCreateModalOpen && (
-        <Modal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          title="Add New Client"
-        >
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
-                <input
-                  type="text"
-                  value={newCompany.name}
-                  onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter company name"
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
-                <select
-                  value={newCompany.industry}
-                  onChange={(e) => setNewCompany({ ...newCompany, industry: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Select industry</option>
-                  {industries.slice(1).map((industry) => (
-                    <option key={industry.id} value={industry.id}>{industry.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                <input
-                  type="text"
-                  value={newCompany.location}
-                  onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter location"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
-                <input
-                  type="url"
-                  value={newCompany.website}
-                  onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input
-                  type="tel"
-                  value={newCompany.phone}
-                  onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={newCompany.email}
-                  onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="contact@company.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                value={newCompany.description}
-                onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Brief description of the company..."
-              />
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                onClick={handleAddCompany}
-              >
-                Add Client
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
 
       {/* Company Details Modal */}
       {isDetailsModalOpen && selectedCompany && (
