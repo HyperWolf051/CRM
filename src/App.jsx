@@ -118,6 +118,8 @@ function App() {
                   <Route path="dashboard" element={<RecruiterDashboard />} />
                   <Route path="candidates" element={<ComingSoon title="Candidates" description="Candidate management system" />} />
                   <Route path="jobs" element={<ComingSoon title="Jobs" description="Job posting and management" />} />
+                  <Route path="interviews" element={<ComingSoon title="Interviews" description="Interview management system" />} />
+                  <Route path="offers" element={<ComingSoon title="Offers" description="Job offer management system" />} />
                   <Route path="calendar" element={<ComingSoon title="Calendar" description="Interview scheduling system" />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />
                   <Route path="reports" element={<ComingSoon title="Reports" description="Daily reporting system" />} />

@@ -1,128 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Users, 
-  Briefcase, 
-  Settings, 
-  Building2,
-  Calendar,
-  BarChart3,
-  CheckSquare,
-  UserCheck,
   Menu,
-  X,
-  Zap
+  X
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { getNavigationItems, getSectorDisplayInfo, hasAccessToSector } from '@/utils/sectorConfig';
 
-const navigationItems = [
-  {
-    name: 'Dashboard',
-    href: '/app/dashboard',
-    icon: LayoutDashboard,
-    color: 'from-blue-500 to-blue-600'
-  },
-  {
-    name: 'Candidates',
-    href: '/app/candidates',
-    icon: Users,
-    color: 'from-green-500 to-green-600'
-  },
-  {
-    name: 'Jobs',
-    href: '/app/jobs',
-    icon: Briefcase,
-    color: 'from-purple-500 to-purple-600'
-  },
-  {
-    name: 'Calendar',
-    href: '/app/calendar',
-    icon: Calendar,
-    color: 'from-pink-500 to-rose-600'
-  },
-  {
-    name: 'Tasks',
-    href: '/app/tasks',
-    icon: CheckSquare,
-    color: 'from-cyan-500 to-blue-600'
-  },
-  {
-    name: 'Clients',
-    href: '/app/companies',
-    icon: Building2,
-    color: 'from-orange-500 to-orange-600'
-  },
-  {
-    name: 'Analytics',
-    href: '/app/analytics',
-    icon: BarChart3,
-    color: 'from-indigo-500 to-indigo-600'
-  },
-  {
-    name: 'Automation',
-    href: '/app/automation',
-    icon: Zap,
-    color: 'from-yellow-500 to-orange-600'
-  },
-  {
-    name: 'Team',
-    href: '/app/team',
-    icon: UserCheck,
-    color: 'from-violet-500 to-violet-600'
-  },
-  {
-    name: 'Settings',
-    href: '/app/settings',
-    icon: Settings,
-    color: 'from-gray-500 to-gray-600'
-  },
-];
 
-const recruiterNavigationItems = [
-  {
-    name: 'Dashboard',
-    href: '/app/recruiter/dashboard',
-    icon: LayoutDashboard,
-    color: 'from-blue-500 to-blue-600'
-  },
-  {
-    name: 'Candidates',
-    href: '/app/recruiter/candidates',
-    icon: Users,
-    color: 'from-green-500 to-green-600'
-  },
-  {
-    name: 'Jobs',
-    href: '/app/recruiter/jobs',
-    icon: Briefcase,
-    color: 'from-purple-500 to-purple-600'
-  },
-  {
-    name: 'Calendar',
-    href: '/app/recruiter/calendar',
-    icon: Calendar,
-    color: 'from-pink-500 to-rose-600'
-  },
-  {
-    name: 'Analytics',
-    href: '/app/recruiter/analytics',
-    icon: BarChart3,
-    color: 'from-indigo-500 to-indigo-600'
-  },
-  {
-    name: 'Reports',
-    href: '/app/recruiter/reports',
-    icon: CheckSquare,
-    color: 'from-cyan-500 to-blue-600'
-  },
-  {
-    name: 'Settings',
-    href: '/app/settings',
-    icon: Settings,
-    color: 'from-gray-500 to-gray-600'
-  },
-];
 
 export default function CollapsibleSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -131,9 +16,10 @@ export default function CollapsibleSidebar() {
   const location = useLocation();
   const { user } = useAuth();
   
-  // Determine which navigation to show based on current route
+  // Get navigation items and sector info based on current route
+  const currentNavigationItems = getNavigationItems(location.pathname);
+  const sectorInfo = getSectorDisplayInfo(location.pathname);
   const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
-  const currentNavigationItems = isRecruiterSection ? recruiterNavigationItems : navigationItems;
 
   useEffect(() => {
     const checkMobile = () => {
@@ -227,7 +113,7 @@ export default function CollapsibleSidebar() {
           }`}>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">TalentHub</span>
             <div className="text-xs text-slate-500 whitespace-nowrap">
-              {isRecruiterSection ? 'Recruitment Suite' : 'Business CRM'}
+              {sectorInfo.displayName}
             </div>
           </div>
         </div>
@@ -246,10 +132,9 @@ export default function CollapsibleSidebar() {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
             
-            // Check if this is a recruiter route and user has access
+            // Check if user has access to this route
             const isRecruiterRoute = item.href.startsWith('/app/recruiter');
-            const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
-            const hasAccess = !isRecruiterRoute || hasRecruiterAccess;
+            const hasAccess = !isRecruiterRoute || hasAccessToSector(user, 'recruitment');
             
             // If no access, show disabled state
             if (!hasAccess) {

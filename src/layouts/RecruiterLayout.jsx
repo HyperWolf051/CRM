@@ -12,6 +12,10 @@ const recruiterPageTitles = {
   '/app/recruiter/candidates/add': 'Add Candidate',
   '/app/recruiter/jobs': 'Jobs & Requirements',
   '/app/recruiter/jobs/add': 'Post New Job',
+  '/app/recruiter/interviews': 'Interviews',
+  '/app/recruiter/interviews/schedule': 'Schedule Interview',
+  '/app/recruiter/offers': 'Job Offers',
+  '/app/recruiter/offers/create': 'Create Offer',
   '/app/recruiter/calendar': 'Interview Calendar',
   '/app/recruiter/analytics': 'Recruitment Analytics',
   '/app/recruiter/reports': 'Daily Reports',
@@ -38,6 +42,14 @@ export default function RecruiterLayout() {
       return 'Job Details';
     }
     
+    if (location.pathname.startsWith('/app/recruiter/interviews/') && location.pathname !== '/app/recruiter/interviews/schedule') {
+      return 'Interview Details';
+    }
+    
+    if (location.pathname.startsWith('/app/recruiter/offers/') && location.pathname !== '/app/recruiter/offers/create') {
+      return 'Offer Details';
+    }
+    
     // Default fallback
     return 'Recruitment Dashboard';
   };
@@ -57,6 +69,21 @@ export default function RecruiterLayout() {
     {
       keys: 'r+j',
       callback: () => navigate('/app/recruiter/jobs'),
+      options: { ignoreInputs: true }
+    },
+    {
+      keys: 'r+i',
+      callback: () => navigate('/app/recruiter/interviews'),
+      options: { ignoreInputs: true }
+    },
+    {
+      keys: 'r+o',
+      callback: () => navigate('/app/recruiter/offers'),
+      options: { ignoreInputs: true }
+    },
+    {
+      keys: 'r+k',
+      callback: () => navigate('/app/recruiter/calendar'),
       options: { ignoreInputs: true }
     },
     {
