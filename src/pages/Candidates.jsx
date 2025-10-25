@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X } from 'lucide-react';
+import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X, Filter } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 import { CandidateAPI } from '../services/api';
+import BulkActionsPanel from '../components/recruitment/BulkActionsPanel';
+import CSVService from '../services/csvService';
 
 const Candidates = () => {
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: 'all',
+    stage: 'all',
+    allocation: 'all'
+  });
 
   // Load candidates from API
   useEffect(() => {
@@ -128,6 +137,125 @@ const Candidates = () => {
     }
   };
 
+  // Handle CSV import
+  const handleCSVImport = async (processedData, fieldMapping, importType) => {
+    try {
+      const result = await CSVService.importCandidates(processedData, fieldMapping, importType);
+      
+      // Reload candidates list
+      await loadCandidates();
+      
+      // Show results
+      if (result.successful > 0) {
+        alert(`Successfully imported ${result.successful} candidates!`);
+      }
+      
+      if (result.failed > 0) {
+        console.error('Import errors:', result.errors);
+        alert(`${result.failed} candidates failed to import. Check console for details.`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('CSV import error:', error);
+      throw error;
+    }
+  };
+
+  // Handle CSV export
+  const handleCSVExport = async (exportConfig) => {
+    try {
+      const result = await CSVService.exportCandidates(candidates, exportConfig);
+      if (result.success) {
+        console.log(`Exported ${result.count} candidates`);
+      } else {
+        alert('Export failed: ' + result.message);
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      alert('Export failed: ' + error.message);
+    }
+  };
+
+  // Handle bulk edit
+  const handleBulkEdit = async (selectedIds, updates) => {
+    try {
+      setIsLoading(true);
+      
+      // Update each selected candidate
+      const updatePromises = selectedIds.map(id => 
+        CandidateAPI.update(id, updates)
+      );
+      
+      await Promise.all(updatePromises);
+      await loadCandidates();
+      setSelectedCandidates([]);
+      
+      alert(`Successfully updated ${selectedIds.length} candidates!`);
+    } catch (error) {
+      console.error('Bulk edit error:', error);
+      alert('Bulk edit failed: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async (selectedIds) => {
+    try {
+      setIsLoading(true);
+      
+      // Delete each selected candidate
+      const deletePromises = selectedIds.map(id => 
+        CandidateAPI.delete(id)
+      );
+      
+      await Promise.all(deletePromises);
+      await loadCandidates();
+      setSelectedCandidates([]);
+      
+      alert(`Successfully deleted ${selectedIds.length} candidates!`);
+    } catch (error) {
+      console.error('Bulk delete error:', error);
+      alert('Bulk delete failed: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle candidate selection
+  const handleCandidateSelect = (candidateId, isSelected) => {
+    setSelectedCandidates(prev => 
+      isSelected 
+        ? [...prev, candidateId]
+        : prev.filter(id => id !== candidateId)
+    );
+  };
+
+  // Handle select all
+  const handleSelectAll = (isSelected) => {
+    setSelectedCandidates(isSelected ? candidates.map(c => c.id) : []);
+  };
+
+  // Filter candidates
+  const filteredCandidates = candidates.filter(candidate => {
+    if (filters.status !== 'all' && candidate.overallStatus !== filters.status) return false;
+    if (filters.stage !== 'all' && candidate.currentStage !== filters.stage) return false;
+    if (filters.allocation !== 'all' && candidate.allocation !== filters.allocation) return false;
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        candidate.name?.toLowerCase().includes(query) ||
+        candidate.email?.toLowerCase().includes(query) ||
+        candidate.phone?.includes(query) ||
+        candidate.position?.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
+  });
+
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -156,7 +284,8 @@ const Candidates = () => {
       <div className="flex gap-6 px-6">
         {/* Sidebar */}
         <div className="w-80 flex-shrink-0">
-          <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6">
+          <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6 space-y-6">
+            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -167,13 +296,122 @@ const Candidates = () => {
                 className="w-full pl-10 pr-4 py-3 bg-slate-50/80 border border-slate-200/50 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300"
               />
             </div>
+
+            {/* Filters */}
+            <div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center justify-between w-full text-left font-medium text-gray-900 mb-3"
+              >
+                <span>Filters</span>
+                <Filter className="w-4 h-4" />
+              </button>
+              
+              {showFilters && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                      value={filters.status}
+                      onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="new">New</option>
+                      <option value="in-process">In Process</option>
+                      <option value="shortlisted">Shortlisted</option>
+                      <option value="interviewed">Interviewed</option>
+                      <option value="selected">Selected</option>
+                      <option value="placed">Placed</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Stage</label>
+                    <select
+                      value={filters.stage}
+                      onChange={(e) => setFilters(prev => ({ ...prev, stage: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All Stages</option>
+                      <option value="registration">Registration</option>
+                      <option value="resume-sharing">Resume Sharing</option>
+                      <option value="shortlisting">Shortlisting</option>
+                      <option value="lineup-feedback">Lineup & Feedback</option>
+                      <option value="selection">Selection</option>
+                      <option value="closure">Closure</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Allocation</label>
+                    <select
+                      value={filters.allocation}
+                      onChange={(e) => setFilters(prev => ({ ...prev, allocation: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All Allocations</option>
+                      <option value="Sheet-1">Sheet-1</option>
+                      <option value="Sheet-2">Sheet-2</option>
+                      <option value="Sheet-3">Sheet-3</option>
+                      <option value="Team Alpha">Team Alpha</option>
+                      <option value="Team Beta">Team Beta</option>
+                    </select>
+                  </div>
+
+                  <button
+                    onClick={() => setFilters({ status: 'all', stage: 'all', allocation: 'all' })}
+                    className="w-full text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-6">
+          {/* Bulk Actions Panel */}
+          <BulkActionsPanel
+            selectedItems={selectedCandidates}
+            onBulkEdit={handleBulkEdit}
+            onBulkDelete={handleBulkDelete}
+            onBulkExport={handleCSVExport}
+            onImport={handleCSVImport}
+            totalSelected={selectedCandidates.length}
+            data={candidates}
+            onClearSelection={() => setSelectedCandidates([])}
+          />
+
           <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6">
-            {candidates.length === 0 ? (
+            {/* Selection Controls */}
+            {filteredCandidates.length > 0 && (
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedCandidates.length === filteredCandidates.length && filteredCandidates.length > 0}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">Select All</span>
+                  </label>
+                  <span className="text-sm text-gray-500">
+                    {selectedCandidates.length} of {filteredCandidates.length} selected
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Showing {filteredCandidates.length} of {candidates.length} candidates
+                </div>
+              </div>
+            )}
+
+            {filteredCandidates.length === 0 ? (
               <EmptyState
                 icon={<Users className="w-16 h-16" />}
                 title="No candidates yet"
@@ -190,13 +428,21 @@ const Candidates = () => {
               />
             ) : (
               <div className="space-y-4">
-                {candidates.map((candidate) => (
+                {filteredCandidates.map((candidate) => (
                   <div key={candidate.id} className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                        <span className="text-xl font-bold text-white">
-                          {candidate.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </span>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedCandidates.includes(candidate.id)}
+                          onChange={(e) => handleCandidateSelect(candidate.id, e.target.checked)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                          <span className="text-xl font-bold text-white">
+                            {candidate.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </span>
+                        </div>
                       </div>
                       
                       <div className="flex-1 min-w-0">
@@ -204,6 +450,11 @@ const Candidates = () => {
                           <div>
                             <h3 className="text-xl font-bold text-slate-900">{candidate.name}</h3>
                             <p className="text-slate-600 font-medium">{candidate.position}</p>
+                            {candidate.allocation && (
+                              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
+                                {candidate.allocation}
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center space-x-2">
                             <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
