@@ -1,41 +1,43 @@
 import { Users, Briefcase, Calendar, TrendingUp, UserCheck, Clock } from 'lucide-react';
 import MetricCard from '@/components/recruitment/MetricCard';
 import PipelineChart from '@/components/recruitment/PipelineChart';
+import RecentCandidatesWidget from '@/components/recruitment/RecentCandidatesWidget';
+import UpcomingInterviewsWidget from '@/components/recruitment/UpcomingInterviewsWidget';
+import ActivityTimelineWidget from '@/components/recruitment/ActivityTimelineWidget';
 import { useRecruitmentMetrics, useRecruitmentPipeline, useRecentActivity } from '@/hooks/useRecruitment';
 
 export default function RecruiterDashboard() {
   const { metrics, loading: metricsLoading } = useRecruitmentMetrics();
   const { pipelineData, loading: pipelineLoading } = useRecruitmentPipeline();
-  const { recentCandidates, upcomingInterviews, loading: activityLoading } = useRecentActivity();
+  const { recentCandidates, upcomingInterviews, recentActivities, loading: activityLoading } = useRecentActivity();
 
-  const getStatusBadgeClass = (status) => {
-    const statusClasses = {
-      new: 'bg-blue-100 text-blue-800',
-      shortlisted: 'bg-purple-100 text-purple-800',
-      interviewed: 'bg-amber-100 text-amber-800',
-      selected: 'bg-cyan-100 text-cyan-800',
-      placed: 'bg-green-100 text-green-800',
-      rejected: 'bg-red-100 text-red-800'
-    };
-    return statusClasses[status] || statusClasses.new;
+  // Handler functions for widget actions
+  const handleViewCandidate = (candidateId) => {
+    console.log('View candidate:', candidateId);
+    // TODO: Navigate to candidate detail page or open modal
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
+  const handleScheduleInterview = (candidateId) => {
+    console.log('Schedule interview for candidate:', candidateId);
+    // TODO: Open interview scheduling modal
   };
 
-  const formatDateTime = (dateTimeString) => {
-    return new Date(dateTimeString).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+  const handleSendEmail = (candidateId) => {
+    console.log('Send email to candidate:', candidateId);
+    // TODO: Open email composition modal
   };
+
+  const handleJoinInterview = (interviewId) => {
+    console.log('Join interview:', interviewId);
+    // TODO: Open video call or redirect to meeting link
+  };
+
+  const handleRescheduleInterview = (interviewId) => {
+    console.log('Reschedule interview:', interviewId);
+    // TODO: Open reschedule modal
+  };
+
+
 
   return (
     <div className="space-y-6">
@@ -101,88 +103,37 @@ export default function RecruiterDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pipeline Chart - Takes 2 columns */}
         <div className="lg:col-span-2">
-          <PipelineChart data={pipelineData} />
+          <PipelineChart data={pipelineData} loading={pipelineLoading} />
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Activity Widgets */}
         <div className="space-y-6">
-          {/* Recent Candidates */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Candidates</h3>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                View All
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              {recentCandidates.map((candidate) => (
-                <div key={candidate.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-                    {candidate.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {candidate.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {candidate.position}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(candidate.status)}`}>
-                      {candidate.status}
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formatDate(candidate.appliedDate)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Recent Candidates Widget */}
+          <RecentCandidatesWidget
+            candidates={recentCandidates}
+            loading={activityLoading}
+            onViewCandidate={handleViewCandidate}
+            onScheduleInterview={handleScheduleInterview}
+            onSendEmail={handleSendEmail}
+          />
 
-          {/* Upcoming Interviews */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Upcoming Interviews</h3>
-              <Clock className="w-5 h-5 text-gray-400" />
-            </div>
-            
-            <div className="space-y-3">
-              {upcomingInterviews.map((interview) => (
-                <div key={interview.id} className="p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium text-gray-900">
-                      {interview.candidateName}
-                    </p>
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      interview.type === 'video' ? 'bg-blue-100 text-blue-800' :
-                      interview.type === 'phone' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {interview.type}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-2">{interview.position}</p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">
-                      {formatDateTime(interview.dateTime)}
-                    </p>
-                    <div className="flex space-x-2">
-                      <button className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors">
-                        Join
-                      </button>
-                      <button className="text-xs text-gray-600 hover:text-gray-800 transition-colors">
-                        Reschedule
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Upcoming Interviews Widget */}
+          <UpcomingInterviewsWidget
+            interviews={upcomingInterviews}
+            loading={activityLoading}
+            onJoinInterview={handleJoinInterview}
+            onRescheduleInterview={handleRescheduleInterview}
+          />
         </div>
+      </div>
+
+      {/* Activity Timeline - Full Width */}
+      <div className="mt-6">
+        <ActivityTimelineWidget
+          activities={recentActivities}
+          loading={activityLoading}
+          maxItems={6}
+        />
       </div>
 
       {/* Quick Actions */}

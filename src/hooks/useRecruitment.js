@@ -75,6 +75,73 @@ const mockRecruitmentData = {
       dateTime: '2024-01-16T14:30:00',
       type: 'phone',
       interviewer: 'Jane Smith'
+    },
+    {
+      id: '3',
+      candidateName: 'Priya Patel',
+      position: 'UI/UX Designer',
+      dateTime: '2024-01-17T09:00:00',
+      type: 'in-person',
+      interviewer: 'Mike Johnson'
+    }
+  ],
+  recentActivities: [
+    {
+      id: '1',
+      type: 'candidate-added',
+      title: 'New candidate added',
+      description: 'Tanishka Negi applied for Software Engineer position',
+      user: 'John Doe',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+      candidateId: '1',
+      jobId: '1'
+    },
+    {
+      id: '2',
+      type: 'interview-scheduled',
+      title: 'Interview scheduled',
+      description: 'Video interview with Rahul Sharma for Product Manager',
+      user: 'Jane Smith',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      candidateId: '2',
+      jobId: '2'
+    },
+    {
+      id: '3',
+      type: 'email-sent',
+      title: 'Email sent',
+      description: 'Follow-up email sent to Priya Patel',
+      user: 'Mike Johnson',
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+      candidateId: '3'
+    },
+    {
+      id: '4',
+      type: 'status-updated',
+      title: 'Status updated',
+      description: 'Sarah Johnson moved to Interview stage',
+      user: 'Lisa Chen',
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+      candidateId: '4'
+    },
+    {
+      id: '5',
+      type: 'note-added',
+      title: 'Note added',
+      description: 'Added interview feedback for Alex Wilson',
+      user: 'David Brown',
+      timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+      candidateId: '5'
+    },
+    {
+      id: '6',
+      type: 'offer-sent',
+      title: 'Offer sent',
+      description: 'Job offer sent to Maria Garcia for Senior Developer',
+      user: 'John Doe',
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      candidateId: '6',
+      jobId: '3'
     }
   ]
 };
@@ -133,6 +200,7 @@ export function useRecruitmentPipeline() {
 export function useRecentActivity() {
   const [recentCandidates, setRecentCandidates] = useState([]);
   const [upcomingInterviews, setUpcomingInterviews] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -144,6 +212,7 @@ export function useRecentActivity() {
         await new Promise(resolve => setTimeout(resolve, 200));
         setRecentCandidates(mockRecruitmentData.recentCandidates);
         setUpcomingInterviews(mockRecruitmentData.upcomingInterviews);
+        setRecentActivities(mockRecruitmentData.recentActivities);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -154,7 +223,7 @@ export function useRecentActivity() {
     fetchRecentActivity();
   }, []);
 
-  return { recentCandidates, upcomingInterviews, loading, error };
+  return { recentCandidates, upcomingInterviews, recentActivities, loading, error };
 }
 
 export function useCandidates(filters = {}) {
