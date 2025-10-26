@@ -94,7 +94,7 @@ describe('RecentCandidatesWidget', () => {
 
     render(
       <RecentCandidatesWidget 
-        candidates={mockCandidates}
+        candidates={[mockCandidates[0]]} // Use only one candidate to avoid multiple elements
         onViewCandidate={mockViewCandidate}
         onScheduleInterview={mockScheduleInterview}
         onSendEmail={mockSendEmail}

@@ -135,6 +135,7 @@ export default function ActivityTimelineWidget({
     }
   ];
 
+  // Only show mock activities if no activities provided and not loading
   const displayActivities = activities.length > 0 ? activities : (loading ? [] : mockActivities);
   const visibleActivities = showAll ? displayActivities : displayActivities.slice(0, maxItems);
 
@@ -169,12 +170,12 @@ export default function ActivityTimelineWidget({
         <Clock className="w-5 h-5 text-gray-400" />
       </div>
       
-      {displayActivities.length === 0 ? (
+      {activities.length === 0 && !loading ? (
         <div className="text-center py-8">
           <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 text-sm">No recent activity</p>
         </div>
-      ) : (
+      ) : displayActivities.length > 0 ? (
         <>
           <div className="space-y-4">
             {visibleActivities.map((activity, index) => {
@@ -241,7 +242,7 @@ export default function ActivityTimelineWidget({
             </div>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }
