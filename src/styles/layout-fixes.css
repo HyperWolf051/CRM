@@ -277,6 +277,27 @@ html, body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  
+  /* Metrics cards mobile optimization */
+  .metrics-grid-mobile {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .metric-card-mobile {
+    padding: 1rem;
+    min-height: 120px;
+  }
+  
+  .metric-card-mobile .metric-value {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .metric-card-mobile .metric-trend {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
 
 /* Enhanced tablet optimizations */
@@ -289,6 +310,17 @@ html, body {
   .tablet-touch {
     min-height: 48px;
     min-width: 48px;
+  }
+  
+  /* Metrics cards tablet optimization */
+  .metrics-grid-tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .metric-card-tablet {
+    padding: 1.25rem;
+    min-height: 140px;
   }
 }
 

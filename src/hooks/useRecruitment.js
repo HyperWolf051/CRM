@@ -14,6 +14,12 @@ const mockRecruitmentData = {
       jobs: { value: 8, direction: 'up', period: 'this week' },
       interviews: { value: 5, direction: 'down', period: 'this week' },
       offers: { value: 15, direction: 'up', period: 'this month' }
+    },
+    sparklineData: {
+      candidates: [1180, 1195, 1210, 1185, 1220, 1205, 1235, 1215, 1240, 1247],
+      jobs: [18, 20, 19, 21, 22, 20, 23, 21, 22, 23],
+      interviews: [12, 10, 15, 11, 9, 13, 8, 10, 9, 8],
+      offers: [3, 4, 2, 5, 4, 6, 3, 4, 5, 5]
     }
   },
   pipelineData: [
@@ -196,7 +202,8 @@ export function useJobs(filters = {}) {
           {
             id: '1',
             title: 'Software Engineer',
-            client: 'Tech Corp',
+            company: 'Tech Corp',
+            location: 'San Francisco, CA',
             status: 'hot-requirement',
             applicants: { total: 45, pipeline: {} },
             postedDate: new Date('2024-01-10')
@@ -204,10 +211,20 @@ export function useJobs(filters = {}) {
           {
             id: '2',
             title: 'Product Manager',
-            client: 'StartupXYZ',
+            company: 'StartupXYZ',
+            location: 'New York, NY',
             status: 'active',
             applicants: { total: 32, pipeline: {} },
             postedDate: new Date('2024-01-08')
+          },
+          {
+            id: '3',
+            title: 'UI/UX Designer',
+            company: 'Design Studio',
+            location: 'Remote',
+            status: 'active',
+            applicants: { total: 28, pipeline: {} },
+            postedDate: new Date('2024-01-12')
           }
         ];
         setJobs(mockJobs);
@@ -223,4 +240,88 @@ export function useJobs(filters = {}) {
   }, [filters]);
 
   return { jobs, loading, error, totalCount };
+}
+
+// Search functionality for candidates and jobs
+export function useRecruitment() {
+  const searchCandidatesAndJobs = async (query) => {
+    // Simulate API search
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    const allCandidates = [
+      ...mockRecruitmentData.recentCandidates,
+      {
+        id: '4',
+        name: 'Sarah Johnson',
+        position: 'Data Scientist',
+        status: 'new',
+        appliedDate: '2024-01-12',
+        rating: 4.3
+      },
+      {
+        id: '5',
+        name: 'Mike Chen',
+        position: 'DevOps Engineer',
+        status: 'interviewed',
+        appliedDate: '2024-01-11',
+        rating: 4.1
+      }
+    ];
+
+    const allJobs = [
+      {
+        id: '1',
+        title: 'Software Engineer',
+        company: 'Tech Corp',
+        location: 'San Francisco, CA'
+      },
+      {
+        id: '2',
+        title: 'Product Manager',
+        company: 'StartupXYZ',
+        location: 'New York, NY'
+      },
+      {
+        id: '3',
+        title: 'UI/UX Designer',
+        company: 'Design Studio',
+        location: 'Remote'
+      },
+      {
+        id: '4',
+        title: 'Data Scientist',
+        company: 'Analytics Inc',
+        location: 'Boston, MA'
+      }
+    ];
+
+    const queryLower = query.toLowerCase();
+    
+    const filteredCandidates = allCandidates.filter(candidate =>
+      candidate.name.toLowerCase().includes(queryLower) ||
+      candidate.position.toLowerCase().includes(queryLower)
+    );
+
+    const filteredJobs = allJobs.filter(job =>
+      job.title.toLowerCase().includes(queryLower) ||
+      job.company.toLowerCase().includes(queryLower) ||
+      job.location.toLowerCase().includes(queryLower)
+    );
+
+    return {
+      candidates: filteredCandidates.slice(0, 5), // Limit to 5 results
+      jobs: filteredJobs.slice(0, 5)
+    };
+  };
+
+  const getUpcomingInterviews = async () => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return mockRecruitmentData.upcomingInterviews;
+  };
+
+  return {
+    searchCandidatesAndJobs,
+    getUpcomingInterviews
+  };
 }

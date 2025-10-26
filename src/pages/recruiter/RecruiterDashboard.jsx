@@ -51,41 +51,49 @@ export default function RecruiterDashboard() {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 metrics-grid-mobile sm:metrics-grid-tablet">
         <MetricCard
           title="Total Candidates"
-          value={metricsLoading ? 0 : metrics?.totalCandidates || 0}
+          value={metrics?.totalCandidates || 0}
           trend={metrics?.trends?.candidates}
           icon={Users}
           color="blue"
-          sparklineData={[45, 52, 48, 61, 55, 67, 72, 68, 75, 82]}
+          sparklineData={metrics?.sparklineData?.candidates || []}
+          description="Active candidates in pipeline"
+          loading={metricsLoading}
         />
         
         <MetricCard
           title="Active Jobs"
-          value={metricsLoading ? 0 : metrics?.activeJobs || 0}
+          value={metrics?.activeJobs || 0}
           trend={metrics?.trends?.jobs}
           icon={Briefcase}
           color="green"
-          sparklineData={[18, 22, 19, 25, 23, 28, 26, 24, 27, 23]}
+          sparklineData={metrics?.sparklineData?.jobs || []}
+          description="Open positions to fill"
+          loading={metricsLoading}
         />
         
         <MetricCard
           title="Interviews Scheduled"
-          value={metricsLoading ? 0 : metrics?.interviewsScheduled || 0}
+          value={metrics?.interviewsScheduled || 0}
           trend={metrics?.trends?.interviews}
           icon={Calendar}
           color="amber"
-          sparklineData={[12, 15, 11, 18, 14, 16, 13, 10, 9, 8]}
+          sparklineData={metrics?.sparklineData?.interviews || []}
+          description="Upcoming interviews this week"
+          loading={metricsLoading}
         />
         
         <MetricCard
-          title="Placements Made"
-          value={metricsLoading ? 0 : metrics?.placementsMade || 0}
+          title="Offers Made"
+          value={metrics?.offersExtended || 0}
           trend={metrics?.trends?.offers}
           icon={UserCheck}
           color="purple"
-          sparklineData={[8, 12, 10, 15, 13, 17, 16, 14, 18, 18]}
+          sparklineData={metrics?.sparklineData?.offers || []}
+          description="Pending candidate offers"
+          loading={metricsLoading}
         />
       </div>
 
