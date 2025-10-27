@@ -9,3 +9,4 @@ export {
   useCandidates, 
   useJobs 
 } from './useRecruitment';
+export { useLastPageMemory } from './useLastPageMemory';

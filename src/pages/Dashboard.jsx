@@ -252,38 +252,7 @@ const Dashboard = () => {
       {/* Enhanced Header */}
       <EnhancedHeader />
 
-      {/* Role Information Banner */}
-      {user && user.dashboardType === 'crm' && (
-        <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div data-role-banner className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
-                <Star className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-semibold text-green-900">
-                  🏢 Company CRM Dashboard
-                </h3>
-                <p className="text-sm text-green-700 mt-1">
-                  You're accessing the company CRM system. This account is restricted to CRM features only.
-                  To access the Recruiter Dashboard, please use the agent account (demo@crm.com).
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  const banner = document.querySelector('[data-role-banner]');
-                  if (banner) banner.style.display = 'none';
-                }}
-                className="flex-shrink-0 text-green-500 hover:text-green-700 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Main Dashboard Content - Full Width with Optimized Spacing */}
       <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-none">
