@@ -1,11 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X, Filter } from 'lucide-react';
+import { Search, Plus, Mail, Phone, Eye, Edit, Trash2, Users, X, Filter, Grid3X3, List, MapPin, Calendar, Star, User } from 'lucide-react';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 import { CandidateAPI } from '../services/api';
 import BulkActionsPanel from '../components/recruitment/BulkActionsPanel';
 import CSVService from '../services/csvService';
+
+// Helper function to get stage display info
+const getStageInfo = (stage) => {
+  const stageMap = {
+    'registration': { label: 'Registration', color: 'bg-blue-100 text-blue-800', progress: 1 },
+    'resume-sharing': { label: 'Resume Sharing', color: 'bg-purple-100 text-purple-800', progress: 2 },
+    'shortlisting': { label: 'Shortlisting', color: 'bg-amber-100 text-amber-800', progress: 3 },
+    'lineup-feedback': { label: 'Lineup & Feedback', color: 'bg-cyan-100 text-cyan-800', progress: 4 },
+    'selection': { label: 'Selection', color: 'bg-green-100 text-green-800', progress: 5 },
+    'closure': { label: 'Closure', color: 'bg-emerald-100 text-emerald-800', progress: 6 },
+    'completed': { label: 'Completed', color: 'bg-gray-100 text-gray-800', progress: 7 }
+  };
+  return stageMap[stage] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800', progress: 0 };
+};
+
+// Helper function to get status display info
+const getStatusInfo = (status) => {
+  const statusMap = {
+    'new': { label: 'New', color: 'bg-blue-100 text-blue-800' },
+    'in-process': { label: 'In Process', color: 'bg-yellow-100 text-yellow-800' },
+    'shortlisted': { label: 'Shortlisted', color: 'bg-purple-100 text-purple-800' },
+    'interviewed': { label: 'Interviewed', color: 'bg-cyan-100 text-cyan-800' },
+    'selected': { label: 'Selected', color: 'bg-green-100 text-green-800' },
+    'placed': { label: 'Placed', color: 'bg-emerald-100 text-emerald-800' },
+    'rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800' }
+  };
+  return statusMap[status] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' };
+};
 
 const Candidates = () => {
   const navigate = useNavigate();
@@ -14,7 +42,10 @@ const Candidates = () => {
   const [error, setError] = useState(null);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
   const [filters, setFilters] = useState({
+    name: '',
+    phone: '',
     status: 'all',
     stage: 'all',
     allocation: 'all'
@@ -49,7 +80,7 @@ const Candidates = () => {
     }
   };
 
-  // Mock data as fallback
+  // Mock data as fallback with workflow stages
   const mockCandidates = [
     {
       id: 1,
@@ -59,7 +90,57 @@ const Candidates = () => {
       position: 'Senior React Developer',
       experience: '5 years',
       location: 'Bengaluru, Karnataka',
-      skills: ['React', 'TypeScript', 'Node.js', 'AWS']
+      skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
+      currentStage: 'shortlisting',
+      overallStatus: 'shortlisted',
+      allocation: 'Sheet-1',
+      createdByName: 'Rahul Kumar',
+      rating: 4.5,
+      appliedDate: '2024-01-15',
+      interestedFor: 'Senior React Developer',
+      totalExperience: '5 years',
+      lastSalary: '12L',
+      salaryExpectation: '18L'
+    },
+    {
+      id: 2,
+      name: 'Amit Patel',
+      email: 'amit.patel@gmail.com',
+      phone: '+91 87654 32109',
+      position: 'Full Stack Developer',
+      experience: '3 years',
+      location: 'Mumbai, Maharashtra',
+      skills: ['JavaScript', 'Python', 'Django', 'React'],
+      currentStage: 'lineup-feedback',
+      overallStatus: 'interviewed',
+      allocation: 'Sheet-2',
+      createdByName: 'Sneha Gupta',
+      rating: 4.2,
+      appliedDate: '2024-01-18',
+      interestedFor: 'Full Stack Developer',
+      totalExperience: '3 years',
+      lastSalary: '8L',
+      salaryExpectation: '12L'
+    },
+    {
+      id: 3,
+      name: 'Kavya Reddy',
+      email: 'kavya.reddy@gmail.com',
+      phone: '+91 76543 21098',
+      position: 'UI/UX Designer',
+      experience: '4 years',
+      location: 'Hyderabad, Telangana',
+      skills: ['Figma', 'Adobe XD', 'Sketch', 'Prototyping'],
+      currentStage: 'selection',
+      overallStatus: 'selected',
+      allocation: 'Team Alpha',
+      createdByName: 'Vikram Singh',
+      rating: 4.8,
+      appliedDate: '2024-01-12',
+      interestedFor: 'Senior UI/UX Designer',
+      totalExperience: '4 years',
+      lastSalary: '10L',
+      salaryExpectation: '15L'
     }
   ];
 
@@ -239,17 +320,30 @@ const Candidates = () => {
 
   // Filter candidates
   const filteredCandidates = candidates.filter(candidate => {
+    // Status filter
     if (filters.status !== 'all' && candidate.overallStatus !== filters.status) return false;
+    
+    // Stage filter
     if (filters.stage !== 'all' && candidate.currentStage !== filters.stage) return false;
+    
+    // Allocation filter
     if (filters.allocation !== 'all' && candidate.allocation !== filters.allocation) return false;
     
+    // Name filter
+    if (filters.name && !candidate.name?.toLowerCase().includes(filters.name.toLowerCase())) return false;
+    
+    // Phone filter
+    if (filters.phone && !candidate.phone?.includes(filters.phone)) return false;
+    
+    // Search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
         candidate.name?.toLowerCase().includes(query) ||
         candidate.email?.toLowerCase().includes(query) ||
         candidate.phone?.includes(query) ||
-        candidate.position?.toLowerCase().includes(query)
+        candidate.position?.toLowerCase().includes(query) ||
+        candidate.interestedFor?.toLowerCase().includes(query)
       );
     }
     
@@ -310,6 +404,28 @@ const Candidates = () => {
               {showFilters && (
                 <div className="space-y-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={filters.name}
+                      onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Filter by name..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <input
+                      type="text"
+                      value={filters.phone}
+                      onChange={(e) => setFilters(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="Filter by phone..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                     <select
                       value={filters.status}
@@ -356,13 +472,16 @@ const Candidates = () => {
                       <option value="Sheet-1">Sheet-1</option>
                       <option value="Sheet-2">Sheet-2</option>
                       <option value="Sheet-3">Sheet-3</option>
+                      <option value="Sheet-4">Sheet-4</option>
+                      <option value="Sheet-5">Sheet-5</option>
+                      <option value="Sheet-6">Sheet-6</option>
                       <option value="Team Alpha">Team Alpha</option>
                       <option value="Team Beta">Team Beta</option>
                     </select>
                   </div>
 
                   <button
-                    onClick={() => setFilters({ status: 'all', stage: 'all', allocation: 'all' })}
+                    onClick={() => setFilters({ name: '', phone: '', status: 'all', stage: 'all', allocation: 'all' })}
                     className="w-full text-sm text-blue-600 hover:text-blue-700 transition-colors"
                   >
                     Clear Filters
@@ -388,7 +507,7 @@ const Candidates = () => {
           />
 
           <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-2xl p-6">
-            {/* Selection Controls */}
+            {/* View Controls */}
             {filteredCandidates.length > 0 && (
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center space-x-4">
@@ -405,8 +524,37 @@ const Candidates = () => {
                     {selectedCandidates.length} of {filteredCandidates.length} selected
                   </span>
                 </div>
-                <div className="text-sm text-gray-500">
-                  Showing {filteredCandidates.length} of {candidates.length} candidates
+                
+                <div className="flex items-center space-x-4">
+                  <div className="text-sm text-gray-500">
+                    Showing {filteredCandidates.length} of {candidates.length} candidates
+                  </div>
+                  
+                  {/* View Toggle */}
+                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                        viewMode === 'list' 
+                          ? 'bg-white text-gray-900 shadow-sm' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <List className="w-4 h-4" />
+                      <span>List</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                        viewMode === 'grid' 
+                          ? 'bg-white text-gray-900 shadow-sm' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                      <span>Grid</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -414,89 +562,255 @@ const Candidates = () => {
             {filteredCandidates.length === 0 ? (
               <EmptyState
                 icon={<Users className="w-16 h-16" />}
-                title="No candidates yet"
-                description="Start building your talent pipeline by adding candidates to your database. You can import from LinkedIn, upload resumes, or add them manually."
+                title="No candidates found"
+                description="No candidates match your current filters. Try adjusting your search criteria or add new candidates to your database."
                 action={
                   <Button
                     variant="primary"
                     icon={<Plus className="w-4 h-4" />}
                     onClick={() => navigate('/app/candidates/add')}
                   >
-                    Add Your First Candidate
+                    Add New Candidate
                   </Button>
                 }
               />
-            ) : (
+            ) : viewMode === 'list' ? (
+              // List View
               <div className="space-y-4">
-                {filteredCandidates.map((candidate) => (
-                  <div key={candidate.id} className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="flex items-center space-x-3">
+                {filteredCandidates.map((candidate) => {
+                  const stageInfo = getStageInfo(candidate.currentStage);
+                  const statusInfo = getStatusInfo(candidate.overallStatus);
+                  
+                  return (
+                    <div key={candidate.id} className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-6 hover:shadow-2xl transition-shadow">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedCandidates.includes(candidate.id)}
+                            onChange={(e) => handleCandidateSelect(candidate.id, e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                            <span className="text-xl font-bold text-white">
+                              {candidate.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <h3 className="text-xl font-bold text-slate-900">{candidate.name}</h3>
+                                {candidate.rating && (
+                                  <div className="flex items-center space-x-1">
+                                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span className="text-sm text-gray-600">{candidate.rating}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <p className="text-slate-600 font-medium mb-1">{candidate.interestedFor || candidate.position}</p>
+                              
+                              <div className="flex items-center space-x-4 mb-3">
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
+                                  {statusInfo.label}
+                                </span>
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${stageInfo.color}`}>
+                                  {stageInfo.label}
+                                </span>
+                                {candidate.allocation && (
+                                  <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">
+                                    {candidate.allocation}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-slate-600">
+                                <div className="flex items-center space-x-2">
+                                  <Mail className="w-4 h-4" />
+                                  <span className="truncate">{candidate.email}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Phone className="w-4 h-4" />
+                                  <span>{candidate.phone}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <MapPin className="w-4 h-4" />
+                                  <span className="truncate">{candidate.location}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <User className="w-4 h-4" />
+                                  <span className="truncate">Added by {candidate.createdByName}</span>
+                                </div>
+                              </div>
+                              
+                              {candidate.skills && candidate.skills.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-1">
+                                  {candidate.skills.slice(0, 4).map((skill, index) => (
+                                    <span key={index} className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                  {candidate.skills.length > 4 && (
+                                    <span className="inline-block bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded">
+                                      +{candidate.skills.length - 4} more
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 ml-4">
+                              <button 
+                                title="View Profile"
+                                className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                                <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                              </button>
+                              <button 
+                                title="Schedule Interview"
+                                className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                                <Calendar className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                              </button>
+                              <button 
+                                title="Send Email"
+                                className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                                <Mail className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                              </button>
+                              <button 
+                                title="Delete Candidate"
+                                onClick={() => handleDeleteCandidate(candidate.id)}
+                                className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                                <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              // Grid View
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCandidates.map((candidate) => {
+                  const stageInfo = getStageInfo(candidate.currentStage);
+                  const statusInfo = getStatusInfo(candidate.overallStatus);
+                  
+                  return (
+                    <div key={candidate.id} className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl p-6 hover:shadow-2xl transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
                         <input
                           type="checkbox"
                           checked={selectedCandidates.includes(candidate.id)}
                           onChange={(e) => handleCandidateSelect(candidate.id, e.target.checked)}
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                          <span className="text-xl font-bold text-white">
+                        {candidate.rating && (
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm text-gray-600">{candidate.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="text-center mb-4">
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg mx-auto mb-3">
+                          <span className="text-2xl font-bold text-white">
                             {candidate.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                           </span>
                         </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">{candidate.name}</h3>
+                        <p className="text-slate-600 text-sm mb-2">{candidate.interestedFor || candidate.position}</p>
+                        
+                        <div className="flex flex-wrap justify-center gap-2 mb-3">
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
+                            {statusInfo.label}
+                          </span>
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${stageInfo.color}`}>
+                            {stageInfo.label}
+                          </span>
+                        </div>
+                        
+                        {candidate.allocation && (
+                          <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full mb-3">
+                            {candidate.allocation}
+                          </span>
+                        )}
                       </div>
                       
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="text-xl font-bold text-slate-900">{candidate.name}</h3>
-                            <p className="text-slate-600 font-medium">{candidate.position}</p>
-                            {candidate.allocation && (
-                              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
-                                {candidate.allocation}
+                      <div className="space-y-2 text-sm text-slate-600 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Mail className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{candidate.email}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Phone className="w-4 h-4 flex-shrink-0" />
+                          <span>{candidate.phone}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{candidate.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <User className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">Added by {candidate.createdByName}</span>
+                        </div>
+                      </div>
+                      
+                      {candidate.skills && candidate.skills.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex flex-wrap gap-1">
+                            {candidate.skills.slice(0, 3).map((skill, index) => (
+                              <span key={index} className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">
+                                {skill}
+                              </span>
+                            ))}
+                            {candidate.skills.length > 3 && (
+                              <span className="inline-block bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded">
+                                +{candidate.skills.length - 3}
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
-                                               overflow-hidden group hover:shadow-md">
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
-                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 
-                                              transform scale-0 group-hover:scale-100 
-                                              transition-transform duration-200 ease-out rounded-lg"></div>
-                            </button>
-                            <button className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
-                                               overflow-hidden group hover:shadow-md">
-                              <Edit className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
-                              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 
-                                              transform scale-0 group-hover:scale-100 
-                                              transition-transform duration-200 ease-out rounded-lg"></div>
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteCandidate(candidate.id)}
-                              className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 
-                                               overflow-hidden group hover:shadow-md">
-                              <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
-                              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 
-                                              transform scale-0 group-hover:scale-100 
-                                              transition-transform duration-200 ease-out rounded-lg"></div>
-                            </button>
-                          </div>
                         </div>
-                        
-                        <div className="mt-4 grid grid-cols-2 gap-4">
-                          <div className="flex items-center space-x-2 text-sm text-slate-600">
-                            <Mail className="w-4 h-4" />
-                            <span>{candidate.email}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm text-slate-600">
-                            <Phone className="w-4 h-4" />
-                            <span>{candidate.phone}</span>
-                          </div>
-                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center space-x-2 pt-4 border-t border-gray-100">
+                        <button 
+                          title="View Profile"
+                          className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                          <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                        </button>
+                        <button 
+                          title="Schedule Interview"
+                          className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                          <Calendar className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                        </button>
+                        <button 
+                          title="Send Email"
+                          className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                          <Mail className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                        </button>
+                        <button 
+                          title="Delete Candidate"
+                          onClick={() => handleDeleteCandidate(candidate.id)}
+                          className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
+                          <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform scale-0 group-hover:scale-100 transition-transform duration-200 ease-out rounded-lg"></div>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
