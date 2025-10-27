@@ -13,6 +13,11 @@ export const AuthProvider = ({ children }) => {
   const [lastVisitedPage, setLastVisitedPage] = useState(null);
   const [shouldRestoreLastPage, setShouldRestoreLastPage] = useState(false);
 
+  // Generate user-specific storage key for last page
+  const generateLastPageStorageKey = useCallback((userId) => {
+    return `lastVisitedPage_${userId}`;
+  }, []);
+
   // Load token from localStorage on mount
   useEffect(() => {
     const loadAuth = async () => {
@@ -352,11 +357,6 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setLastVisitedPage(null);
     setShouldRestoreLastPage(false);
-  }, []);
-
-  // Generate user-specific storage key for last page
-  const generateLastPageStorageKey = useCallback((userId) => {
-    return `lastVisitedPage_${userId}`;
   }, []);
 
   // Get stored last page for current user
