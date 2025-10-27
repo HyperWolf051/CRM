@@ -5,7 +5,7 @@
 import { useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import storageManager from '@/utils/storageManager';
-import { hasRoutePermission, getRedirectRoute, getDefaultDashboard } from '@/utils/routePermissions';
+import { hasRoutePermission, getRedirectRoute, getDefaultDashboard, validateRouteAccess } from '@/utils/routePermissions';
 
 const STORAGE_KEY_PREFIX = 'lastVisitedPage';
 
@@ -108,24 +108,8 @@ export const useLastPageMemory = () => {
       return null;
     }
 
-    // Check if user has permission to access the stored page
-    if (!hasRoutePermission(lastPage, currentUserRole)) {
-      // Clear invalid page and return appropriate redirect
-      clearLastPage();
-      return getRedirectRoute(lastPage, currentUserRole);
-    }
-
-    // Validate that the route still makes sense for the user's role
     const storedPageState = storageManager.get(generateStorageKey(user?.id));
     
-    if (storedPageState && storedPageState.userRole !== currentUserRole) {
-      // User's role has changed, validate if the page is still accessible
-      if (!hasRoutePermission(lastPage, currentUserRole)) {
-        clearLastPage();
-        return getDefaultDashboard(currentUserRole);
-      }
-    }
-
     // Check if the stored page is too old (older than 7 days)
     if (storedPageState) {
       const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
@@ -133,6 +117,45 @@ export const useLastPageMemory = () => {
         clearLastPage();
         return getDefaultDashboard(currentUserRole);
       }
+    }
+
+    // Use the enhanced validation function
+    const validation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+    
+    if (!validation.allowed) {
+      // Clear invalid page
+      clearLastPage();
+      
+      // Return appropriate redirect based on validation reason
+      switch (validation.reason) {
+        case 'role_mismatch':
+        case 'admin_required':
+        case 'insufficient_permissions':
+          return validation.redirectTo;
+        default:
+          return getDefaultDashboard(currentUserRole);
+      }
+    }
+
+    // Handle role changes - if user's role has changed since storing the page
+    if (storedPageState && storedPageState.userRole !== currentUserRole) {
+      // Re-validate with new role
+      const newRoleValidation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+      
+      if (!newRoleValidation.allowed) {
+        clearLastPage();
+        return getDefaultDashboard(currentUserRole);
+      }
+      
+      // Update stored page state with new role
+      const updatedPageState = {
+        ...storedPageState,
+        userRole: currentUserRole,
+        timestamp: Date.now() // Update timestamp to reflect role change
+      };
+      
+      const storageKey = generateStorageKey(user?.id);
+      storageManager.set(storageKey, updatedPageState);
     }
 
     return lastPage;
@@ -146,6 +169,44 @@ export const useLastPageMemory = () => {
   }, []);
 
   /**
+   * Handle role changes by validating and potentially clearing stored pages
+   */
+  const handleRoleChange = useCallback((newRole, oldRole) => {
+    if (!user || newRole === oldRole) {
+      return;
+    }
+
+    const lastPage = getLastPage();
+    
+    if (lastPage) {
+      const validation = validateRouteAccess(lastPage, newRole, user.id);
+      
+      if (!validation.allowed) {
+        // Clear incompatible stored page
+        clearLastPage();
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Cleared incompatible stored page "${lastPage}" due to role change from "${oldRole}" to "${newRole}"`);
+        }
+      } else {
+        // Update stored page state with new role
+        const storageKey = generateStorageKey(user.id);
+        const storedPageState = storageManager.get(storageKey);
+        
+        if (storedPageState) {
+          const updatedPageState = {
+            ...storedPageState,
+            userRole: newRole,
+            timestamp: Date.now()
+          };
+          
+          storageManager.set(storageKey, updatedPageState);
+        }
+      }
+    }
+  }, [user, getLastPage, clearLastPage]);
+
+  /**
    * Get storage information for debugging
    */
   const getStorageInfo = useCallback(() => {
@@ -157,6 +218,7 @@ export const useLastPageMemory = () => {
     getLastPage,
     clearLastPage,
     getRestorablePage,
+    handleRoleChange,
     isStorageAvailable,
     getStorageInfo
   };
