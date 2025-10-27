@@ -1,23 +1,17 @@
 import { useState } from 'react';
-import { Upload, Download, Trash2, Edit, Mail, Phone, X, CheckCircle } from 'lucide-react';
-import CSVImportModal from './CSVImportModal';
-import CSVExportModal from './CSVExportModal';
+import { useNavigate } from 'react-router-dom';
+import { Upload, Download, Trash2, Edit, X, CheckCircle } from 'lucide-react';
 
 export default function BulkActionsPanel({
   selectedItems = [],
   onBulkEdit,
   onBulkDelete,
-  onBulkExport,
-  onImport,
   totalSelected = 0,
-  data = [],
   onClearSelection,
   className = ''
 }) {
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
+  const navigate = useNavigate();
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
-  const [importType, setImportType] = useState('registration');
   const [bulkEditData, setBulkEditData] = useState({
     allocation: '',
     overallStatus: '',
@@ -25,29 +19,28 @@ export default function BulkActionsPanel({
     tags: ''
   });
 
-  // Handle CSV import
-  const handleImport = async (processedData, fieldMapping) => {
-    try {
-      if (onImport) {
-        const result = await onImport(processedData, fieldMapping, importType);
-        return result;
-      }
-      return { successful: processedData.length, failed: 0, errors: [] };
-    } catch (error) {
-      console.error('Import error:', error);
-      throw error;
+  // Handle navigation to import/export pages
+  const handleImportClick = () => {
+    // Check if we're in recruiter context
+    const currentPath = window.location.pathname;
+    const isRecruiterContext = currentPath.includes('/app/recruiter');
+    
+    if (isRecruiterContext) {
+      navigate('/app/recruiter/csv-import');
+    } else {
+      navigate('/app/csv-import');
     }
   };
 
-  // Handle CSV export
-  const handleExport = async (exportConfig) => {
-    try {
-      if (onBulkExport) {
-        await onBulkExport(exportConfig);
-      }
-    } catch (error) {
-      console.error('Export error:', error);
-      throw error;
+  const handleExportClick = () => {
+    // Check if we're in recruiter context
+    const currentPath = window.location.pathname;
+    const isRecruiterContext = currentPath.includes('/app/recruiter');
+    
+    if (isRecruiterContext) {
+      navigate('/app/recruiter/csv-export');
+    } else {
+      navigate('/app/csv-export');
     }
   };
 
@@ -94,7 +87,7 @@ export default function BulkActionsPanel({
     }
   };
 
-  if (totalSelected === 0 && !showImportModal && !showExportModal) {
+  if (totalSelected === 0) {
     return (
       <div className={`bg-white border border-gray-200 rounded-lg p-4 ${className}`}>
         <div className="flex items-center justify-between">
@@ -103,14 +96,14 @@ export default function BulkActionsPanel({
           </div>
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setShowImportModal(true)}
+              onClick={handleImportClick}
               className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Upload className="w-4 h-4" />
               <span>Import CSV</span>
             </button>
             <button
-              onClick={() => setShowExportModal(true)}
+              onClick={handleExportClick}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="w-4 h-4" />
@@ -152,7 +145,7 @@ export default function BulkActionsPanel({
             </button>
 
             <button
-              onClick={() => setShowExportModal(true)}
+              onClick={handleExportClick}
               className="flex items-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="w-4 h-4" />
@@ -170,7 +163,7 @@ export default function BulkActionsPanel({
             {/* Import/Export Actions */}
             <div className="border-l border-blue-300 pl-2 ml-2">
               <button
-                onClick={() => setShowImportModal(true)}
+                onClick={handleImportClick}
                 className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Upload className="w-4 h-4" />
@@ -181,24 +174,7 @@ export default function BulkActionsPanel({
         </div>
       </div>
 
-      {/* CSV Import Modal */}
-      <CSVImportModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImport={handleImport}
-        importType={importType}
-        title="Import Candidate Data"
-      />
 
-      {/* CSV Export Modal */}
-      <CSVExportModal
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        onExport={handleExport}
-        data={selectedItems.length > 0 ? data.filter(item => selectedItems.includes(item.id)) : data}
-        exportType="registration"
-        title="Export Candidate Data"
-      />
 
       {/* Bulk Edit Modal */}
       {showBulkEditModal && (

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { X, Download, FileText, Calendar, Filter, CheckCircle } from 'lucide-react';
+import { X, Download, FileText, Calendar, Filter, CheckCircle, Sparkles, Zap, BarChart3, Settings, ArrowRight } from 'lucide-react';
 import { CSV_FIELD_MAPPINGS } from '../../utils/csvMappings';
 
 export default function CSVExportModal({
@@ -237,79 +237,128 @@ export default function CSVExportModal({
   const filteredData = getFilteredData();
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-            <p className="text-gray-600 mt-1">
-              Export {exportType} data to CSV format
-            </p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-500 border border-gray-100">
+        {/* Enhanced Header */}
+        <div className="relative bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 p-6 text-white">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                <Download className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">{title}</h2>
+                <p className="text-green-100 mt-1 flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Export {exportType} data to CSV format</span>
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className="p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
           {!exportComplete ? (
-            <div className="space-y-6">
-              {/* Export Summary */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">{data.length}</div>
-                  <div className="text-sm text-blue-700">Total Records</div>
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Enhanced Export Summary */}
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 transform hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-blue-600 animate-in zoom-in duration-500">
+                      {data.length}
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium text-blue-700">Total Records</div>
+                  <div className="w-full bg-blue-200 rounded-full h-1 mt-2">
+                    <div className="bg-blue-600 h-1 rounded-full animate-in slide-in-from-left duration-1000 w-full"></div>
+                  </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">{filteredData.length}</div>
-                  <div className="text-sm text-green-700">Filtered Records</div>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 transform hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                      <Filter className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-green-600 animate-in zoom-in duration-500 delay-100">
+                      {filteredData.length}
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium text-green-700">Filtered Records</div>
+                  <div className="w-full bg-green-200 rounded-full h-1 mt-2">
+                    <div className="bg-green-600 h-1 rounded-full animate-in slide-in-from-left duration-1000 delay-200" 
+                         style={{width: `${data.length > 0 ? (filteredData.length / data.length) * 100 : 0}%`}}></div>
+                  </div>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-purple-600">{selectedFields.length}</div>
-                  <div className="text-sm text-purple-700">Selected Fields</div>
+                <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-6 border border-purple-100 transform hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                      <Settings className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-purple-600 animate-in zoom-in duration-500 delay-200">
+                      {selectedFields.length}
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium text-purple-700">Selected Fields</div>
+                  <div className="w-full bg-purple-200 rounded-full h-1 mt-2">
+                    <div className="bg-purple-600 h-1 rounded-full animate-in slide-in-from-left duration-1000 delay-300" 
+                         style={{width: `${availableFields.length > 0 ? (selectedFields.length / availableFields.length) * 100 : 0}%`}}></div>
+                  </div>
                 </div>
               </div>
 
-              {/* Filters */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Export Filters</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Date Range */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Date Range
+              {/* Enhanced Filters */}
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-6 border border-gray-100">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Filter className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Export Filters</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Enhanced Date Range */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                      <Calendar className="w-4 h-4" />
+                      <span>Date Range</span>
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <input
                         type="date"
                         value={dateRange.start}
                         onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                         placeholder="Start date"
                       />
                       <input
                         type="date"
                         value={dateRange.end}
                         onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                         placeholder="End date"
                       />
                     </div>
                   </div>
 
-                  {/* Status Filter */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status Filter
+                  {/* Enhanced Status Filter */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                      <Filter className="w-4 h-4" />
+                      <span>Status Filter</span>
                     </label>
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                     >
                       <option value="all">All Statuses</option>
                       <option value="new">New</option>
@@ -322,15 +371,16 @@ export default function CSVExportModal({
                     </select>
                   </div>
 
-                  {/* Export Format */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Export Format
+                  {/* Enhanced Export Format */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                      <Settings className="w-4 h-4" />
+                      <span>Export Format</span>
                     </label>
                     <select
                       value={exportFormat}
                       onChange={(e) => setExportFormat(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                     >
                       <option value="all">All Fields</option>
                       <option value="selected">Selected Fields Only</option>
@@ -340,26 +390,44 @@ export default function CSVExportModal({
                 </div>
               </div>
 
-              {/* Field Selection */}
+              {/* Enhanced Field Selection */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Select Fields to Export</h3>
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Select Fields to Export</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+                </div>
                 <div className="space-y-4">
                   {Object.entries(groupedFields).map(([category, fields]) => {
                     const allSelected = fields.every(field => selectedFields.includes(field.csvField));
                     const someSelected = fields.some(field => selectedFields.includes(field.csvField));
                     
                     return (
-                      <div key={category} className="border border-gray-200 rounded-lg">
-                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                      <div key={category} className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <div className="bg-gradient-to-r from-gray-50 to-blue-50/30 px-6 py-4 border-b border-gray-100">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-gray-900">{category}</h4>
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                                allSelected ? 'bg-blue-100' : someSelected ? 'bg-yellow-100' : 'bg-gray-100'
+                              }`}>
+                                <div className={`w-2 h-2 rounded-full ${
+                                  allSelected ? 'bg-blue-600' : someSelected ? 'bg-yellow-600' : 'bg-gray-400'
+                                }`}></div>
+                              </div>
+                              <h4 className="font-semibold text-gray-900">{category}</h4>
+                              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                {fields.filter(field => selectedFields.includes(field.csvField)).length}/{fields.length}
+                              </span>
+                            </div>
                             <button
                               onClick={() => handleCategoryToggle(category, fields)}
-                              className={`text-sm px-3 py-1 rounded transition-colors ${
+                              className={`text-sm px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                 allSelected
-                                  ? 'bg-blue-600 text-white'
+                                  ? 'bg-blue-600 text-white shadow-lg hover:bg-blue-700'
                                   : someSelected
-                                  ? 'bg-blue-100 text-blue-700'
+                                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
                                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                               }`}
                             >
@@ -367,17 +435,19 @@ export default function CSVExportModal({
                             </button>
                           </div>
                         </div>
-                        <div className="p-4">
-                          <div className="grid grid-cols-2 gap-3">
+                        <div className="p-6">
+                          <div className="grid grid-cols-2 gap-4">
                             {fields.map(field => (
-                              <label key={field.csvField} className="flex items-center space-x-2 cursor-pointer">
+                              <label key={field.csvField} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors duration-150">
                                 <input
                                   type="checkbox"
                                   checked={selectedFields.includes(field.csvField)}
                                   onChange={() => handleFieldToggle(field.csvField)}
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors duration-150"
                                 />
-                                <span className="text-sm text-gray-700">{field.displayName}</span>
+                                <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
+                                  {field.displayName}
+                                </span>
                               </label>
                             ))}
                           </div>
@@ -389,42 +459,77 @@ export default function CSVExportModal({
               </div>
             </div>
           ) : (
-            /* Export Complete */
-            <div className="text-center space-y-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+            /* Enhanced Export Complete */
+            <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="relative">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                  <CheckCircle className="w-12 h-12 text-white animate-in zoom-in duration-700" />
+                </div>
+                <div className="absolute inset-0 w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full mx-auto animate-ping opacity-20"></div>
+                <div className="absolute -top-2 -right-8 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce delay-300">
+                  <Sparkles className="w-3 h-3 text-yellow-800" />
+                </div>
               </div>
               
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-3">
                   Export Complete!
                 </h3>
-                <p className="text-gray-600">
-                  Your CSV file has been downloaded successfully.
+                <p className="text-gray-600 text-lg">
+                  Your CSV file has been downloaded successfully and is ready to use.
                 </p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-4 max-w-md mx-auto">
-                <div className="text-sm text-green-700">
-                  <div><strong>Records exported:</strong> {filteredData.length}</div>
-                  <div><strong>Fields included:</strong> {selectedFields.length}</div>
-                  <div><strong>File format:</strong> CSV</div>
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 max-w-md mx-auto border border-green-100">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between p-3 bg-white/60 backdrop-blur-sm rounded-xl">
+                    <span className="font-medium text-green-800">Records exported:</span>
+                    <span className="font-bold text-green-600">{filteredData.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white/60 backdrop-blur-sm rounded-xl">
+                    <span className="font-medium text-green-800">Fields included:</span>
+                    <span className="font-bold text-green-600">{selectedFields.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white/60 backdrop-blur-sm rounded-xl">
+                    <span className="font-medium text-green-800">File format:</span>
+                    <span className="font-bold text-green-600">CSV</span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+                <p className="text-blue-800 font-medium">
+                  📊 Your data export is complete and ready for analysis!
+                </p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
-            {!exportComplete && `${filteredData.length} records will be exported`}
+        {/* Enhanced Footer */}
+        <div className="flex items-center justify-between p-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-green-50/30">
+          <div className="flex items-center space-x-4">
+            {!exportComplete && (
+              <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-gray-200">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {filteredData.length} records ready
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {selectedFields.length} fields selected
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center space-x-3">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium rounded-xl hover:bg-white/50 transition-all duration-200"
             >
               {exportComplete ? 'Close' : 'Cancel'}
             </button>
@@ -433,10 +538,20 @@ export default function CSVExportModal({
               <button
                 onClick={handleExport}
                 disabled={isExporting || selectedFields.length === 0}
-                className="flex items-center space-x-2 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-2 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Download className="w-4 h-4" />
-                <span>{isExporting ? 'Exporting...' : 'Export CSV'}</span>
+                {isExporting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Exporting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    <span>Export CSV</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             )}
           </div>

@@ -13,6 +13,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadAuth = async () => {
       try {
+        // In development, clear auth data on hot reload to prevent auto-login
+        if (import.meta.env.DEV) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('isDemoMode');
+          setIsLoading(false);
+          return;
+        }
+        
         const storedToken = localStorage.getItem('authToken');
         const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
         
@@ -20,15 +28,41 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           
           if (isDemoMode) {
-            // Demo mode - use fake user data
-            const demoUser = {
-              id: 'demo-user',
-              name: 'Demo User',
-              email: 'demo@crm.com',
-              avatar: null,
-              role: 'user',
-              isDemo: true
-            };
+            // Demo mode - determine user based on stored token
+            let demoUser;
+            
+            if (storedToken.includes('admin')) {
+              demoUser = {
+                id: 'demo-user-admin',
+                name: 'Company Admin',
+                email: 'admin@crm.com',
+                avatar: null,
+                role: 'admin',
+                dashboardType: 'crm',
+                isDemo: true
+              };
+            } else if (storedToken.includes('recruiter')) {
+              demoUser = {
+                id: 'demo-user-recruiter',
+                name: 'Recruiter Agent',
+                email: 'demo@crm.com',
+                avatar: null,
+                role: 'recruiter',
+                dashboardType: 'recruiter',
+                isDemo: true
+              };
+            } else {
+              // Default to sales user
+              demoUser = {
+                id: 'demo-user-user',
+                name: 'Sales User',
+                email: 'sales@crm.com',
+                avatar: null,
+                role: 'user',
+                isDemo: true
+              };
+            }
+            
             setUser(demoUser);
             setIsAuthenticated(true);
           } else {

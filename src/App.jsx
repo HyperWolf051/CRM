@@ -31,6 +31,8 @@ const AutomationDashboard = lazy(() => import('@/pages/AutomationDashboard'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon'));
 const AnalyticsDashboard = lazy(() => import('@/pages/AnalyticsDashboard'));
+const CSVImport = lazy(() => import('@/pages/CSVImport'));
+const CSVExport = lazy(() => import('@/pages/CSVExport'));
 
 // Recruiter pages
 const RecruiterDashboard = lazy(() => import('@/pages/recruiter/RecruiterDashboard'));
@@ -106,6 +108,8 @@ function App() {
                   <Route path="automation" element={<AutomationDashboard />} />
                   <Route path="email-automation" element={<EmailAutomation />} />
                   <Route path="reminders" element={<ReminderSystem />} />
+                  <Route path="csv-import" element={<CSVImport />} />
+                  <Route path="csv-export" element={<CSVExport />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
@@ -126,6 +130,8 @@ function App() {
                   <Route path="calendar" element={<ComingSoon title="Calendar" description="Interview scheduling system" />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />
                   <Route path="reports" element={<ComingSoon title="Reports" description="Daily reporting system" />} />
+                  <Route path="csv-import" element={<CSVImport />} />
+                  <Route path="csv-export" element={<CSVExport />} />
                 </Route>
                 
                 {/* 404 Not Found */}
