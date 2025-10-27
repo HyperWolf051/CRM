@@ -34,6 +34,8 @@ const AnalyticsDashboard = lazy(() => import('@/pages/AnalyticsDashboard'));
 
 // Recruiter pages
 const RecruiterDashboard = lazy(() => import('@/pages/recruiter/RecruiterDashboard'));
+const RecruiterCandidates = lazy(() => import('@/pages/recruiter/RecruiterCandidates'));
+const RecruiterAddCandidate = lazy(() => import('@/pages/recruiter/RecruiterAddCandidate'));
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -116,7 +118,8 @@ function App() {
                 }>
                   <Route index element={<RecruiterDashboard />} />
                   <Route path="dashboard" element={<RecruiterDashboard />} />
-                  <Route path="candidates" element={<ComingSoon title="Candidates" description="Candidate management system" />} />
+                  <Route path="candidates" element={<RecruiterCandidates />} />
+                  <Route path="candidates/add" element={<RecruiterAddCandidate />} />
                   <Route path="jobs" element={<ComingSoon title="Jobs" description="Job posting and management" />} />
                   <Route path="interviews" element={<ComingSoon title="Interviews" description="Interview management system" />} />
                   <Route path="offers" element={<ComingSoon title="Offers" description="Job offer management system" />} />

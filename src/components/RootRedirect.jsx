@@ -1,20 +1,17 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 
 const RootRedirect = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { forceLogout } = useAuth();
 
-  // Show loading spinner while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
+  // Clear authentication data when accessing root path
+  useEffect(() => {
+    forceLogout();
+  }, [forceLogout]);
 
-  // Redirect based on authentication status
-  return <Navigate to={isAuthenticated ? "/app/dashboard" : "/login"} replace />;
+  // Always redirect to login page when accessing root path
+  return <Navigate to="/login" replace />;
 };
 
 export default RootRedirect;

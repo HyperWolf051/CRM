@@ -98,7 +98,9 @@ export default function RecentCandidatesWidget({
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">Recent Candidates</h3>
-        <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+        <button 
+          onClick={() => window.location.href = '/app/recruiter/candidates'}
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
           View All
         </button>
       </div>

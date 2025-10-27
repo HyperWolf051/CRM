@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -9,8 +9,24 @@ import Input from '@/components/ui/Input';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading, user } = useAuth();
   const { showToast } = useToast();
+
+  // Redirect to appropriate dashboard if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      // Determine redirect path based on user role and dashboard type
+      let redirectPath = '/app/dashboard'; // Default
+      
+      if (user.role === 'recruiter' || user.dashboardType === 'recruiter') {
+        redirectPath = '/app/recruiter/dashboard';
+      } else if (user.dashboardType === 'crm' || user.role === 'admin') {
+        redirectPath = '/app/dashboard';
+      }
+      
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -83,7 +99,10 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       if (result.success) {
         showToast('success', 'Login successful! Welcome back.');
-        navigate('/app/dashboard');
+        
+        // The useEffect will handle the redirect based on user role
+        // No need to manually navigate here as the user state will be updated
+        // and the useEffect will trigger the appropriate redirect
       } else {
         showToast('error', result.error);
       }

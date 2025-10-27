@@ -179,6 +179,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Force logout method - clears all data without API call
+  const forceLogout = useCallback(() => {
+    // Clear all localStorage data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('isDemoMode');
+    
+    // Clear state
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
+  }, []);
+
   // Update user method
   const updateUser = useCallback(async (userData) => {
     try {
@@ -200,6 +212,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    forceLogout,
     updateUser,
     loginAsDemo,
   };

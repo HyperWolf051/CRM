@@ -140,7 +140,9 @@ export default function RecruiterDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
+          <button 
+            onClick={() => window.location.href = '/app/recruiter/candidates/add'}
+            className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
             <Users className="w-5 h-5 text-blue-600" />
             <span className="text-sm font-medium text-gray-700">Add Candidate</span>
           </button>
