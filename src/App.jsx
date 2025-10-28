@@ -44,6 +44,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import CrmProtectedRoute from '@/components/CrmProtectedRoute';
 import RecruiterProtectedRoute from '@/components/RecruiterProtectedRoute';
 import RootRedirect from '@/components/RootRedirect';
+import RouteTracker from '@/components/RouteTracker';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import NetworkStatus from '@/components/NetworkStatus';
 import SkeletonLoader from '@/components/ui/SkeletonLoader';
@@ -68,6 +69,7 @@ function App() {
           <ToastProvider>
             <DemoModeIndicator />
             <NetworkStatus />
+            <RouteTracker />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Root redirect */}

@@ -3,7 +3,7 @@
  * and storing current page in last page memory system
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLastPageMemory } from '@/hooks/useLastPageMemory';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +12,7 @@ const RouteTracker = () => {
   const location = useLocation();
   const { setLastPage } = useLastPageMemory();
   const { user, isAuthenticated } = useAuth();
+  const previousPathRef = useRef(null);
 
   useEffect(() => {
     // Only track routes when user is authenticated
@@ -21,11 +22,36 @@ const RouteTracker = () => {
 
     const currentPath = location.pathname;
 
+    // Avoid duplicate tracking for the same path
+    if (previousPathRef.current === currentPath) {
+      return;
+    }
+
     // Only track valid application routes
     if (isValidApplicationRoute(currentPath)) {
-      setLastPage(currentPath);
+      try {
+        setLastPage(currentPath);
+        previousPathRef.current = currentPath;
+        
+        // Development mode logging
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[RouteTracker] Tracked page: ${currentPath}`);
+        }
+      } catch (error) {
+        // Handle any errors in page tracking gracefully
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[RouteTracker] Failed to track page:', currentPath, error);
+        }
+      }
     }
   }, [location.pathname, isAuthenticated, user, setLastPage]);
+
+  // Handle component unmount - ensure we don't leave stale references
+  useEffect(() => {
+    return () => {
+      previousPathRef.current = null;
+    };
+  }, []);
 
   // This component doesn't render anything
   return null;
@@ -49,10 +75,22 @@ const isValidApplicationRoute = (path) => {
   const excludedRoutes = [
     '/app/404',
     '/app/error',
-    '/app/loading'
+    '/app/loading',
+    '/app/not-found'
   ];
 
   if (excludedRoutes.some(excluded => path.startsWith(excluded))) {
+    return false;
+  }
+
+  // Don't track routes with suspicious patterns that might indicate errors
+  if (path.includes('undefined') || path.includes('null') || path.includes('//')) {
+    return false;
+  }
+
+  // Validate that the path doesn't contain invalid characters
+  const invalidChars = ['<', '>', '"', '\'', '&'];
+  if (invalidChars.some(char => path.includes(char))) {
     return false;
   }
 

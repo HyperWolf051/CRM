@@ -118,17 +118,63 @@ export const getRedirectRoute = (path, userRole) => {
  * Validate if a user can access a specific route with detailed checking
  */
 export const validateRouteAccess = (path, userRole, userId = null) => {
+  // Validate input parameters
+  if (!path || typeof path !== 'string') {
+    return {
+      allowed: false,
+      reason: 'invalid_path',
+      redirectTo: getDefaultDashboard(userRole || 'user')
+    };
+  }
+
+  if (!userRole || typeof userRole !== 'string') {
+    return {
+      allowed: false,
+      reason: 'invalid_role',
+      redirectTo: '/app/dashboard'
+    };
+  }
+
+  // Sanitize and validate path format
+  const sanitizedPath = sanitizePath(path);
+  if (!sanitizedPath) {
+    return {
+      allowed: false,
+      reason: 'malformed_path',
+      redirectTo: getDefaultDashboard(userRole)
+    };
+  }
+
+  // Check for invalid route parameters (e.g., /app/contacts/undefined)
+  if (hasInvalidParameters(sanitizedPath)) {
+    const basePath = getBasePath(sanitizedPath);
+    return {
+      allowed: false,
+      reason: 'invalid_parameters',
+      redirectTo: basePath || getDefaultDashboard(userRole)
+    };
+  }
+
+  // Check if route exists in our application
+  if (!isKnownRoute(sanitizedPath)) {
+    return {
+      allowed: false,
+      reason: 'route_not_found',
+      redirectTo: getDefaultDashboard(userRole)
+    };
+  }
+
   // Basic permission check
-  if (!hasRoutePermission(path, userRole)) {
+  if (!hasRoutePermission(sanitizedPath, userRole)) {
     return {
       allowed: false,
       reason: 'insufficient_permissions',
-      redirectTo: getRedirectRoute(path, userRole)
+      redirectTo: getRedirectRoute(sanitizedPath, userRole)
     };
   }
 
   // Check for role-specific route restrictions
-  if (path.startsWith('/app/recruiter/') && userRole !== 'recruiter') {
+  if (sanitizedPath.startsWith('/app/recruiter/') && userRole !== 'recruiter') {
     return {
       allowed: false,
       reason: 'role_mismatch',
@@ -138,7 +184,7 @@ export const validateRouteAccess = (path, userRole, userId = null) => {
 
   // Check for admin-only routes
   const adminOnlyRoutes = ['/app/team', '/app/settings', '/app/add-member'];
-  if (adminOnlyRoutes.some(route => path.startsWith(route)) && userRole !== 'admin') {
+  if (adminOnlyRoutes.some(route => sanitizedPath.startsWith(route)) && userRole !== 'admin') {
     return {
       allowed: false,
       reason: 'admin_required',
@@ -197,4 +243,164 @@ export const getAccessibleRoutes = (userRole) => {
       path: route.path,
       defaultRedirect: route.defaultRedirect
     }));
+};
+
+/**
+ * Sanitize path to prevent XSS and ensure valid format
+ */
+export const sanitizePath = (path) => {
+  if (!path || typeof path !== 'string') {
+    return null;
+  }
+
+  // Remove dangerous characters
+  const sanitized = path
+    .replace(/[<>'"&]/g, '') // Remove XSS-prone characters
+    .replace(/\/+/g, '/') // Replace multiple slashes with single slash
+    .replace(/\/$/, '') // Remove trailing slash (except for root)
+    .trim();
+
+  // Ensure path starts with /
+  if (!sanitized.startsWith('/')) {
+    return null;
+  }
+
+  // Validate path length (prevent extremely long URLs)
+  if (sanitized.length > 500) {
+    return null;
+  }
+
+  return sanitized || '/';
+};
+
+/**
+ * Check if path has invalid parameters like undefined, null, etc.
+ */
+export const hasInvalidParameters = (path) => {
+  const invalidParams = ['undefined', 'null', 'NaN', '[object Object]'];
+  return invalidParams.some(param => path.includes(param));
+};
+
+/**
+ * Get base path from a path with parameters
+ * e.g., /app/contacts/123 -> /app/contacts
+ */
+export const getBasePath = (path) => {
+  if (!path || !path.startsWith('/app/')) {
+    return null;
+  }
+
+  const segments = path.split('/').filter(Boolean);
+  
+  if (segments.length <= 2) {
+    return path; // Already a base path
+  }
+
+  // For paths like /app/contacts/123, return /app/contacts
+  // For paths like /app/recruiter/candidates/456, return /app/recruiter/candidates
+  if (segments[1] === 'recruiter' && segments.length > 3) {
+    return `/${segments.slice(0, 4).join('/')}`;
+  } else if (segments.length > 2) {
+    return `/${segments.slice(0, 3).join('/')}`;
+  }
+
+  return path;
+};
+
+/**
+ * Check if a route is known/defined in our application
+ */
+export const isKnownRoute = (path) => {
+  if (!path || !path.startsWith('/app/')) {
+    return false;
+  }
+
+  // Check exact matches first
+  const exactMatch = ROUTE_PERMISSIONS.some(route => 
+    route.path === path || (route.path.endsWith('/*') && path.startsWith(route.path.slice(0, -2)))
+  );
+
+  if (exactMatch) {
+    return true;
+  }
+
+  // Check known base routes
+  const knownBaseRoutes = [
+    '/app/dashboard',
+    '/app/contacts',
+    '/app/companies', 
+    '/app/candidates',
+    '/app/jobs',
+    '/app/calendar',
+    '/app/tasks',
+    '/app/analytics',
+    '/app/team',
+    '/app/settings',
+    '/app/profile',
+    '/app/automation',
+    '/app/email-automation',
+    '/app/reminders',
+    '/app/csv-import',
+    '/app/csv-export',
+    '/app/recruiter/dashboard',
+    '/app/recruiter/candidates',
+    '/app/recruiter/jobs',
+    '/app/recruiter/interviews',
+    '/app/recruiter/offers',
+    '/app/recruiter/calendar',
+    '/app/recruiter/analytics',
+    '/app/recruiter/reports',
+    '/app/recruiter/csv-import',
+    '/app/recruiter/csv-export'
+  ];
+
+  // Check if path starts with any known base route
+  return knownBaseRoutes.some(baseRoute => {
+    return path === baseRoute || path.startsWith(baseRoute + '/');
+  });
+};
+
+/**
+ * Handle route errors and provide appropriate fallbacks
+ */
+export const handleRouteError = (error, path, userRole) => {
+  const errorInfo = {
+    timestamp: Date.now(),
+    path,
+    userRole,
+    error: error.message || 'Unknown error'
+  };
+
+  // Log error for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.error('[RouteError]', errorInfo);
+  }
+
+  // Determine appropriate fallback based on error type
+  if (error.name === 'ChunkLoadError' || error.message?.includes('Loading chunk')) {
+    // Handle lazy loading errors - suggest page refresh
+    return {
+      type: 'chunk_load_error',
+      redirectTo: getDefaultDashboard(userRole),
+      message: 'Failed to load page resources. Please refresh the page.',
+      shouldRefresh: true
+    };
+  }
+
+  if (path && hasInvalidParameters(path)) {
+    // Handle invalid parameters
+    const basePath = getBasePath(path);
+    return {
+      type: 'invalid_parameters',
+      redirectTo: basePath || getDefaultDashboard(userRole),
+      message: 'Invalid page parameters detected.'
+    };
+  }
+
+  // Default error handling
+  return {
+    type: 'general_error',
+    redirectTo: getDefaultDashboard(userRole),
+    message: 'An error occurred while navigating. Redirecting to dashboard.'
+  };
 };

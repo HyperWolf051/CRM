@@ -342,30 +342,57 @@ describe('StorageManager', () => {
 
       // Clear previous calls
       mockLocalStorage.removeItem.mockClear();
+      mockLocalStorage.key.mockClear();
+      mockLocalStorage.getItem.mockClear();
       
-      mockLocalStorage.length = 1;
-      mockLocalStorage.key.mockReturnValue('lastVisitedPage_user123');
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(oldData));
+      // Create a more complete mock that behaves like real localStorage
+      const mockStorage = {
+        ...mockLocalStorage,
+        length: 1,
+        key: vi.fn((index) => {
+          if (index === 0) return 'lastVisitedPage_user123';
+          return null;
+        }),
+        getItem: vi.fn((key) => {
+          if (key === 'lastVisitedPage_user123') return JSON.stringify(oldData);
+          return null;
+        }),
+        removeItem: vi.fn()
+      };
+
+      // Replace the storage manager's primary storage with our mock
+      storageManager.primaryStorage = mockStorage;
 
       storageManager.clearOldEntries();
 
-      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('lastVisitedPage_user123');
+      expect(mockStorage.removeItem).toHaveBeenCalledWith('lastVisitedPage_user123');
     });
 
     it('should remove corrupted entries', () => {
       // Ensure storage is available
       expect(storageManager.isAvailable()).toBe(true);
 
-      // Clear previous calls
-      mockLocalStorage.removeItem.mockClear();
-      
-      mockLocalStorage.length = 1;
-      mockLocalStorage.key.mockReturnValue('lastVisitedPage_user123');
-      mockLocalStorage.getItem.mockReturnValue('corrupted json');
+      // Create a more complete mock that behaves like real localStorage
+      const mockStorage = {
+        ...mockLocalStorage,
+        length: 1,
+        key: vi.fn((index) => {
+          if (index === 0) return 'lastVisitedPage_user123';
+          return null;
+        }),
+        getItem: vi.fn((key) => {
+          if (key === 'lastVisitedPage_user123') return 'corrupted json';
+          return null;
+        }),
+        removeItem: vi.fn()
+      };
+
+      // Replace the storage manager's primary storage with our mock
+      storageManager.primaryStorage = mockStorage;
 
       storageManager.clearOldEntries();
 
-      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('lastVisitedPage_user123');
+      expect(mockStorage.removeItem).toHaveBeenCalledWith('lastVisitedPage_user123');
     });
 
     it('should handle errors during clearing gracefully', () => {

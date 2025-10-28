@@ -96,69 +96,93 @@ export const useLastPageMemory = () => {
    * Get restorable page with permission validation
    */
   const getRestorablePage = useCallback((userRole = null) => {
-    const currentUserRole = userRole || user?.role;
-    
-    if (!currentUserRole) {
-      return null;
-    }
-
-    const lastPage = getLastPage();
-    
-    if (!lastPage) {
-      return null;
-    }
-
-    const storedPageState = storageManager.get(generateStorageKey(user?.id));
-    
-    // Check if the stored page is too old (older than 7 days)
-    if (storedPageState) {
-      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-      if (storedPageState.timestamp < sevenDaysAgo) {
-        clearLastPage();
-        return getDefaultDashboard(currentUserRole);
-      }
-    }
-
-    // Use the enhanced validation function
-    const validation = validateRouteAccess(lastPage, currentUserRole, user?.id);
-    
-    if (!validation.allowed) {
-      // Clear invalid page
-      clearLastPage();
+    try {
+      const currentUserRole = userRole || user?.role;
       
-      // Return appropriate redirect based on validation reason
-      switch (validation.reason) {
-        case 'role_mismatch':
-        case 'admin_required':
-        case 'insufficient_permissions':
-          return validation.redirectTo;
-        default:
+      if (!currentUserRole) {
+        return null;
+      }
+
+      const lastPage = getLastPage();
+      
+      if (!lastPage) {
+        return null;
+      }
+
+      const storedPageState = storageManager.get(generateStorageKey(user?.id));
+      
+      // Check if the stored page is too old (older than 7 days)
+      if (storedPageState) {
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        if (storedPageState.timestamp < sevenDaysAgo) {
+          clearLastPage();
           return getDefaultDashboard(currentUserRole);
+        }
       }
-    }
 
-    // Handle role changes - if user's role has changed since storing the page
-    if (storedPageState && storedPageState.userRole !== currentUserRole) {
-      // Re-validate with new role
-      const newRoleValidation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+      // Use the enhanced validation function
+      const validation = validateRouteAccess(lastPage, currentUserRole, user?.id);
       
-      if (!newRoleValidation.allowed) {
+      if (!validation.allowed) {
+        // Clear invalid page
         clearLastPage();
-        return getDefaultDashboard(currentUserRole);
+        
+        // Return appropriate redirect based on validation reason
+        switch (validation.reason) {
+          case 'role_mismatch':
+          case 'admin_required':
+          case 'insufficient_permissions':
+          case 'invalid_parameters':
+          case 'route_not_found':
+          case 'malformed_path':
+            return validation.redirectTo;
+          default:
+            return getDefaultDashboard(currentUserRole);
+        }
+      }
+
+      // Handle role changes - if user's role has changed since storing the page
+      if (storedPageState && storedPageState.userRole !== currentUserRole) {
+        // Re-validate with new role
+        const newRoleValidation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+        
+        if (!newRoleValidation.allowed) {
+          clearLastPage();
+          return getDefaultDashboard(currentUserRole);
+        }
+        
+        // Update stored page state with new role
+        const updatedPageState = {
+          ...storedPageState,
+          userRole: currentUserRole,
+          timestamp: Date.now() // Update timestamp to reflect role change
+        };
+        
+        const storageKey = generateStorageKey(user?.id);
+        const updateSuccess = storageManager.set(storageKey, updatedPageState);
+        
+        if (!updateSuccess && process.env.NODE_ENV === 'development') {
+          console.warn('Failed to update stored page state with new role');
+        }
+      }
+
+      return lastPage;
+    } catch (error) {
+      // Handle any errors gracefully
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error in getRestorablePage:', error);
       }
       
-      // Update stored page state with new role
-      const updatedPageState = {
-        ...storedPageState,
-        userRole: currentUserRole,
-        timestamp: Date.now() // Update timestamp to reflect role change
-      };
+      // Clear potentially corrupted data
+      try {
+        clearLastPage();
+      } catch (clearError) {
+        // Ignore clear errors
+      }
       
-      const storageKey = generateStorageKey(user?.id);
-      storageManager.set(storageKey, updatedPageState);
+      // Return safe default
+      return getDefaultDashboard(userRole || user?.role || 'user');
     }
-
-    return lastPage;
   }, [user, getLastPage, clearLastPage]);
 
   /**
