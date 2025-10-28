@@ -1,4 +1,6 @@
-import { Users, Briefcase, Calendar, TrendingUp, UserCheck, Clock } from 'lucide-react';
+import { Users, Briefcase, Calendar, TrendingUp, UserCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import MetricCard from '@/components/recruitment/MetricCard';
 import PipelineChart from '@/components/recruitment/PipelineChart';
 import RecentCandidatesWidget from '@/components/recruitment/RecentCandidatesWidget';
@@ -7,34 +9,44 @@ import ActivityTimelineWidget from '@/components/recruitment/ActivityTimelineWid
 import { useRecruitmentMetrics, useRecruitmentPipeline, useRecentActivity } from '@/hooks/useRecruitment';
 
 export default function RecruiterDashboard() {
+  const navigate = useNavigate();
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [selectedInterview, setSelectedInterview] = useState(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  
   const { metrics, loading: metricsLoading } = useRecruitmentMetrics();
   const { pipelineData, loading: pipelineLoading } = useRecruitmentPipeline();
   const { recentCandidates, upcomingInterviews, recentActivities, loading: activityLoading } = useRecentActivity();
 
   // Handler functions for widget actions
   const handleViewCandidate = (candidateId) => {
-    console.log('View candidate:', candidateId);
-    // TODO: Navigate to candidate detail page or open modal
+    // Navigate to candidate detail page
+    navigate(`/app/recruiter/candidates/${candidateId}`);
   };
 
   const handleScheduleInterview = (candidateId) => {
-    console.log('Schedule interview for candidate:', candidateId);
-    // TODO: Open interview scheduling modal
+    // Open interview scheduling modal
+    setSelectedCandidate(candidateId);
+    setShowScheduleModal(true);
   };
 
   const handleSendEmail = (candidateId) => {
-    console.log('Send email to candidate:', candidateId);
-    // TODO: Open email composition modal
+    // Open email composition modal
+    setSelectedCandidate(candidateId);
+    setShowEmailModal(true);
   };
 
   const handleJoinInterview = (interviewId) => {
-    console.log('Join interview:', interviewId);
-    // TODO: Open video call or redirect to meeting link
+    // Open video call or redirect to meeting link
+    window.open(`/app/recruiter/interviews/${interviewId}/join`, '_blank');
   };
 
   const handleRescheduleInterview = (interviewId) => {
-    console.log('Reschedule interview:', interviewId);
-    // TODO: Open reschedule modal
+    // Open reschedule modal
+    setSelectedInterview(interviewId);
+    setShowRescheduleModal(true);
   };
 
 
