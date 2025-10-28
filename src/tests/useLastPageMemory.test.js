@@ -23,7 +23,13 @@ vi.mock('@/utils/routePermissions', () => ({
   hasRoutePermission: vi.fn(() => true),
   getRedirectRoute: vi.fn(() => '/app/dashboard'),
   getDefaultDashboard: vi.fn(() => '/app/dashboard'),
-  validateRouteAccess: vi.fn(() => ({ allowed: true, reason: null, redirectTo: null }))
+  validateRouteAccess: vi.fn(() => ({ allowed: true, reason: null, redirectTo: null })),
+  validateAndSanitizeRoute: vi.fn((path) => ({ 
+    isValid: true, 
+    sanitizedPath: path, 
+    error: null, 
+    fallbackPath: null 
+  }))
 }));
 
 // Mock storage manager
@@ -33,6 +39,16 @@ vi.mock('../utils/storageManager', () => ({
     get: vi.fn(() => null),
     remove: vi.fn(() => true),
     isAvailable: vi.fn(() => true)
+  }
+}));
+
+// Mock the monitor
+vi.mock('@/utils/lastPageMemoryMonitor', () => ({
+  default: {
+    logError: vi.fn(),
+    logSuccess: vi.fn(),
+    runDiagnostics: vi.fn(() => Promise.resolve({})),
+    getHealthStatus: vi.fn(() => ({ status: 'healthy' }))
   }
 }));
 
