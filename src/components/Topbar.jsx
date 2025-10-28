@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { Search, Command } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { Search } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import NotificationPanel from '@/components/NotificationPanel';
 import ProfileAvatar from '@/components/ProfileAvatar';
 
-export default function Topbar({ title = 'Dashboard' }) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+export default function Topbar() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 

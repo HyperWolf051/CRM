@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { AuthAPI } from '@/services/api';
 import storageManager from '@/utils/storageManager';
 import { hasRoutePermission, getDefaultDashboard } from '@/utils/routePermissions';
+import { devConsole } from '@/utils/console-wrapper';
 
 const AuthContext = createContext(null);
 
@@ -323,7 +324,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       // Continue with logout even if API call fails
-      console.error('Logout API call failed:', error);
+      devConsole.error('Logout API call failed:', error);
     } finally {
       // Clear token from localStorage
       localStorage.removeItem('authToken');
