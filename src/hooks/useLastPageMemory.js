@@ -5,7 +5,8 @@
 import { useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import storageManager from '@/utils/storageManager';
-import { hasRoutePermission, getRedirectRoute, getDefaultDashboard, validateRouteAccess } from '@/utils/routePermissions';
+import { hasRoutePermission, getRedirectRoute, getDefaultDashboard, validateRouteAccess, validateAndSanitizeRoute } from '@/utils/routePermissions';
+import lastPageMemoryMonitor from '@/utils/lastPageMemoryMonitor';
 
 const STORAGE_KEY_PREFIX = 'lastVisitedPage';
 
@@ -23,35 +24,135 @@ export const useLastPageMemory = () => {
   const { user } = useAuth();
 
   /**
-   * Store current page in storage
+   * Store current page in storage with comprehensive validation and error handling
    */
   const setLastPage = useCallback((path) => {
-    if (!user || !path) {
-      return;
-    }
-
-    // Don't store login page or other auth-related pages
-    if (path.includes('/login') || path.includes('/register') || path === '/') {
-      return;
-    }
-
-    // Don't store if path is not a valid app route
-    if (!path.startsWith('/app/')) {
-      return;
-    }
-
-    const lastPageState = {
+    const context = {
       path,
-      timestamp: Date.now(),
-      userRole: user.role,
-      userId: user.id
+      userId: user?.id,
+      userRole: user?.role,
+      operation: 'setLastPage'
     };
 
-    const storageKey = generateStorageKey(user.id);
-    const success = storageManager.set(storageKey, lastPageState);
+    try {
+      // Validate user context
+      if (!user || !user.id || !user.role) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Cannot store page - invalid user context:', { user: !!user, userId: user?.id, userRole: user?.role });
+        }
+        return false;
+      }
 
-    if (!success && process.env.NODE_ENV === 'development') {
-      console.warn('Failed to store last page:', path);
+      // Validate path parameter
+      if (!path || typeof path !== 'string') {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Cannot store page - invalid path:', path);
+        }
+        return false;
+      }
+
+      // Validate and sanitize the path
+      const routeValidation = validateAndSanitizeRoute(path, user.role);
+      if (!routeValidation.isValid) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Cannot store invalid route:', routeValidation.error);
+        }
+        return false;
+      }
+
+      const sanitizedPath = routeValidation.sanitizedPath;
+
+      // Don't store login page or other auth-related pages
+      if (sanitizedPath.includes('/login') || sanitizedPath.includes('/register') || sanitizedPath === '/') {
+        return false;
+      }
+
+      // Don't store if path is not a valid app route
+      if (!sanitizedPath.startsWith('/app/')) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Cannot store non-app route:', sanitizedPath);
+        }
+        return false;
+      }
+
+      // Don't store error or utility pages
+      const excludedPaths = ['/app/404', '/app/error', '/app/loading', '/app/not-found'];
+      if (excludedPaths.some(excluded => sanitizedPath.startsWith(excluded))) {
+        return false;
+      }
+
+      // Check if user has permission to access this route
+      if (!hasRoutePermission(sanitizedPath, user.role)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Cannot store route user lacks permission for:', sanitizedPath);
+        }
+        return false;
+      }
+
+      // Create page state object
+      const lastPageState = {
+        path: sanitizedPath,
+        timestamp: Date.now(),
+        userRole: user.role,
+        userId: user.id
+      };
+
+      // Validate the page state structure before storing
+      if (!isValidPageState(lastPageState)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Invalid page state structure:', lastPageState);
+        }
+        return false;
+      }
+
+      const storageKey = generateStorageKey(user.id);
+      let success;
+      
+      try {
+        success = storageManager.set(storageKey, lastPageState);
+      } catch (storageError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Storage error while setting last page:', storageError);
+        }
+        return false;
+      }
+
+      if (!success) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Failed to store last page:', sanitizedPath);
+        }
+        return false;
+      }
+
+      // Log successful tracking
+      lastPageMemoryMonitor.logSuccess('pageTracked', {
+        path: sanitizedPath,
+        userRole: user.role,
+        userId: user.id
+      });
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useLastPageMemory] Successfully stored last page:', sanitizedPath);
+      }
+
+      return true;
+    } catch (error) {
+      // Log error to monitor
+      lastPageMemoryMonitor.logError(error, {
+        ...context,
+        operation: 'setLastPage'
+      });
+
+      // Log comprehensive error information
+      if (process.env.NODE_ENV === 'development') {
+        console.group('[useLastPageMemory] Critical error in setLastPage');
+        console.error('Error:', error);
+        console.log('Context:', context);
+        console.log('Stack:', error.stack);
+        console.groupEnd();
+      }
+      
+      return false;
     }
   }, [user]);
 
@@ -93,37 +194,115 @@ export const useLastPageMemory = () => {
   }, [user]);
 
   /**
-   * Get restorable page with permission validation
+   * Get restorable page with comprehensive validation and error handling
    */
   const getRestorablePage = useCallback((userRole = null) => {
+    const context = {
+      userRole: userRole || user?.role,
+      userId: user?.id,
+      operation: 'getRestorablePage'
+    };
+
     try {
       const currentUserRole = userRole || user?.role;
       
       if (!currentUserRole) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] No user role available for page restoration');
+        }
         return null;
       }
 
-      const lastPage = getLastPage();
+      if (!user?.id) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] No user ID available for page restoration');
+        }
+        return getDefaultDashboard(currentUserRole);
+      }
+
+      let lastPage;
+      try {
+        lastPage = getLastPage();
+      } catch (getPageError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Error getting last page:', getPageError);
+        }
+        // Clear potentially corrupted data and return default
+        try {
+          clearLastPage();
+        } catch (clearError) {
+          // Ignore clear errors
+        }
+        return getDefaultDashboard(currentUserRole);
+      }
       
       if (!lastPage) {
         return null;
       }
 
-      const storedPageState = storageManager.get(generateStorageKey(user?.id));
+      let storedPageState;
+      try {
+        storedPageState = storageManager.get(generateStorageKey(user.id));
+      } catch (storageError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Storage error getting page state:', storageError);
+        }
+        // Clear corrupted storage and return default
+        try {
+          clearLastPage();
+        } catch (clearError) {
+          // Ignore clear errors
+        }
+        return getDefaultDashboard(currentUserRole);
+      }
       
+      // Validate stored page state structure
+      if (storedPageState && !isValidPageState(storedPageState)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useLastPageMemory] Invalid stored page state structure, clearing');
+        }
+        clearLastPage();
+        return getDefaultDashboard(currentUserRole);
+      }
+
       // Check if the stored page is too old (older than 7 days)
       if (storedPageState) {
         const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
         if (storedPageState.timestamp < sevenDaysAgo) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[useLastPageMemory] Stored page expired, clearing');
+          }
+          clearLastPage();
+          return getDefaultDashboard(currentUserRole);
+        }
+
+        // Check for future timestamps (potential tampering or clock issues)
+        if (storedPageState.timestamp > Date.now() + (5 * 60 * 1000)) { // 5 minutes tolerance
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[useLastPageMemory] Future timestamp detected, clearing stored page');
+          }
           clearLastPage();
           return getDefaultDashboard(currentUserRole);
         }
       }
 
-      // Use the enhanced validation function
-      const validation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+      // Validate and sanitize the route
+      let validation;
+      try {
+        validation = validateRouteAccess(lastPage, currentUserRole, user.id);
+      } catch (validationError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Route validation error:', validationError);
+        }
+        clearLastPage();
+        return getDefaultDashboard(currentUserRole);
+      }
       
       if (!validation.allowed) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[useLastPageMemory] Route access denied: ${validation.reason}, redirecting to: ${validation.redirectTo}`);
+        }
+        
         // Clear invalid page
         clearLastPage();
         
@@ -135,6 +314,8 @@ export const useLastPageMemory = () => {
           case 'invalid_parameters':
           case 'route_not_found':
           case 'malformed_path':
+          case 'invalid_path':
+          case 'invalid_role':
             return validation.redirectTo;
           default:
             return getDefaultDashboard(currentUserRole);
@@ -143,47 +324,107 @@ export const useLastPageMemory = () => {
 
       // Handle role changes - if user's role has changed since storing the page
       if (storedPageState && storedPageState.userRole !== currentUserRole) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[useLastPageMemory] User role changed from ${storedPageState.userRole} to ${currentUserRole}, re-validating`);
+        }
+
         // Re-validate with new role
-        const newRoleValidation = validateRouteAccess(lastPage, currentUserRole, user?.id);
+        let newRoleValidation;
+        try {
+          newRoleValidation = validateRouteAccess(lastPage, currentUserRole, user.id);
+        } catch (revalidationError) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[useLastPageMemory] Re-validation error:', revalidationError);
+          }
+          clearLastPage();
+          return getDefaultDashboard(currentUserRole);
+        }
         
         if (!newRoleValidation.allowed) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[useLastPageMemory] Page no longer accessible with new role, clearing`);
+          }
           clearLastPage();
           return getDefaultDashboard(currentUserRole);
         }
         
         // Update stored page state with new role
-        const updatedPageState = {
-          ...storedPageState,
-          userRole: currentUserRole,
-          timestamp: Date.now() // Update timestamp to reflect role change
-        };
-        
-        const storageKey = generateStorageKey(user?.id);
-        const updateSuccess = storageManager.set(storageKey, updatedPageState);
-        
-        if (!updateSuccess && process.env.NODE_ENV === 'development') {
-          console.warn('Failed to update stored page state with new role');
+        try {
+          const updatedPageState = {
+            ...storedPageState,
+            userRole: currentUserRole,
+            timestamp: Date.now() // Update timestamp to reflect role change
+          };
+          
+          const storageKey = generateStorageKey(user.id);
+          const updateSuccess = storageManager.set(storageKey, updatedPageState);
+          
+          if (!updateSuccess && process.env.NODE_ENV === 'development') {
+            console.warn('[useLastPageMemory] Failed to update stored page state with new role');
+          }
+        } catch (updateError) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[useLastPageMemory] Error updating page state with new role:', updateError);
+          }
+          // Continue anyway, the page is still valid
         }
       }
 
+      // Log successful restoration
+      lastPageMemoryMonitor.logSuccess('pageRestored', {
+        path: lastPage,
+        userRole: currentUserRole,
+        userId: user.id
+      });
+
       return lastPage;
     } catch (error) {
-      // Handle any errors gracefully
+      // Log error to monitor
+      lastPageMemoryMonitor.logError(error, {
+        ...context,
+        operation: 'getRestorablePage'
+      });
+
+      // Log comprehensive error information
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error in getRestorablePage:', error);
+        console.group('[useLastPageMemory] Critical error in getRestorablePage');
+        console.error('Error:', error);
+        console.log('Context:', context);
+        console.log('Stack:', error.stack);
+        console.groupEnd();
       }
       
       // Clear potentially corrupted data
       try {
         clearLastPage();
       } catch (clearError) {
-        // Ignore clear errors
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useLastPageMemory] Failed to clear corrupted data:', clearError);
+        }
       }
       
       // Return safe default
       return getDefaultDashboard(userRole || user?.role || 'user');
     }
   }, [user, getLastPage, clearLastPage]);
+
+  /**
+   * Validate page state structure
+   */
+  const isValidPageState = (pageState) => {
+    return (
+      pageState &&
+      typeof pageState === 'object' &&
+      typeof pageState.path === 'string' &&
+      typeof pageState.timestamp === 'number' &&
+      typeof pageState.userRole === 'string' &&
+      typeof pageState.userId === 'string' &&
+      pageState.path.length > 0 &&
+      pageState.timestamp > 0 &&
+      pageState.userRole.length > 0 &&
+      pageState.userId.length > 0
+    );
+  };
 
   /**
    * Check if storage is available
@@ -237,6 +478,33 @@ export const useLastPageMemory = () => {
     return storageManager.getStorageInfo();
   }, []);
 
+  /**
+   * Run comprehensive diagnostics
+   */
+  const runDiagnostics = useCallback(async () => {
+    if (!user) {
+      return { error: 'No user context available' };
+    }
+
+    try {
+      return await lastPageMemoryMonitor.runDiagnostics(user.id, user.role);
+    } catch (error) {
+      lastPageMemoryMonitor.logError(error, {
+        operation: 'runDiagnostics',
+        userId: user.id,
+        userRole: user.role
+      });
+      return { error: error.message };
+    }
+  }, [user]);
+
+  /**
+   * Get system health status
+   */
+  const getHealthStatus = useCallback(() => {
+    return lastPageMemoryMonitor.getHealthStatus();
+  }, []);
+
   return {
     setLastPage,
     getLastPage,
@@ -244,6 +512,8 @@ export const useLastPageMemory = () => {
     getRestorablePage,
     handleRoleChange,
     isStorageAvailable,
-    getStorageInfo
+    getStorageInfo,
+    runDiagnostics,
+    getHealthStatus
   };
 };

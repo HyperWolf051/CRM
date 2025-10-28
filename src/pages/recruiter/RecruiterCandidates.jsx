@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { CandidateAPI } from '@/services/api';
 import BulkActionsPanel from '@/components/recruitment/BulkActionsPanel';
 import CSVService from '@/services/csvService';
+import CandidateDetailModal from '@/components/recruitment/CandidateDetailModal';
 
 // Helper function to get stage display info
 const getStageInfo = (stage) => {
@@ -50,6 +51,8 @@ const RecruiterCandidates = () => {
     stage: 'all',
     allocation: 'all'
   });
+  const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+  const [showCandidateDetail, setShowCandidateDetail] = useState(false);
 
   // Load candidates from API
   useEffect(() => {
@@ -84,6 +87,7 @@ const RecruiterCandidates = () => {
   const mockCandidates = [
     {
       id: 1,
+      cvNo: 'CV001',
       name: 'Priya Sharma',
       email: 'priya.sharma@gmail.com',
       phone: '+91 98765 43210',
@@ -100,10 +104,76 @@ const RecruiterCandidates = () => {
       interestedFor: 'Senior React Developer',
       totalExperience: '5 years',
       lastSalary: '12L',
-      salaryExpectation: '18L'
+      salaryExpectation: '18L',
+      currentCompany: 'TechCorp Solutions',
+      designation: 'Senior Frontend Developer',
+      qualification: 'B.Tech Computer Science',
+      industry: 'Information Technology',
+      registration: {
+        date: new Date('2024-01-15'),
+        resource: 'Naukri',
+        registrationStatus: 'Yes'
+      },
+      resumeSharing: {
+        shortlistsForClient: 'Infosys',
+        resumeShareStatus: 'Done',
+        remark: 'Strong React skills'
+      },
+      shortlisting: {
+        shortlistDate: new Date('2024-01-18'),
+        shortlistsForClient: 'Infosys',
+        resource: 'Internal',
+        shortlistStatus: 'Done'
+      },
+      lineupFeedback: {
+        feedbacks: [
+          {
+            feedbackNumber: 1,
+            clientName: 'Infosys',
+            feedback: 'Selected',
+            scheduledDate: new Date('2024-01-20')
+          }
+        ],
+        lineupStatus: 'Done'
+      },
+      notes: [
+        {
+          id: '1',
+          content: 'Excellent technical skills, good communication',
+          createdBy: 'rahul-kumar',
+          createdByName: 'Rahul Kumar',
+          createdAt: new Date('2024-01-16'),
+          isPrivate: false
+        }
+      ],
+      documents: [
+        {
+          id: '1',
+          name: 'Priya_Sharma_Resume.pdf',
+          type: 'application/pdf',
+          size: 1024000,
+          uploadedAt: new Date('2024-01-15'),
+          uploadedBy: 'Rahul Kumar'
+        }
+      ],
+      changeHistory: [
+        {
+          id: '1',
+          candidateId: '1',
+          changedBy: 'rahul-kumar',
+          changedByName: 'Rahul Kumar',
+          changeType: 'created',
+          changes: [],
+          timestamp: new Date('2024-01-15'),
+          reason: 'Initial candidate registration'
+        }
+      ],
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-18')
     },
     {
       id: 2,
+      cvNo: 'CV002',
       name: 'Amit Patel',
       email: 'amit.patel@gmail.com',
       phone: '+91 87654 32109',
@@ -120,10 +190,40 @@ const RecruiterCandidates = () => {
       interestedFor: 'Full Stack Developer',
       totalExperience: '3 years',
       lastSalary: '8L',
-      salaryExpectation: '12L'
+      salaryExpectation: '12L',
+      currentCompany: 'WebTech Solutions',
+      designation: 'Software Developer',
+      qualification: 'MCA',
+      industry: 'Software Development',
+      registration: {
+        date: new Date('2024-01-18'),
+        resource: 'LinkedIn',
+        registrationStatus: 'Yes'
+      },
+      resumeSharing: {
+        shortlistsForClient: 'TCS',
+        resumeShareStatus: 'Done'
+      },
+      lineupFeedback: {
+        feedbacks: [
+          {
+            feedbackNumber: 1,
+            clientName: 'TCS',
+            feedback: 'Hold',
+            scheduledDate: new Date('2024-01-22')
+          }
+        ],
+        lineupStatus: 'Done'
+      },
+      notes: [],
+      documents: [],
+      changeHistory: [],
+      createdAt: new Date('2024-01-18'),
+      updatedAt: new Date('2024-01-22')
     },
     {
       id: 3,
+      cvNo: 'CV003',
       name: 'Kavya Reddy',
       email: 'kavya.reddy@gmail.com',
       phone: '+91 76543 21098',
@@ -140,10 +240,30 @@ const RecruiterCandidates = () => {
       interestedFor: 'Senior UI/UX Designer',
       totalExperience: '4 years',
       lastSalary: '10L',
-      salaryExpectation: '15L'
+      salaryExpectation: '15L',
+      currentCompany: 'Design Studio',
+      designation: 'UI/UX Designer',
+      qualification: 'B.Des Visual Communication',
+      industry: 'Design & Creative',
+      registration: {
+        date: new Date('2024-01-12'),
+        resource: 'Behance',
+        registrationStatus: 'Yes'
+      },
+      selection: {
+        client: 'Adobe',
+        selectionDate: new Date('2024-01-25'),
+        selectionStatus: 'Selected'
+      },
+      notes: [],
+      documents: [],
+      changeHistory: [],
+      createdAt: new Date('2024-01-12'),
+      updatedAt: new Date('2024-01-25')
     },
     {
       id: 4,
+      cvNo: 'CV004',
       name: 'Rohit Verma',
       email: 'rohit.verma@gmail.com',
       phone: '+91 65432 10987',
@@ -160,10 +280,29 @@ const RecruiterCandidates = () => {
       interestedFor: 'Senior DevOps Engineer',
       totalExperience: '6 years',
       lastSalary: '15L',
-      salaryExpectation: '22L'
+      salaryExpectation: '22L',
+      currentCompany: 'CloudTech Systems',
+      designation: 'DevOps Engineer',
+      qualification: 'B.Tech Information Technology',
+      industry: 'Cloud Computing',
+      registration: {
+        date: new Date('2024-01-20'),
+        resource: 'Indeed',
+        registrationStatus: 'Yes'
+      },
+      resumeSharing: {
+        shortlistsForClient: 'Amazon',
+        resumeShareStatus: 'Pending'
+      },
+      notes: [],
+      documents: [],
+      changeHistory: [],
+      createdAt: new Date('2024-01-20'),
+      updatedAt: new Date('2024-01-20')
     },
     {
       id: 5,
+      cvNo: 'CV005',
       name: 'Neha Agarwal',
       email: 'neha.agarwal@gmail.com',
       phone: '+91 54321 09876',
@@ -180,7 +319,37 @@ const RecruiterCandidates = () => {
       interestedFor: 'Senior Data Scientist',
       totalExperience: '4 years',
       lastSalary: '14L',
-      salaryExpectation: '20L'
+      salaryExpectation: '20L',
+      currentCompany: 'DataTech Analytics',
+      designation: 'Data Scientist',
+      qualification: 'M.Tech Data Science',
+      industry: 'Analytics & AI',
+      registration: {
+        date: new Date('2024-01-10'),
+        resource: 'Kaggle',
+        registrationStatus: 'Yes'
+      },
+      closure: {
+        joiningDate: new Date('2024-02-01'),
+        placedIn: 'Microsoft',
+        offeredSalary: '22L',
+        charges: '2.2L',
+        joiningStatus: 'Yes'
+      },
+      notes: [
+        {
+          id: '1',
+          content: 'Exceptional ML skills, placed successfully at Microsoft',
+          createdBy: 'rajesh-kumar',
+          createdByName: 'Rajesh Kumar',
+          createdAt: new Date('2024-01-28'),
+          isPrivate: false
+        }
+      ],
+      documents: [],
+      changeHistory: [],
+      createdAt: new Date('2024-01-10'),
+      updatedAt: new Date('2024-02-01')
     }
   ];
 
@@ -302,6 +471,29 @@ const RecruiterCandidates = () => {
   // Handle select all
   const handleSelectAll = (isSelected) => {
     setSelectedCandidates(isSelected ? candidates.map(c => c.id) : []);
+  };
+
+  // Handle view candidate
+  const handleViewCandidate = (candidateId) => {
+    setSelectedCandidateId(candidateId);
+    setShowCandidateDetail(true);
+  };
+
+  // Handle close candidate detail
+  const handleCloseCandidateDetail = () => {
+    setShowCandidateDetail(false);
+    setSelectedCandidateId(null);
+  };
+
+  // Handle candidate status update
+  const handleCandidateStatusUpdate = async (newStatus) => {
+    // Reload candidates to reflect changes
+    await loadCandidates();
+  };
+
+  // Handle add note
+  const handleAddNote = (note) => {
+    console.log('Note added:', note);
   };
 
   // Filter candidates
@@ -646,6 +838,7 @@ const RecruiterCandidates = () => {
                             
                             <div className="flex items-center space-x-2 ml-4">
                               <button 
+                                onClick={() => handleViewCandidate(candidate.id)}
                                 title="View Profile"
                                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                 <Eye className="w-4 h-4" />
@@ -761,6 +954,7 @@ const RecruiterCandidates = () => {
                       
                       <div className="flex items-center justify-center space-x-2 pt-4 border-t border-gray-200">
                         <button 
+                          onClick={() => handleViewCandidate(candidate.id)}
                           title="View Profile"
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye className="w-4 h-4" />
@@ -790,6 +984,16 @@ const RecruiterCandidates = () => {
           </div>
         </div>
       </div>
+
+      {/* Candidate Detail Modal */}
+      <CandidateDetailModal
+        isOpen={showCandidateDetail}
+        onClose={handleCloseCandidateDetail}
+        candidateId={selectedCandidateId}
+        onStatusUpdate={handleCandidateStatusUpdate}
+        onAddNote={handleAddNote}
+        currentUser={{ id: 'current-user', name: 'Current User' }}
+      />
     </div>
   );
 };

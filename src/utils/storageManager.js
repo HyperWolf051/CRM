@@ -54,47 +54,245 @@ class StorageManager {
   }
 
   /**
-   * Set data in storage with error handling
+   * Set data in storage with comprehensive error handling
    */
   set(key, value) {
     if (!this.isAvailable()) {
-      console.warn('No storage available for last page memory');
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[StorageManager] No storage available for last page memory');
+      }
+      return false;
+    }
+
+    // Validate input parameters
+    if (!key || typeof key !== 'string') {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[StorageManager] Invalid key provided:', key);
+      }
+      return false;
+    }
+
+    if (value === undefined) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[StorageManager] Undefined value provided for key:', key);
+      }
       return false;
     }
 
     try {
       const storage = this.getActiveStorage();
+      
+      // Validate data before serialization
+      if (!this.validateDataForStorage(value)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[StorageManager] Invalid data structure for storage:', value);
+        }
+        return false;
+      }
+
       const serializedValue = JSON.stringify(value);
+      
+      // Check if serialized value is too large (most browsers limit to ~5-10MB)
+      if (serializedValue.length > 5 * 1024 * 1024) { // 5MB limit
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[StorageManager] Data too large for storage:', serializedValue.length, 'bytes');
+        }
+        return false;
+      }
+
       storage.setItem(key, serializedValue);
       return true;
     } catch (error) {
-      // Handle quota exceeded or other storage errors
-      if (error.name === 'QuotaExceededError') {
-        console.warn('Storage quota exceeded, attempting to clear old entries');
+      return this.handleStorageError(error, 'set', key, value);
+    }
+  }
+
+  /**
+   * Handle storage errors with comprehensive fallback strategies
+   */
+  handleStorageError(error, operation, key, value = null) {
+    const errorInfo = {
+      operation,
+      key,
+      error: error.message,
+      errorName: error.name,
+      timestamp: Date.now()
+    };
+
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[StorageManager] Storage error:', errorInfo);
+    }
+
+    // Handle quota exceeded errors
+    if (error.name === 'QuotaExceededError') {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[StorageManager] Storage quota exceeded, attempting cleanup');
+      }
+
+      try {
+        // Clear old entries
         this.clearOldEntries();
         
-        // Retry once after clearing
-        try {
-          const storage = this.getActiveStorage();
-          const serializedValue = JSON.stringify(value);
-          storage.setItem(key, serializedValue);
-          return true;
-        } catch (retryError) {
-          console.error('Failed to store data after clearing old entries:', retryError);
-          return false;
+        // Try to clear some additional space by removing non-essential items
+        this.emergencyCleanup();
+
+        // Retry the operation once after clearing
+        if (operation === 'set' && key && value !== null) {
+          try {
+            const storage = this.getActiveStorage();
+            const serializedValue = JSON.stringify(value);
+            storage.setItem(key, serializedValue);
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[StorageManager] Successfully stored data after cleanup');
+            }
+            return true;
+          } catch (retryError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('[StorageManager] Failed to store data after cleanup:', retryError);
+            }
+            return false;
+          }
         }
+      } catch (cleanupError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[StorageManager] Cleanup failed:', cleanupError);
+        }
+        return false;
+      }
+    }
+
+    // Handle security errors (private browsing, etc.)
+    if (error.name === 'SecurityError') {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[StorageManager] Storage access denied due to security restrictions');
       }
       
-      console.error('Storage error:', error);
+      // Try fallback storage
+      if (this.primaryStorage && this.fallbackStorage) {
+        try {
+          if (operation === 'set' && key && value !== null) {
+            const serializedValue = JSON.stringify(value);
+            this.fallbackStorage.setItem(key, serializedValue);
+            return true;
+          }
+        } catch (fallbackError) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[StorageManager] Fallback storage also failed:', fallbackError);
+          }
+        }
+      }
+      return false;
+    }
+
+    // Handle data corruption or serialization errors
+    if (error.name === 'DataError' || error.message?.includes('serialize')) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[StorageManager] Data serialization error, attempting to clean corrupted data');
+      }
+      
+      // Remove potentially corrupted entry
+      if (operation === 'get' && key) {
+        try {
+          this.remove(key);
+        } catch (removeError) {
+          // Ignore removal errors
+        }
+      }
+      return false;
+    }
+
+    // Generic error handling
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[StorageManager] Unhandled storage error:', error);
+    }
+    return false;
+  }
+
+  /**
+   * Validate data structure before storage
+   */
+  validateDataForStorage(data) {
+    try {
+      // Check for circular references
+      JSON.stringify(data);
+      
+      // For last page state, validate specific structure
+      if (data && typeof data === 'object' && data.path) {
+        return this.validateLastPageState(data);
+      }
+      
+      // For other data types, basic validation
+      return data !== null && data !== undefined;
+    } catch (error) {
       return false;
     }
   }
 
   /**
-   * Get data from storage with validation and corruption recovery
+   * Emergency cleanup to free up storage space
+   */
+  emergencyCleanup() {
+    if (!this.isAvailable()) return;
+
+    try {
+      const storage = this.getActiveStorage();
+      const keysToRemove = [];
+      
+      // Remove any keys that look corrupted or invalid
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i);
+        if (key) {
+          try {
+            const value = storage.getItem(key);
+            if (!value || value === 'undefined' || value === 'null') {
+              keysToRemove.push(key);
+            } else {
+              // Try to parse the value
+              JSON.parse(value);
+            }
+          } catch (e) {
+            // If we can't parse it, it's corrupted
+            keysToRemove.push(key);
+          }
+        }
+      }
+
+      // Remove corrupted entries
+      keysToRemove.forEach(key => {
+        try {
+          storage.removeItem(key);
+        } catch (e) {
+          // Ignore individual removal errors
+        }
+      });
+
+      if (process.env.NODE_ENV === 'development' && keysToRemove.length > 0) {
+        console.log(`[StorageManager] Emergency cleanup removed ${keysToRemove.length} corrupted entries`);
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[StorageManager] Emergency cleanup failed:', error);
+      }
+    }
+  }
+
+  /**
+   * Get data from storage with comprehensive validation and corruption recovery
    */
   get(key) {
     if (!this.isAvailable()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[StorageManager] No storage available for retrieval');
+      }
+      return null;
+    }
+
+    // Validate input key
+    if (!key || typeof key !== 'string') {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[StorageManager] Invalid key provided for get operation:', key);
+      }
       return null;
     }
 
@@ -106,22 +304,90 @@ class StorageManager {
         return null;
       }
 
-      const parsedValue = JSON.parse(serializedValue);
-      
-      // Validate data structure
-      if (this.validateLastPageState(parsedValue)) {
-        return parsedValue;
-      } else {
-        console.warn('Invalid last page state data, removing corrupted entry');
+      // Check for obviously corrupted data
+      if (serializedValue === 'undefined' || serializedValue === 'null' || serializedValue.length === 0) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[StorageManager] Found corrupted data for key:', key);
+        }
         this.remove(key);
         return null;
       }
-    } catch (error) {
-      console.error('Error retrieving data from storage:', error);
-      // Remove corrupted data
-      this.remove(key);
+
+      let parsedValue;
+      try {
+        parsedValue = JSON.parse(serializedValue);
+      } catch (parseError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[StorageManager] JSON parse error for key:', key, parseError);
+        }
+        // Remove corrupted data
+        this.remove(key);
+        return null;
+      }
+
+      // Validate data structure based on key type
+      if (key.includes('lastVisitedPage')) {
+        if (this.validateLastPageState(parsedValue)) {
+          // Additional validation for expired data
+          if (this.isDataExpired(parsedValue)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[StorageManager] Removing expired data for key:', key);
+            }
+            this.remove(key);
+            return null;
+          }
+          return parsedValue;
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[StorageManager] Invalid last page state data structure, removing corrupted entry:', key);
+          }
+          this.remove(key);
+          return null;
+        }
+      }
+
+      // For other data types, basic validation
+      if (parsedValue !== null && parsedValue !== undefined) {
+        // If it looks like it should be a last page state but key doesn't match pattern,
+        // still validate it (for backward compatibility and test cases)
+        if (parsedValue && typeof parsedValue === 'object' && parsedValue.path) {
+          if (!this.validateLastPageState(parsedValue)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[StorageManager] Invalid data structure detected, removing corrupted entry:', key);
+            }
+            this.remove(key);
+            return null;
+          }
+        }
+        return parsedValue;
+      }
+
       return null;
+    } catch (error) {
+      return this.handleStorageError(error, 'get', key);
     }
+  }
+
+  /**
+   * Check if stored data has expired
+   */
+  isDataExpired(data, maxAgeMs = 7 * 24 * 60 * 60 * 1000) { // Default 7 days
+    if (!data || !data.timestamp || typeof data.timestamp !== 'number') {
+      return true; // Consider invalid timestamp as expired
+    }
+
+    const now = Date.now();
+    const age = now - data.timestamp;
+    
+    // Check for future timestamps (clock skew or tampering)
+    if (data.timestamp > now + (5 * 60 * 1000)) { // 5 minutes tolerance
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[StorageManager] Future timestamp detected, considering expired');
+      }
+      return true;
+    }
+
+    return age > maxAgeMs;
   }
 
   /**

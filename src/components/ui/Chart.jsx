@@ -888,11 +888,6 @@ const ChartContainer = memo(({
   const [currentChartType, setCurrentChartType] = useState(String(chartType));
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Ensure data is valid
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    return <div className="flex items-center justify-center h-64 text-gray-500">No data available</div>;
-  }
-
   // Sync with external chartType prop
   useEffect(() => {
     const newChartType = String(chartType);
@@ -900,6 +895,11 @@ const ChartContainer = memo(({
       setCurrentChartType(newChartType);
     }
   }, [chartType, currentChartType]);
+
+  // Ensure data is valid
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div className="flex items-center justify-center h-64 text-gray-500">No data available</div>;
+  }
 
   const handleChartTypeChange = (newType) => {
     const safeNewType = String(newType);

@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import PropTypes from 'prop-types';
 import Avatar from './ui/Avatar';
 import { formatCurrency } from '../utils/formatters';
+import { DealPropType } from '@/utils/propTypes';
 
 const STAGE_COLORS = {
   lead: 'border-l-gray-400',
@@ -16,9 +18,8 @@ const DealCard = memo(function DealCard({ deal, onClick, isDragging = false }) {
 
   return (
     <div
-      className={`bg-white rounded-lg border border-gray-200 border-l-4 ${stageColor} p-4 cursor-pointer hover:shadow-md transition-all duration-150 transform hover:scale-105 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-        isDragging ? 'shadow-lg rotate-2 scale-105' : ''
-      }`}
+      className={`bg-white rounded-lg border border-gray-200 border-l-4 ${stageColor} p-4 cursor-pointer hover:shadow-md transition-all duration-150 transform hover:scale-105 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${isDragging ? 'shadow-lg rotate-2 scale-105' : ''
+        }`}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -72,5 +73,11 @@ const DealCard = memo(function DealCard({ deal, onClick, isDragging = false }) {
     </div>
   );
 });
+
+DealCard.propTypes = {
+  deal: DealPropType.isRequired,
+  onClick: PropTypes.func,
+  isDragging: PropTypes.bool,
+};
 
 export default DealCard;

@@ -117,7 +117,7 @@ export default function CandidateCard({
               {showQuickActions && (
                 <div className="flex items-center space-x-2 ml-4">
                   <button 
-                    onClick={onView}
+                    onClick={() => onView(candidate.id)}
                     title="View Profile"
                     className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
                     <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
@@ -229,7 +229,7 @@ export default function CandidateCard({
       {showQuickActions && (
         <div className="flex items-center justify-center space-x-2 pt-4 border-t border-gray-100">
           <button 
-            onClick={onView}
+            onClick={() => onView(candidate.id)}
             title="View Profile"
             className="relative p-2 rounded-lg transition-all duration-200 hover:scale-110 overflow-hidden group hover:shadow-md">
             <Eye className="w-4 h-4 text-slate-400 group-hover:text-white relative z-10 transition-colors duration-200" />
