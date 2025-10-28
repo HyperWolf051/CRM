@@ -19,7 +19,6 @@ export default function CollapsibleSidebar() {
   // Get navigation items and sector info based on current route
   const currentNavigationItems = getNavigationItems(location.pathname);
   const sectorInfo = getSectorDisplayInfo(location.pathname);
-  const isRecruiterSection = location.pathname.startsWith('/app/recruiter');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -40,13 +39,13 @@ export default function CollapsibleSidebar() {
 
   const handleMouseEnter = () => {
     if (!isMobile) {
-      setTimeout(() => setIsExpanded(true), 50);
+      window.setTimeout(() => setIsExpanded(true), 50);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isMobile) {
-      setTimeout(() => setIsExpanded(false), 100);
+      window.setTimeout(() => setIsExpanded(false), 100);
     }
   };
 
@@ -64,6 +63,15 @@ export default function CollapsibleSidebar() {
           className="fixed inset-0 bg-black/50 lg:hidden"
           style={{ zIndex: 90 }}
           onClick={toggleMobileMenu}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleMobileMenu();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
         />
       )}
       

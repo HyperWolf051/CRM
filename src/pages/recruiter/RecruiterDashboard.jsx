@@ -1,6 +1,5 @@
 import { Users, Briefcase, Calendar, TrendingUp, UserCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import MetricCard from '@/components/recruitment/MetricCard';
 import PipelineChart from '@/components/recruitment/PipelineChart';
 import RecentCandidatesWidget from '@/components/recruitment/RecentCandidatesWidget';
@@ -10,12 +9,7 @@ import { useRecruitmentMetrics, useRecruitmentPipeline, useRecentActivity } from
 
 export default function RecruiterDashboard() {
   const navigate = useNavigate();
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [selectedInterview, setSelectedInterview] = useState(null);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
-  
+
   const { metrics, loading: metricsLoading } = useRecruitmentMetrics();
   const { pipelineData, loading: pipelineLoading } = useRecruitmentPipeline();
   const { recentCandidates, upcomingInterviews, recentActivities, loading: activityLoading } = useRecentActivity();
@@ -27,15 +21,13 @@ export default function RecruiterDashboard() {
   };
 
   const handleScheduleInterview = (candidateId) => {
-    // Open interview scheduling modal
-    setSelectedCandidate(candidateId);
-    setShowScheduleModal(true);
+    // Navigate to interview scheduling page
+    navigate(`/app/recruiter/interviews/schedule/${candidateId}`);
   };
 
   const handleSendEmail = (candidateId) => {
-    // Open email composition modal
-    setSelectedCandidate(candidateId);
-    setShowEmailModal(true);
+    // Navigate to email composition page
+    navigate(`/app/recruiter/candidates/${candidateId}/email`);
   };
 
   const handleJoinInterview = (interviewId) => {
@@ -44,9 +36,8 @@ export default function RecruiterDashboard() {
   };
 
   const handleRescheduleInterview = (interviewId) => {
-    // Open reschedule modal
-    setSelectedInterview(interviewId);
-    setShowRescheduleModal(true);
+    // Navigate to reschedule page
+    navigate(`/app/recruiter/interviews/${interviewId}/reschedule`);
   };
 
 
@@ -57,7 +48,7 @@ export default function RecruiterDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Recruitment Dashboard</h1>
-          <p className="text-gray-600">Welcome back! Here's your recruitment overview.</p>
+          <p className="text-gray-600">Welcome back! Here&apos;s your recruitment overview.</p>
         </div>
         <div className="text-sm text-gray-500">
           Last updated: {new Date().toLocaleTimeString()}
@@ -76,7 +67,7 @@ export default function RecruiterDashboard() {
           description="Active candidates in pipeline"
           loading={metricsLoading}
         />
-        
+
         <MetricCard
           title="Active Jobs"
           value={metrics?.activeJobs || 0}
@@ -87,7 +78,7 @@ export default function RecruiterDashboard() {
           description="Open positions to fill"
           loading={metricsLoading}
         />
-        
+
         <MetricCard
           title="Interviews Scheduled"
           value={metrics?.interviewsScheduled || 0}
@@ -98,7 +89,7 @@ export default function RecruiterDashboard() {
           description="Upcoming interviews this week"
           loading={metricsLoading}
         />
-        
+
         <MetricCard
           title="Offers Made"
           value={metrics?.offersExtended || 0}
@@ -152,7 +143,7 @@ export default function RecruiterDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button 
+          <button
             onClick={() => window.location.href = '/app/recruiter/candidates/add'}
             className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
             <Users className="w-5 h-5 text-blue-600" />

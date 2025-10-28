@@ -7,6 +7,21 @@ const RecruiterProtectedRoute = ({ children }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { showToast } = useToast();
 
+  // Check if user has access to recruiter dashboard
+  const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
+
+  // Use effect to show toast for restricted access
+  useEffect(() => {
+    if (!hasRecruiterAccess && isAuthenticated && !isLoading) {
+      showToast({
+        type: 'error',
+        title: 'Access Restricted',
+        message: 'You can only access the CRM Dashboard. Redirecting you now.',
+        duration: 4000
+      });
+    }
+  }, [hasRecruiterAccess, isAuthenticated, isLoading, showToast]);
+
   // Show loading while authentication is being checked
   if (isLoading) {
     return (
@@ -21,21 +36,8 @@ const RecruiterProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user has access to recruiter dashboard
-  const hasRecruiterAccess = user?.dashboardType === 'recruiter' || user?.email === 'sales@crm.com';
-
   // If user doesn't have recruiter access, redirect to CRM dashboard
   if (!hasRecruiterAccess) {
-    // Show toast notification
-    useEffect(() => {
-      showToast({
-        type: 'error',
-        title: 'Access Restricted',
-        message: 'You can only access the CRM Dashboard. Redirecting you now.',
-        duration: 4000
-      });
-    }, [showToast]);
-
     return <Navigate to="/app/dashboard" replace />;
   }
 

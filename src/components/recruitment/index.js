@@ -10,8 +10,4 @@ export { default as CandidateCard } from './CandidateCard';
 export { default as PipelineChart } from './PipelineChart';
 
 // Re-export MetricCard if it exists
-try {
-  export { default as MetricCard } from './MetricCard';
-} catch (e) {
-  // MetricCard might not exist yet
-}
+// export { default as MetricCard } from './MetricCard';
