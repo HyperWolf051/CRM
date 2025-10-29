@@ -8,8 +8,9 @@ import {
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { CandidateAPI } from '@/services/api';
+import { CandidateAPI, InterviewAPI } from '@/services/api';
 import { ProfileTab, ApplicationTab, DocumentsTab, NotesTab } from './CandidateDetailTabs';
+import WorkflowManagement from './WorkflowManagement';
 
 // Helper function to get stage display info
 const getStageInfo = (stage) => {
@@ -312,11 +313,44 @@ const CandidateDetailModal = ({
     }
   };
 
+  const handleCandidateUpdate = async (candidateId, updates) => {
+    try {
+      const result = await CandidateAPI.update(candidateId, updates);
+      
+      if (result.success) {
+        setCandidate(prev => ({ ...prev, ...updates }));
+        // Reload candidate to get updated data
+        await loadCandidate();
+      }
+    } catch (err) {
+      console.error('Error updating candidate:', err);
+    }
+  };
+
+  const handleInterviewSchedule = async (interviewData) => {
+    try {
+      const result = await InterviewAPI.create(interviewData);
+      
+      if (result.success) {
+        // Update candidate with interview scheduled change history
+        const updates = {
+          lastModifiedBy: currentUser?.id,
+          lastModifiedByName: currentUser?.name
+        };
+        
+        await handleCandidateUpdate(candidateId, updates);
+      }
+    } catch (err) {
+      console.error('Error scheduling interview:', err);
+    }
+  };
+
   if (!isOpen) return null;
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'application', label: 'Application', icon: Briefcase },
+    { id: 'workflow', label: 'Workflow', icon: Clock },
     { id: 'documents', label: 'Documents', icon: FileText },
     { id: 'notes', label: 'Notes', icon: MessageSquare }
   ];
@@ -452,6 +486,14 @@ const CandidateDetailModal = ({
             )}
             {activeTab === 'application' && (
               <ApplicationTab candidate={candidate} />
+            )}
+            {activeTab === 'workflow' && (
+              <WorkflowManagement
+                candidate={candidate}
+                onCandidateUpdate={handleCandidateUpdate}
+                onInterviewSchedule={handleInterviewSchedule}
+                currentUser={currentUser}
+              />
             )}
             {activeTab === 'documents' && (
               <DocumentsTab 

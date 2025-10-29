@@ -363,6 +363,87 @@ export const CandidateAPI = {
   }
 };
 
+// Interview API
+export const InterviewAPI = {
+  // Get all interviews
+  getAll: async () => {
+    try {
+      const response = await api.get('/interviews');
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get interview by ID
+  getById: async (id) => {
+    try {
+      const response = await api.get(`/interviews/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Create new interview
+  create: async (data) => {
+    try {
+      const response = await api.post('/interviews', data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Update interview
+  update: async (id, data) => {
+    try {
+      const response = await api.put(`/interviews/${id}`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Delete interview
+  delete: async (id) => {
+    try {
+      const response = await api.delete(`/interviews/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get interviews by candidate ID
+  getByCandidateId: async (candidateId) => {
+    try {
+      const response = await api.get(`/interviews/candidate/${candidateId}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
 // Authentication API
 export const AuthAPI = {
   // Login with email and password

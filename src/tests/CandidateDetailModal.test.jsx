@@ -8,6 +8,9 @@ vi.mock('@/services/api', () => ({
   CandidateAPI: {
     getById: vi.fn(),
     update: vi.fn()
+  },
+  InterviewAPI: {
+    create: vi.fn()
   }
 }));
 
@@ -17,6 +20,11 @@ vi.mock('@/components/recruitment/CandidateDetailTabs', () => ({
   ApplicationTab: ({ candidate }) => <div data-testid="application-tab">Application: {candidate?.name}</div>,
   DocumentsTab: ({ candidate }) => <div data-testid="documents-tab">Documents: {candidate?.name}</div>,
   NotesTab: ({ candidate }) => <div data-testid="notes-tab">Notes: {candidate?.name}</div>
+}));
+
+// Mock the WorkflowManagement component
+vi.mock('@/components/recruitment/WorkflowManagement', () => ({
+  default: ({ candidate }) => <div data-testid="workflow-tab">Workflow: {candidate?.name}</div>
 }));
 
 const mockCandidate = {
@@ -93,6 +101,10 @@ describe('CandidateDetailModal', () => {
     // Click on Application tab
     fireEvent.click(screen.getByText('Application'));
     expect(screen.getByTestId('application-tab')).toBeInTheDocument();
+
+    // Click on Workflow tab
+    fireEvent.click(screen.getByText('Workflow'));
+    expect(screen.getByTestId('workflow-tab')).toBeInTheDocument();
 
     // Click on Documents tab
     fireEvent.click(screen.getByText('Documents'));
