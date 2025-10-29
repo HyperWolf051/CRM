@@ -22,6 +22,7 @@ const AddJob = () => {
   const [formData, setFormData] = useState({
     title: '',
     company: '',
+    client: '',
     department: '',
     location: '',
     type: 'Full-time',
@@ -34,7 +35,9 @@ const AddJob = () => {
     benefits: '',
     deadline: '',
     remote: false,
-    urgent: false
+    urgent: false,
+    priority: 'medium',
+    status: 'active'
   });
 
   const [errors, setErrors] = useState({});
@@ -58,7 +61,7 @@ const AddJob = () => {
     const newErrors = {};
 
     if (!formData.title.trim()) newErrors.title = 'Job title is required';
-    if (!formData.company.trim()) newErrors.company = 'Company name is required';
+    if (!formData.client.trim()) newErrors.client = 'Client name is required';
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.description.trim()) newErrors.description = 'Job description is required';
     if (!formData.requirements.trim()) newErrors.requirements = 'Requirements are required';
@@ -96,6 +99,8 @@ const AddJob = () => {
   const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
   const experienceLevels = ['Entry-level', 'Mid-level', 'Senior-level', 'Executive'];
   const currencies = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD'];
+  const priorities = ['low', 'medium', 'high', 'urgent'];
+  const jobStatuses = ['active', 'hot-requirement', 'paused'];
 
   try {
     return (
@@ -190,21 +195,21 @@ const AddJob = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company *
+                      Client Name *
                     </label>
                     <input
                       type="text"
-                      value={formData.company}
-                      onChange={(e) => handleInputChange('company', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors duration-150 ${errors.company ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+                      value={formData.client}
+                      onChange={(e) => handleInputChange('client', e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors duration-150 ${errors.client ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                         }`}
-                      placeholder="Company name"
-                      aria-describedby={errors.company ? 'company-error' : undefined}
+                      placeholder="Client company name"
+                      aria-describedby={errors.client ? 'client-error' : undefined}
                     />
-                    {errors.company && (
-                      <p id="company-error" className="text-red-600 text-xs mt-1 flex items-center space-x-1">
+                    {errors.client && (
+                      <p id="client-error" className="text-red-600 text-xs mt-1 flex items-center space-x-1">
                         <AlertCircle className="w-3 h-3" />
-                        <span>{errors.company}</span>
+                        <span>{errors.client}</span>
                       </p>
                     )}
                   </div>
@@ -218,7 +223,7 @@ const AddJob = () => {
                       value={formData.department}
                       onChange={(e) => handleInputChange('department', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors duration-150"
-                      placeholder="e.g., Engineering, Marketing"
+                      placeholder="e.g., Engineering, Marketing, Sales"
                     />
                   </div>
 
@@ -316,30 +321,74 @@ const AddJob = () => {
                     />
                   </div>
 
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        id="remote"
-                        checked={formData.remote}
-                        onChange={(e) => handleInputChange('remote', e.target.checked)}
-                        className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500 focus:ring-1"
-                      />
-                      <label htmlFor="remote" className="text-sm text-gray-700">
-                        Remote work available
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        id="urgent"
-                        checked={formData.urgent}
-                        onChange={(e) => handleInputChange('urgent', e.target.checked)}
-                        className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500 focus:ring-1"
-                      />
-                      <label htmlFor="urgent" className="text-sm text-gray-700">
-                        Urgent hiring
-                      </label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Priority Level
+                    </label>
+                    <select
+                      value={formData.priority}
+                      onChange={(e) => handleInputChange('priority', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors duration-150"
+                    >
+                      {priorities.map(priority => (
+                        <option key={priority} value={priority}>
+                          {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Job Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => handleInputChange('status', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors duration-150"
+                    >
+                      {jobStatuses.map(status => (
+                        <option key={status} value={status}>
+                          {status === 'hot-requirement' ? 'Hot Requirement' : 
+                           status.charAt(0).toUpperCase() + status.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <div className="flex flex-col space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          id="remote"
+                          checked={formData.remote}
+                          onChange={(e) => handleInputChange('remote', e.target.checked)}
+                          className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500 focus:ring-1"
+                        />
+                        <label htmlFor="remote" className="text-sm text-gray-700">
+                          Remote work available
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          id="urgent"
+                          checked={formData.urgent}
+                          onChange={(e) => {
+                            handleInputChange('urgent', e.target.checked);
+                            // Auto-set priority to urgent if urgent checkbox is checked
+                            if (e.target.checked) {
+                              handleInputChange('priority', 'urgent');
+                              handleInputChange('status', 'hot-requirement');
+                            }
+                          }}
+                          className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500 focus:ring-1"
+                        />
+                        <label htmlFor="urgent" className="text-sm text-gray-700">
+                          Mark as urgent hiring (Hot Requirement)
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>

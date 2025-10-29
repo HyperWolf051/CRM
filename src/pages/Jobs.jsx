@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, Search, Download, Eye, Trash2, TrendingUp, Users, Banknote, Target, MapPin, Briefcase } from 'lucide-react';
+import { Plus, Filter, Search, Download, Eye, Trash2, TrendingUp, Users, Banknote, Target, MapPin, Briefcase, AlertTriangle, Clock, Building2, Calendar, Edit3 } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
 import { JobAPI, EmployerAPI } from '../services/api';
@@ -59,19 +59,123 @@ export default function Jobs() {
     }
   };
 
-  // Mock data as fallback
+  // Mock data as fallback with enhanced job information
   const mockJobs = [
     {
       id: 1,
       title: 'Senior React Developer',
       employerId: 1,
+      client: 'TechCorp Solutions',
+      department: 'Engineering',
       location: 'Bengaluru, Karnataka',
       employmentType: 'Full-time',
+      experienceLevel: 'Senior',
       minSalary: 1800000,
       maxSalary: 2500000,
       description: 'We are looking for a Senior React Developer to join our growing team...',
       qualification: '5+ years React experience, TypeScript, Node.js, AWS',
-      closingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      closingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'hot-requirement',
+      priority: 'urgent',
+      postedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      applicants: {
+        total: 45,
+        pipeline: {
+          registration: 45,
+          resumeSharing: 32,
+          shortlisting: 18,
+          lineupFeedback: 12,
+          selection: 8,
+          closure: 3
+        }
+      }
+    },
+    {
+      id: 2,
+      title: 'Product Manager',
+      employerId: 2,
+      client: 'StartupXYZ',
+      department: 'Product',
+      location: 'Mumbai, Maharashtra',
+      employmentType: 'Full-time',
+      experienceLevel: 'Mid-level',
+      minSalary: 1500000,
+      maxSalary: 2200000,
+      description: 'Looking for an experienced Product Manager to drive product strategy...',
+      qualification: '3+ years product management, Agile, Analytics',
+      closingDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'active',
+      priority: 'high',
+      postedDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      applicants: {
+        total: 28,
+        pipeline: {
+          registration: 28,
+          resumeSharing: 22,
+          shortlisting: 15,
+          lineupFeedback: 8,
+          selection: 4,
+          closure: 1
+        }
+      }
+    },
+    {
+      id: 3,
+      title: 'UI/UX Designer',
+      employerId: 3,
+      client: 'Design Studio Pro',
+      department: 'Design',
+      location: 'Remote',
+      employmentType: 'Contract',
+      experienceLevel: 'Mid-level',
+      minSalary: 800000,
+      maxSalary: 1200000,
+      description: 'Seeking a creative UI/UX Designer for exciting projects...',
+      qualification: 'Figma, Adobe Creative Suite, User Research',
+      closingDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'hot-requirement',
+      priority: 'urgent',
+      postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      applicants: {
+        total: 35,
+        pipeline: {
+          registration: 35,
+          resumeSharing: 28,
+          shortlisting: 20,
+          lineupFeedback: 14,
+          selection: 6,
+          closure: 2
+        }
+      }
+    },
+    {
+      id: 4,
+      title: 'DevOps Engineer',
+      employerId: 4,
+      client: 'CloudTech Inc',
+      department: 'Infrastructure',
+      location: 'Hyderabad, Telangana',
+      employmentType: 'Full-time',
+      experienceLevel: 'Senior',
+      minSalary: 2000000,
+      maxSalary: 2800000,
+      description: 'DevOps Engineer to manage cloud infrastructure and CI/CD pipelines...',
+      qualification: 'AWS, Docker, Kubernetes, Jenkins, Terraform',
+      closingDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'active',
+      priority: 'medium',
+      postedDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      applicants: {
+        total: 22,
+        pipeline: {
+          registration: 22,
+          resumeSharing: 18,
+          shortlisting: 12,
+          lineupFeedback: 7,
+          selection: 3,
+          closure: 0
+        }
+      }
     }
   ];
 
@@ -85,9 +189,10 @@ export default function Jobs() {
   // Job statuses and filters
   const jobStatuses = [
     { id: 'all', name: 'All Jobs', count: jobs.length, color: 'bg-gray-100 text-gray-800' },
+    { id: 'hot-requirement', name: 'Hot Requirements', count: jobs.filter(j => j.status === 'hot-requirement' || j.priority === 'urgent').length, color: 'bg-red-100 text-red-800' },
     { id: 'active', name: 'Active', count: jobs.filter(j => j.status === 'active').length, color: 'bg-green-100 text-green-800' },
     { id: 'paused', name: 'Paused', count: jobs.filter(j => j.status === 'paused').length, color: 'bg-yellow-100 text-yellow-800' },
-    { id: 'closed', name: 'Closed', count: jobs.filter(j => j.status === 'closed').length, color: 'bg-red-100 text-red-800' },
+    { id: 'closed', name: 'Closed', count: jobs.filter(j => j.status === 'closed').length, color: 'bg-gray-100 text-gray-600' },
   ];
 
   const jobTypes = [
@@ -112,20 +217,27 @@ export default function Jobs() {
   // Filter jobs based on search and filters
   const filteredJobs = jobs.filter(job => {
     const employer = employers.find(e => e.id === job.employerId);
-    const companyName = employer?.name || 'Unknown Company';
+    const companyName = job.client || employer?.name || 'Unknown Company';
 
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'all' || job.employmentType === selectedType;
     const matchesLocation = selectedLocation === 'all' || job.location === selectedLocation;
-    return matchesSearch && matchesType && matchesLocation;
+    
+    // Handle status filtering including hot requirements
+    const matchesStatus = selectedStatus === 'all' || 
+      (selectedStatus === 'hot-requirement' && (job.status === 'hot-requirement' || job.priority === 'urgent')) ||
+      (selectedStatus !== 'hot-requirement' && job.status === selectedStatus);
+    
+    return matchesSearch && matchesType && matchesLocation && matchesStatus;
   });
 
   // Calculate metrics
   const totalJobs = jobs.length;
   const activeJobs = jobs.filter(j => j.status === 'active').length;
-  const totalApplicants = jobs.reduce((sum, job) => sum + (job.applicants || 0), 0);
+  const hotRequirements = jobs.filter(j => j.status === 'hot-requirement' || j.priority === 'urgent');
+  const totalApplicants = jobs.reduce((sum, job) => sum + (job.applicants?.total || 0), 0);
   const avgApplicants = jobs.length ? totalApplicants / jobs.length : 0;
 
   const handleCreateJob = () => {
@@ -200,7 +312,7 @@ export default function Jobs() {
                   <p className="text-2xl font-bold text-gray-900">{totalJobs}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-blue-600" />
+                  <Briefcase className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
@@ -220,6 +332,18 @@ export default function Jobs() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
+                  <p className="text-sm font-medium text-gray-600">Hot Requirements</p>
+                  <p className="text-2xl font-bold text-gray-900">{hotRequirements.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm font-medium text-gray-600">Total Applicants</p>
                   <p className="text-2xl font-bold text-gray-900">{totalApplicants}</p>
                 </div>
@@ -228,19 +352,81 @@ export default function Jobs() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Applicants</p>
-                  <p className="text-2xl font-bold text-gray-900">{Math.round(avgApplicants)}</p>
+          {/* Hot Requirements Section */}
+          {hotRequirements.length > 0 && (
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 border border-red-200">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Banknote className="w-6 h-6 text-orange-600" />
+                <div>
+                  <h3 className="text-lg font-semibold text-red-900">Hot Requirements</h3>
+                  <p className="text-sm text-red-700">Urgent positions that need immediate attention</p>
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {hotRequirements.map((job) => {
+                  const employer = employers.find(e => e.id === job.employerId);
+                  const companyName = job.client || employer?.name || 'Unknown Company';
+                  const daysLeft = job.closingDate ? Math.ceil((new Date(job.closingDate) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+                  
+                  return (
+                    <div key={job.id} className="bg-white rounded-lg p-4 border border-red-200 hover:shadow-md transition-all duration-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 text-sm">{job.title}</h4>
+                          <p className="text-xs text-gray-600 flex items-center mt-1">
+                            <Building2 className="w-3 h-3 mr-1" />
+                            {companyName}
+                          </p>
+                        </div>
+                        <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                          {job.priority === 'urgent' ? 'URGENT' : 'HOT'}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2 text-xs text-gray-600">
+                        <div className="flex items-center">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {job.location}
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="w-3 h-3 mr-1" />
+                          {job.applicants?.total || 0} applicants
+                        </div>
+                        {daysLeft !== null && (
+                          <div className="flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {daysLeft > 0 ? `${daysLeft} days left` : 'Deadline passed'}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Pipeline Progress</span>
+                          <span className="text-xs font-medium text-gray-700">
+                            {job.applicants?.pipeline?.selection || 0} selected
+                          </span>
+                        </div>
+                        <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className="bg-red-500 h-1.5 rounded-full transition-all duration-300"
+                            style={{ 
+                              width: `${job.applicants?.total ? (job.applicants.pipeline?.selection || 0) / job.applicants.total * 100 : 0}%` 
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Filters and Search */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
@@ -359,20 +545,41 @@ export default function Jobs() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredJobs.map((job) => {
                   const employer = employers.find(e => e.id === job.employerId);
-                  const companyName = employer?.name || 'Unknown Company';
+                  const companyName = job.client || employer?.name || 'Unknown Company';
                   const salaryRange = job.minSalary && job.maxSalary
                     ? `₹${(job.minSalary / 100000).toFixed(1)}L - ₹${(job.maxSalary / 100000).toFixed(1)}L`
                     : 'Salary not specified';
+                  
+                  const isHotRequirement = job.status === 'hot-requirement' || job.priority === 'urgent';
+                  const daysLeft = job.closingDate ? Math.ceil((new Date(job.closingDate) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+                  const pipelineData = job.applicants?.pipeline || {};
+                  const totalApplicants = job.applicants?.total || 0;
 
                   return (
                     <div
                       key={job.id}
-                      className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-[1.02]"
+                      className={`bg-white rounded-xl p-6 shadow-sm border transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] ${
+                        isHotRequirement ? 'border-red-200 bg-gradient-to-br from-white to-red-50' : 'border-gray-200'
+                      }`}
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">{job.title}</h3>
-                          <p className="text-gray-600 text-sm">{companyName}</p>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                            {isHotRequirement && (
+                              <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full flex items-center">
+                                <AlertTriangle className="w-3 h-3 mr-1" />
+                                HOT
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600 mb-1">
+                            <Building2 className="w-4 h-4 mr-1" />
+                            {companyName}
+                          </div>
+                          {job.department && (
+                            <p className="text-xs text-gray-500">{job.department} Department</p>
+                          )}
                         </div>
                       </div>
 
@@ -385,43 +592,97 @@ export default function Jobs() {
                           <Banknote className="w-4 h-4 mr-2" />
                           {salaryRange}
                         </div>
-                        {job.minExperienceYears && job.maxExperienceYears && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Users className="w-4 h-4 mr-2" />
+                          {totalApplicants} applicants • {job.experienceLevel || 'All levels'}
+                        </div>
+                        {daysLeft !== null && (
                           <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2" />
-                            {job.minExperienceYears}-{job.maxExperienceYears} years experience
+                            <Calendar className="w-4 h-4 mr-2" />
+                            {daysLeft > 0 ? `${daysLeft} days left` : 'Deadline passed'}
                           </div>
                         )}
                       </div>
 
-                      {job.closingDate && (
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>Deadline: {new Date(job.closingDate).toLocaleDateString()}</span>
+                      {/* Pipeline Breakdown */}
+                      {totalApplicants > 0 && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-gray-700">Candidate Pipeline</span>
+                            <span className="text-xs text-gray-500">{pipelineData.closure || 0} placed</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-6 gap-1 mb-2">
+                            {[
+                              { key: 'registration', label: 'Reg', color: 'bg-blue-500' },
+                              { key: 'resumeSharing', label: 'Resume', color: 'bg-purple-500' },
+                              { key: 'shortlisting', label: 'Short', color: 'bg-amber-500' },
+                              { key: 'lineupFeedback', label: 'Interview', color: 'bg-cyan-500' },
+                              { key: 'selection', label: 'Select', color: 'bg-green-500' },
+                              { key: 'closure', label: 'Place', color: 'bg-emerald-600' }
+                            ].map((stage) => (
+                              <div key={stage.key} className="text-center">
+                                <div className={`h-2 rounded-full ${stage.color} mb-1`} 
+                                     style={{ 
+                                       opacity: (pipelineData[stage.key] || 0) / totalApplicants 
+                                     }}
+                                ></div>
+                                <div className="text-xs text-gray-600">{pipelineData[stage.key] || 0}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="text-xs text-gray-500 text-center">
+                            Conversion: {totalApplicants > 0 ? Math.round((pipelineData.closure || 0) / totalApplicants * 100) : 0}%
+                          </div>
                         </div>
                       )}
 
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            job.status === 'active' ? 'bg-green-100 text-green-700' :
+                            job.status === 'hot-requirement' ? 'bg-red-100 text-red-700' :
+                            job.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {job.status === 'hot-requirement' ? 'Hot Requirement' : 
+                             job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                          </span>
                           <span className="text-xs text-gray-500">{job.employmentType}</span>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteJob(job.id);
-                              }}
-                              className="p-1 text-gray-400 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Navigate to job details or edit
-                              }}
-                              className="p-1 text-gray-400 hover:text-green-600"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Navigate to edit job
+                            }}
+                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                            title="Edit Job"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Navigate to job details
+                            }}
+                            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteJob(job.id);
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                            title="Delete Job"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -433,43 +694,128 @@ export default function Jobs() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Job Title</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Company</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Location</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Type</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900">Salary</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Job Details</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Client & Location</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Applicants & Pipeline</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Status & Priority</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Salary Range</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredJobs.map((job) => {
                       const employer = employers.find(e => e.id === job.employerId);
-                      const companyName = employer?.name || 'Unknown Company';
+                      const companyName = job.client || employer?.name || 'Unknown Company';
                       const salaryRange = job.minSalary && job.maxSalary
                         ? `₹${(job.minSalary / 100000).toFixed(1)}L - ₹${(job.maxSalary / 100000).toFixed(1)}L`
                         : 'Not specified';
+                      
+                      const isHotRequirement = job.status === 'hot-requirement' || job.priority === 'urgent';
+                      const daysLeft = job.closingDate ? Math.ceil((new Date(job.closingDate) - new Date()) / (1000 * 60 * 60 * 1000 * 24)) : null;
+                      const pipelineData = job.applicants?.pipeline || {};
+                      const totalApplicants = job.applicants?.total || 0;
 
                       return (
                         <tr
                           key={job.id}
-                          className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                          className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                            isHotRequirement ? 'bg-red-50' : ''
+                          }`}
                         >
                           <td className="py-4 px-4">
                             <div>
-                              <div className="font-medium text-gray-900">{job.title}</div>
+                              <div className="flex items-center space-x-2">
+                                <div className="font-medium text-gray-900">{job.title}</div>
+                                {isHotRequirement && (
+                                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full flex items-center">
+                                    <AlertTriangle className="w-3 h-3 mr-1" />
+                                    HOT
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1">
+                                {job.department && `${job.department} • `}
+                                {job.employmentType} • {job.experienceLevel || 'All levels'}
+                              </div>
                               {job.closingDate && (
-                                <div className="text-sm text-gray-500">Deadline: {new Date(job.closingDate).toLocaleDateString()}</div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Deadline: {new Date(job.closingDate).toLocaleDateString()}
+                                  {daysLeft !== null && (
+                                    <span className={`ml-2 ${daysLeft <= 3 ? 'text-red-600 font-medium' : ''}`}>
+                                      ({daysLeft > 0 ? `${daysLeft} days left` : 'Expired'})
+                                    </span>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <div className="text-gray-900">{companyName}</div>
+                            <div>
+                              <div className="font-medium text-gray-900 flex items-center">
+                                <Building2 className="w-4 h-4 mr-1" />
+                                {companyName}
+                              </div>
+                              <div className="text-sm text-gray-600 flex items-center mt-1">
+                                <MapPin className="w-4 h-4 mr-1" />
+                                {job.location || 'Not specified'}
+                              </div>
+                            </div>
                           </td>
                           <td className="py-4 px-4">
-                            <div className="text-gray-900">{job.location || 'Not specified'}</div>
+                            <div>
+                              <div className="font-medium text-gray-900 flex items-center">
+                                <Users className="w-4 h-4 mr-1" />
+                                {totalApplicants} applicants
+                              </div>
+                              {totalApplicants > 0 && (
+                                <div className="mt-2">
+                                  <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                    <span>Pipeline Progress</span>
+                                    <span>{pipelineData.closure || 0} placed</span>
+                                  </div>
+                                  <div className="flex space-x-1">
+                                    {[
+                                      { key: 'registration', color: 'bg-blue-500' },
+                                      { key: 'resumeSharing', color: 'bg-purple-500' },
+                                      { key: 'shortlisting', color: 'bg-amber-500' },
+                                      { key: 'lineupFeedback', color: 'bg-cyan-500' },
+                                      { key: 'selection', color: 'bg-green-500' },
+                                      { key: 'closure', color: 'bg-emerald-600' }
+                                    ].map((stage) => (
+                                      <div key={stage.key} className="flex-1">
+                                        <div 
+                                          className={`h-1.5 rounded-full ${stage.color}`}
+                                          style={{ 
+                                            opacity: (pipelineData[stage.key] || 0) / totalApplicants 
+                                          }}
+                                        ></div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {totalApplicants > 0 ? Math.round((pipelineData.closure || 0) / totalApplicants * 100) : 0}% conversion rate
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="py-4 px-4">
-                            <div className="text-gray-900">{job.employmentType}</div>
+                            <div>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                job.status === 'active' ? 'bg-green-100 text-green-700' :
+                                job.status === 'hot-requirement' ? 'bg-red-100 text-red-700' :
+                                job.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {job.status === 'hot-requirement' ? 'Hot Requirement' : 
+                                 job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                              </span>
+                              {job.priority && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Priority: {job.priority.charAt(0).toUpperCase() + job.priority.slice(1)}
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="py-4 px-4">
                             <div className="text-gray-900">{salaryRange}</div>
@@ -479,9 +825,20 @@ export default function Jobs() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  // Navigate to edit job
+                                }}
+                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                title="Edit Job"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   // Navigate to job details
                                 }}
-                                className="p-1 text-gray-400 hover:text-blue-600"
+                                className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                                title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -490,7 +847,8 @@ export default function Jobs() {
                                   e.stopPropagation();
                                   handleDeleteJob(job.id);
                                 }}
-                                className="p-1 text-gray-400 hover:text-red-600"
+                                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                title="Delete Job"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>

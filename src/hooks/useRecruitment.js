@@ -266,34 +266,111 @@ export function useJobs(filters = {}) {
       try {
         setLoading(true);
         await new Promise(resolve => setTimeout(resolve, 300));
-        // Mock job data
+        // Enhanced mock job data with pipeline information
         const mockJobs = [
           {
             id: '1',
-            title: 'Software Engineer',
-            company: 'Tech Corp',
-            location: 'San Francisco, CA',
+            title: 'Senior React Developer',
+            client: 'TechCorp Solutions',
+            department: 'Engineering',
+            location: 'Bengaluru, Karnataka',
+            employmentType: 'Full-time',
+            experienceLevel: 'Senior',
             status: 'hot-requirement',
-            applicants: { total: 45, pipeline: {} },
-            postedDate: new Date('2024-01-10')
+            priority: 'urgent',
+            postedDate: new Date('2024-01-10'),
+            closingDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+            minSalary: 1800000,
+            maxSalary: 2500000,
+            applicants: { 
+              total: 45, 
+              pipeline: {
+                registration: 45,
+                resumeSharing: 32,
+                shortlisting: 18,
+                lineupFeedback: 12,
+                selection: 8,
+                closure: 3
+              }
+            }
           },
           {
             id: '2',
             title: 'Product Manager',
-            company: 'StartupXYZ',
-            location: 'New York, NY',
+            client: 'StartupXYZ',
+            department: 'Product',
+            location: 'Mumbai, Maharashtra',
+            employmentType: 'Full-time',
+            experienceLevel: 'Mid-level',
             status: 'active',
-            applicants: { total: 32, pipeline: {} },
-            postedDate: new Date('2024-01-08')
+            priority: 'high',
+            postedDate: new Date('2024-01-08'),
+            closingDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
+            minSalary: 1500000,
+            maxSalary: 2200000,
+            applicants: { 
+              total: 32, 
+              pipeline: {
+                registration: 32,
+                resumeSharing: 25,
+                shortlisting: 15,
+                lineupFeedback: 8,
+                selection: 4,
+                closure: 1
+              }
+            }
           },
           {
             id: '3',
             title: 'UI/UX Designer',
-            company: 'Design Studio',
+            client: 'Design Studio Pro',
+            department: 'Design',
             location: 'Remote',
+            employmentType: 'Contract',
+            experienceLevel: 'Mid-level',
+            status: 'hot-requirement',
+            priority: 'urgent',
+            postedDate: new Date('2024-01-12'),
+            closingDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+            minSalary: 800000,
+            maxSalary: 1200000,
+            applicants: { 
+              total: 28, 
+              pipeline: {
+                registration: 28,
+                resumeSharing: 22,
+                shortlisting: 16,
+                lineupFeedback: 10,
+                selection: 5,
+                closure: 2
+              }
+            }
+          },
+          {
+            id: '4',
+            title: 'DevOps Engineer',
+            client: 'CloudTech Inc',
+            department: 'Infrastructure',
+            location: 'Hyderabad, Telangana',
+            employmentType: 'Full-time',
+            experienceLevel: 'Senior',
             status: 'active',
-            applicants: { total: 28, pipeline: {} },
-            postedDate: new Date('2024-01-12')
+            priority: 'medium',
+            postedDate: new Date('2024-01-05'),
+            closingDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
+            minSalary: 2000000,
+            maxSalary: 2800000,
+            applicants: { 
+              total: 22, 
+              pipeline: {
+                registration: 22,
+                resumeSharing: 18,
+                shortlisting: 12,
+                lineupFeedback: 7,
+                selection: 3,
+                closure: 0
+              }
+            }
           }
         ];
         setJobs(mockJobs);
