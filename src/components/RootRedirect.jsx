@@ -1,10 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
-import { getDefaultDashboard } from '@/utils/routePermissions';
+import { getDefaultDashboard, validateAndSanitizeRoute } from '@/utils/routePermissions';
+import { useLastPageMemory } from '@/hooks/useLastPageMemory';
 
 const RootRedirect = () => {
   const { user, isAuthenticated, isLoading, forceLogout, restoreLastPage } = useAuth();
+  const { getLastPage, clearLastPage } = useLastPageMemory();
   const [redirectTarget, setRedirectTarget] = useState(null);
   const [isProcessing, setIsProcessing] = useState(true);
 
@@ -16,14 +18,43 @@ const RootRedirect = () => {
           return;
         }
 
+        // Check URL parameters for explicit logout
+        const urlParams = new URLSearchParams(window.location.search);
+        const isExplicitLogout = urlParams.get('logout') === 'true';
+
         // Check if user is authenticated and has valid session
         if (isAuthenticated && user) {
-          // User is authenticated, try to restore last page
-          const restorablePage = restoreLastPage();
+          // User is authenticated - check for stored last page before proceeding
+          let targetPage = null;
+
+          // First, try to get last page from AuthContext (handles user-specific storage)
+          const contextLastPage = restoreLastPage();
           
-          if (restorablePage) {
-            // Valid last page found, redirect there
-            setRedirectTarget(restorablePage);
+          if (contextLastPage) {
+            // Validate the page from context
+            const validation = validateAndSanitizeRoute(contextLastPage, user.role);
+            if (validation.isValid) {
+              targetPage = validation.sanitizedPath;
+            }
+          }
+
+          // If no valid page from context, check direct storage
+          if (!targetPage) {
+            const storedLastPage = getLastPage();
+            if (storedLastPage) {
+              const validation = validateAndSanitizeRoute(storedLastPage, user.role);
+              if (validation.isValid) {
+                targetPage = validation.sanitizedPath;
+              } else {
+                // Clear invalid stored page
+                clearLastPage();
+              }
+            }
+          }
+
+          // Set redirect target
+          if (targetPage) {
+            setRedirectTarget(targetPage);
           } else {
             // No valid last page, redirect to appropriate dashboard
             const defaultDashboard = getDefaultDashboard(user.role);
@@ -31,16 +62,24 @@ const RootRedirect = () => {
           }
         } else {
           // User is not authenticated
-          // Check if this is an explicit logout (clear last page)
-          const urlParams = new URLSearchParams(window.location.search);
-          const isExplicitLogout = urlParams.get('logout') === 'true';
-          
           if (isExplicitLogout) {
-            // Force logout will clear authentication and last page data
+            // Explicit logout - clear all data including last page memory
             forceLogout();
+            clearLastPage();
           } else {
-            // Regular root access - just clear auth but preserve last page for development
-            forceLogout();
+            // Fresh visit or session expired - check for stored last page before forcing logout
+            const storedLastPage = getLastPage();
+            
+            if (storedLastPage) {
+              // There's a stored last page, but user is not authenticated
+              // This could be a fresh browser session or expired session
+              // Preserve the last page for when they log back in
+              // Only force logout (clear auth) but don't clear last page memory
+              forceLogout();
+            } else {
+              // No stored last page, regular logout behavior
+              forceLogout();
+            }
           }
           
           setRedirectTarget('/login');
@@ -51,8 +90,15 @@ const RootRedirect = () => {
           console.error('Error in RootRedirect:', error);
         }
         
-        // Fallback to safe behavior
+        // Fallback to safe behavior - clear auth but preserve last page unless explicit logout
+        const urlParams = new URLSearchParams(window.location.search);
+        const isExplicitLogout = urlParams.get('logout') === 'true';
+        
         forceLogout();
+        if (isExplicitLogout) {
+          clearLastPage();
+        }
+        
         setRedirectTarget('/login');
       } finally {
         setIsProcessing(false);
@@ -60,7 +106,7 @@ const RootRedirect = () => {
     };
 
     handleRootRedirect();
-  }, [isAuthenticated, user, isLoading, forceLogout, restoreLastPage]);
+  }, [isAuthenticated, user, isLoading, forceLogout, restoreLastPage, getLastPage, clearLastPage]);
 
   // Show loading state while processing or auth is loading
   if (isProcessing || isLoading) {

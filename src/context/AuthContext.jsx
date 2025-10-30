@@ -23,54 +23,71 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadAuth = async () => {
       try {
-        // In development, clear auth data on hot reload to prevent auto-login
-        // but preserve last page memory for better development experience
+        // In development mode, we want to preserve authentication across page refreshes
+        // Only clear auth data if explicitly requested (e.g., via a dev flag)
         if (import.meta.env.DEV) {
-          // Check if there was a user before clearing auth
-          const storedToken = localStorage.getItem('authToken');
-          const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
-          let previousUser = null;
+          // Check if there's an explicit flag to clear auth in development
+          const shouldClearAuth = sessionStorage.getItem('__dev_clear_auth__') === 'true';
           
-          if (storedToken && isDemoMode) {
-            // Determine previous user from stored token for last page preservation
-            if (storedToken.includes('admin')) {
-              previousUser = {
-                id: 'demo-user-admin',
-                role: 'admin'
-              };
-            } else if (storedToken.includes('recruiter')) {
-              previousUser = {
-                id: 'demo-user-recruiter',
-                role: 'recruiter'
-              };
-            } else {
-              previousUser = {
-                id: 'demo-user-user',
-                role: 'user'
-              };
-            }
-          }
-          
-          // Clear auth data but preserve last page memory
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('isDemoMode');
-          
-          // If there was a previous user, check for stored last page
-          if (previousUser) {
-            const storageKey = generateLastPageStorageKey(previousUser.id);
-            const lastPageState = storageManager.get(storageKey);
+          if (shouldClearAuth) {
+            // Clear the flag and proceed with auth clearing
+            sessionStorage.removeItem('__dev_clear_auth__');
             
-            if (lastPageState && lastPageState.userId === previousUser.id) {
-              // Validate the stored page is still accessible for the user role
-              if (hasRoutePermission(lastPageState.path, previousUser.role)) {
-                setLastVisitedPage(lastPageState.path);
-                // Don't set shouldRestoreLastPage here - wait for actual authentication
+            // Check if there was a user before clearing auth
+            const storedToken = localStorage.getItem('authToken');
+            const isDemoMode = localStorage.getItem('isDemoMode') === 'true';
+            let previousUser = null;
+            
+            if (storedToken && isDemoMode) {
+              // Determine previous user from stored token for last page preservation
+              if (storedToken.includes('token-admin')) {
+                previousUser = {
+                  id: 'demo-user-admin',
+                  role: 'admin'
+                };
+              } else if (storedToken.includes('token-recruiter')) {
+                previousUser = {
+                  id: 'demo-user-recruiter',
+                  role: 'recruiter'
+                };
+              } else if (storedToken.includes('token-user')) {
+                previousUser = {
+                  id: 'demo-user-user',
+                  role: 'user'
+                };
+              } else {
+                // Fallback for old tokens
+                previousUser = {
+                  id: 'demo-user-user',
+                  role: 'user'
+                };
               }
             }
+            
+            // Clear auth data but preserve last page memory
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('isDemoMode');
+            
+            // If there was a previous user, check for stored last page
+            if (previousUser) {
+              const storageKey = generateLastPageStorageKey(previousUser.id);
+              const lastPageState = storageManager.get(storageKey);
+              
+              if (lastPageState && lastPageState.userId === previousUser.id) {
+                // Validate the stored page is still accessible for the user role
+                if (hasRoutePermission(lastPageState.path, previousUser.role)) {
+                  setLastVisitedPage(lastPageState.path);
+                  // Don't set shouldRestoreLastPage here - wait for actual authentication
+                }
+              }
+            }
+            
+            setIsLoading(false);
+            return;
           }
           
-          setIsLoading(false);
-          return;
+          // In development mode without the clear flag, proceed with normal auth loading
+          // This allows authentication to persist across page refreshes
         }
         
         const storedToken = localStorage.getItem('authToken');
@@ -83,7 +100,7 @@ export const AuthProvider = ({ children }) => {
             // Demo mode - determine user based on stored token
             let demoUser;
             
-            if (storedToken.includes('admin')) {
+            if (storedToken.includes('token-admin')) {
               demoUser = {
                 id: 'demo-user-admin',
                 name: 'Company Admin',
@@ -93,7 +110,7 @@ export const AuthProvider = ({ children }) => {
                 dashboardType: 'crm',
                 isDemo: true
               };
-            } else if (storedToken.includes('recruiter')) {
+            } else if (storedToken.includes('token-recruiter')) {
               demoUser = {
                 id: 'demo-user-recruiter',
                 name: 'Recruiter Agent',
@@ -103,8 +120,19 @@ export const AuthProvider = ({ children }) => {
                 dashboardType: 'recruiter',
                 isDemo: true
               };
+            } else if (storedToken.includes('token-user')) {
+              // Sales user
+              demoUser = {
+                id: 'demo-user-user',
+                name: 'Sales User',
+                email: 'sales@crm.com',
+                avatar: null,
+                role: 'user',
+                isDemo: true
+              };
             } else {
-              // Default to sales user
+              // Fallback for old tokens or unknown format
+              console.warn('Unknown token format, defaulting to user role:', storedToken);
               demoUser = {
                 id: 'demo-user-user',
                 name: 'Sales User',
@@ -141,6 +169,9 @@ export const AuthProvider = ({ children }) => {
 
   // Login method
   const login = useCallback(async (email, password) => {
+    // ========================================
+    // DEMO AUTHENTICATION - REMOVE IN PRODUCTION
+    // ========================================
     // Check for demo credentials first
     const demoCredentials = [
       { email: 'admin@crm.com', password: 'admin123', name: 'Company Admin', role: 'admin', dashboardType: 'crm' },
@@ -151,8 +182,8 @@ export const AuthProvider = ({ children }) => {
     const demoUser = demoCredentials.find(cred => cred.email === email && cred.password === password);
     
     if (demoUser) {
-      // Demo login
-      const demoToken = 'demo-token-' + Date.now();
+      // Demo login - include role in token for proper detection on refresh
+      const demoToken = `demo-token-${demoUser.role}-${Date.now()}`;
       const userData = {
         id: 'demo-user-' + demoUser.role,
         name: demoUser.name,
@@ -254,7 +285,7 @@ export const AuthProvider = ({ children }) => {
       isDemo: true
     };
     
-    const demoToken = 'demo-token-' + Date.now();
+    const demoToken = `demo-token-${demoUser.role}-${Date.now()}`;
     
     // Store demo token
     localStorage.setItem('authToken', demoToken);
@@ -360,6 +391,23 @@ export const AuthProvider = ({ children }) => {
     setShouldRestoreLastPage(false);
   }, []);
 
+  // Development helper to clear auth on next reload
+  const clearAuthOnNextReload = useCallback(() => {
+    if (import.meta.env.DEV) {
+      sessionStorage.setItem('__dev_clear_auth__', 'true');
+      console.log('🔄 Auth will be cleared on next page reload');
+      window.location.reload();
+    }
+  }, []);
+
+  // Expose helper to window in development for easy access
+  useEffect(() => {
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      window.clearAuth = clearAuthOnNextReload;
+      console.log('🛠️ Development helper available: window.clearAuth() to clear authentication');
+    }
+  }, [clearAuthOnNextReload]);
+
   // Get stored last page for current user
   const getStoredLastPage = useCallback(() => {
     if (!user) return null;
@@ -442,6 +490,7 @@ export const AuthProvider = ({ children }) => {
     lastVisitedPage,
     shouldRestoreLastPage,
     restoreLastPage,
+    clearAuthOnNextReload, // Development helper
   };
 
   return (
