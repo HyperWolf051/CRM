@@ -41,6 +41,8 @@ const RecruiterAddCandidate = lazy(() => import('@/pages/recruiter/RecruiterAddC
 const RecruiterClients = lazy(() => import('@/pages/recruiter/RecruiterClients'));
 const RecruiterClientDetail = lazy(() => import('@/pages/recruiter/RecruiterClientDetail'));
 const RecruiterAddClient = lazy(() => import('@/pages/recruiter/RecruiterAddClient'));
+const RecruiterCalendar = lazy(() => import('@/pages/recruiter/RecruiterCalendar'));
+const RecruiterScheduleInterview = lazy(() => import('@/pages/recruiter/RecruiterScheduleInterview'));
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -135,7 +137,8 @@ function App() {
                   <Route path="jobs" element={<ComingSoon title="Jobs" description="Job posting and management" />} />
                   <Route path="interviews" element={<ComingSoon title="Interviews" description="Interview management system" />} />
                   <Route path="offers" element={<ComingSoon title="Offers" description="Job offer management system" />} />
-                  <Route path="calendar" element={<ComingSoon title="Calendar" description="Interview scheduling system" />} />
+                  <Route path="calendar" element={<RecruiterCalendar />} />
+                  <Route path="calendar/schedule" element={<RecruiterScheduleInterview />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />
                   <Route path="reports" element={<ComingSoon title="Reports" description="Daily reporting system" />} />
                   <Route path="csv-import" element={<CSVImport />} />
