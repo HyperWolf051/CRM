@@ -129,6 +129,12 @@ export const businessSectors = {
         color: 'from-emerald-500 to-teal-600'
       },
       {
+        name: 'Clients',
+        href: '/app/recruiter/clients',
+        icon: Building2,
+        color: 'from-orange-500 to-orange-600'
+      },
+      {
         name: 'Calendar',
         href: '/app/recruiter/calendar',
         icon: Calendar,

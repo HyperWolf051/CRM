@@ -16,6 +16,8 @@ const recruiterPageTitles = {
   '/app/recruiter/interviews/schedule': 'Schedule Interview',
   '/app/recruiter/offers': 'Job Offers',
   '/app/recruiter/offers/create': 'Create Offer',
+  '/app/recruiter/clients': 'Client Management',
+  '/app/recruiter/clients/add': 'Add New Client',
   '/app/recruiter/calendar': 'Interview Calendar',
   '/app/recruiter/analytics': 'Recruitment Analytics',
   '/app/recruiter/reports': 'Daily Reports',
@@ -48,6 +50,10 @@ export default function RecruiterLayout() {
     
     if (location.pathname.startsWith('/app/recruiter/offers/') && location.pathname !== '/app/recruiter/offers/create') {
       return 'Offer Details';
+    }
+    
+    if (location.pathname.startsWith('/app/recruiter/clients/') && location.pathname !== '/app/recruiter/clients/add') {
+      return 'Client Details';
     }
     
     // Default fallback

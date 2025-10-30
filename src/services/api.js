@@ -444,6 +444,152 @@ export const InterviewAPI = {
   }
 };
 
+// Client Management API
+export const ClientAPI = {
+  // Get all clients
+  getAll: async () => {
+    try {
+      const response = await api.get('/clients');
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get client by ID
+  getById: async (id) => {
+    try {
+      const response = await api.get(`/clients/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Create new client
+  create: async (data) => {
+    try {
+      const response = await api.post('/clients', data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Update client
+  update: async (id, data) => {
+    try {
+      const response = await api.put(`/clients/${id}`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Delete client
+  delete: async (id) => {
+    try {
+      const response = await api.delete(`/clients/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get client communications
+  getCommunications: async (clientId) => {
+    try {
+      const response = await api.get(`/clients/${clientId}/communications`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Add client communication
+  addCommunication: async (clientId, data) => {
+    try {
+      const response = await api.post(`/clients/${clientId}/communications`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get client feedback
+  getFeedback: async (clientId) => {
+    try {
+      const response = await api.get(`/clients/${clientId}/feedback`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Add client feedback
+  addFeedback: async (clientId, data) => {
+    try {
+      const response = await api.post(`/clients/${clientId}/feedback`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get client requirements
+  getRequirements: async (clientId) => {
+    try {
+      const response = await api.get(`/clients/${clientId}/requirements`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Add client requirement
+  addRequirement: async (clientId, data) => {
+    try {
+      const response = await api.post(`/clients/${clientId}/requirements`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
 // Authentication API
 export const AuthAPI = {
   // Login with email and password

@@ -376,6 +376,251 @@ export interface HotRequirement {
   candidatesSubmitted: number;
 }
 
+// Client Management Types
+export interface Client {
+  id: string;
+  name: string;
+  industry: string;
+  website?: string;
+  
+  // Contact Information
+  primaryContact: {
+    name: string;
+    designation: string;
+    email: string;
+    phone: string;
+    directLine?: string;
+  };
+  
+  // Additional Contacts
+  contacts: ClientContact[];
+  
+  // Company Details
+  companyDetails: {
+    size: 'startup' | 'small' | 'medium' | 'large' | 'enterprise';
+    location: {
+      address: string;
+      city: string;
+      state: string;
+      country: string;
+      pincode?: string;
+    };
+    establishedYear?: number;
+    description?: string;
+  };
+  
+  // Business Information
+  businessInfo: {
+    gstNumber?: string;
+    panNumber?: string;
+    registrationNumber?: string;
+    paymentTerms: string; // e.g., "30 days", "45 days"
+    preferredCurrency: string;
+  };
+  
+  // Recruitment Preferences
+  preferences: {
+    preferredCommunication: 'email' | 'phone' | 'whatsapp' | 'teams';
+    interviewTypes: ('phone' | 'video' | 'in-person')[];
+    noticePeriod: string; // e.g., "2 weeks", "1 month"
+    salaryNegotiation: boolean;
+    backgroundChecks: boolean;
+    documentRequirements: string[];
+  };
+  
+  // Relationship Status
+  status: 'active' | 'inactive' | 'prospect' | 'blacklisted';
+  tier: 'platinum' | 'gold' | 'silver' | 'bronze';
+  
+  // Performance Metrics
+  metrics: {
+    totalJobsPosted: number;
+    activeJobs: number;
+    candidatesHired: number;
+    averageTimeToHire: number; // in days
+    offerAcceptanceRate: number; // percentage
+    repeatBusinessRate: number; // percentage
+  };
+  
+  // Financial Information
+  financial: {
+    totalRevenue: number;
+    outstandingAmount: number;
+    creditLimit: number;
+    paymentHistory: PaymentRecord[];
+  };
+  
+  // Tags and Categories
+  tags: string[];
+  categories: string[]; // e.g., "IT Services", "Manufacturing", "Healthcare"
+  
+  // Relationship Management
+  assignedRecruiter: string; // User ID
+  accountManager?: string; // User ID
+  
+  // Metadata
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  lastContactDate?: Date;
+  nextFollowUpDate?: Date;
+}
+
+export interface ClientContact {
+  id: string;
+  name: string;
+  designation: string;
+  email: string;
+  phone: string;
+  department: string;
+  isPrimary: boolean;
+  isActive: boolean;
+  notes?: string;
+}
+
+export interface PaymentRecord {
+  id: string;
+  invoiceNumber: string;
+  amount: number;
+  dueDate: Date;
+  paidDate?: Date;
+  status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  paymentMethod?: string;
+  notes?: string;
+}
+
+// Client Feedback and Communication
+export interface ClientCommunication {
+  id: string;
+  clientId: string;
+  type: 'email' | 'phone' | 'meeting' | 'whatsapp' | 'video-call';
+  subject: string;
+  content: string;
+  direction: 'inbound' | 'outbound';
+  participants: string[]; // User IDs
+  attachments?: string[]; // File URLs
+  followUpRequired: boolean;
+  followUpDate?: Date;
+  status: 'completed' | 'pending' | 'scheduled';
+  createdBy: string;
+  createdAt: Date;
+}
+
+export interface ClientFeedbackEntry {
+  id: string;
+  clientId: string;
+  candidateId: string;
+  jobId: string;
+  feedbackType: 'interview' | 'resume-review' | 'general' | 'placement';
+  rating: number; // 1-5 scale
+  feedback: string;
+  strengths?: string[];
+  concerns?: string[];
+  recommendation: 'hire' | 'reject' | 'maybe' | 'hold';
+  nextSteps?: string;
+  interviewDate?: Date;
+  interviewer: string; // Client contact name
+  submittedBy: string; // Recruiter who collected feedback
+  submittedAt: Date;
+  
+  // Additional context from lineupfeedback.csv
+  scheduledDate?: Date;
+  feedbackNumber: number; // 1, 2, 3 for multiple rounds
+  status: 'Selected' | 'Rejected' | 'Hold' | 'Joined' | 'Pending';
+}
+
+// Client Requirements and Job Specifications
+export interface ClientRequirement {
+  id: string;
+  clientId: string;
+  title: string;
+  description: string;
+  priority: 'urgent' | 'high' | 'medium' | 'low';
+  status: 'open' | 'in-progress' | 'filled' | 'on-hold' | 'cancelled';
+  
+  // Job Details
+  jobDetails: {
+    department: string;
+    reportingTo: string;
+    teamSize?: number;
+    workMode: 'remote' | 'hybrid' | 'onsite';
+    location: string;
+    travelRequired: boolean;
+    shiftTimings?: string;
+  };
+  
+  // Candidate Requirements
+  candidateProfile: {
+    experience: {
+      min: number;
+      max: number;
+      unit: 'months' | 'years';
+    };
+    skills: {
+      mandatory: string[];
+      preferred: string[];
+      certifications?: string[];
+    };
+    education: {
+      degree: string[];
+      specialization?: string[];
+      instituteTier?: 'tier1' | 'tier2' | 'tier3' | 'any';
+    };
+    location: string[];
+    currentSalary?: {
+      min: number;
+      max: number;
+    };
+  };
+  
+  // Compensation Package
+  compensation: {
+    salary: {
+      min: number;
+      max: number;
+      currency: string;
+      negotiable: boolean;
+    };
+    benefits: string[];
+    bonuses?: {
+      joining: number;
+      performance: number;
+      annual: number;
+    };
+    equity?: boolean;
+    otherPerks: string[];
+  };
+  
+  // Timeline
+  timeline: {
+    expectedStartDate: Date;
+    urgency: 'immediate' | 'within-week' | 'within-month' | 'flexible';
+    interviewProcess: string; // Description of interview rounds
+    decisionTimeline: string; // How long client takes to decide
+  };
+  
+  // Submission Guidelines
+  submissionGuidelines: {
+    maxSubmissions: number;
+    submissionFormat: string;
+    requiredDocuments: string[];
+    clientPreferences: string[];
+  };
+  
+  // Tracking
+  candidatesSubmitted: number;
+  candidatesInterviewed: number;
+  candidatesSelected: number;
+  candidatesJoined: number;
+  
+  // Metadata
+  createdBy: string;
+  assignedRecruiter: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deadline?: Date;
+}
+
 // Metrics for dashboard
 export interface RecruitmentMetrics {
   totalCandidates: number;
