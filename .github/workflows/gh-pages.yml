@@ -3,11 +3,15 @@ name: Deploy CRM to GitHub Pages
 on:
   push:
     branches:
-      - main  # or 'master' if that’s your default branch
+      - main  # Change if your default branch is different
+
+permissions:
+  contents: write  # Allow GitHub Pages deployment
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,4 +31,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./dist   # Change if your build output is not 'dist'
