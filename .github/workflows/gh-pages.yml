@@ -6,7 +6,7 @@ on:
       - main  # Change if your default branch is different
 
 permissions:
-  contents: write  # Allow GitHub Pages deployment
+  contents: write  # Allow the workflow to push to gh-pages
 
 jobs:
   build-and-deploy:
@@ -27,8 +27,10 @@ jobs:
       - name: Build the site
         run: npm run build
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages (clean publish)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist   # Change if your build output is not 'dist'
+          publish_dir: ./dist    # change if your build output is not 'dist'
+          clean: true            # <-- remove old files on gh-pages before publishing
+          commit_message: "chore: publish site from GitHub Actions"
