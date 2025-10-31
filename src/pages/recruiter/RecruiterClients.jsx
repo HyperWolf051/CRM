@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Building2, 
-  Phone, 
-  Mail, 
+import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
+import {
+  Plus,
+  Search,
+  Building2,
+  Phone,
+  Mail,
   MapPin,
   Star,
-  TrendingUp,
   Users,
   Briefcase,
   Calendar,
@@ -17,69 +15,103 @@ import {
   Edit,
   Eye,
   MessageSquare,
-  FileText,
   Download,
   X,
-  ChevronDown,
+  Grid3X3,
+  List,
   Trophy,
   Award,
   Medal,
+  TrendingUp,
   Target,
-  Activity,
-  Grid3X3,
-  List,
-  ExternalLink
-} from 'lucide-react';
-import { ClientAPI } from '@/services/api';
+  Sparkles,
+} from "lucide-react";
+import { ClientAPI } from "@/services/api";
 
-// Helper functions - moved outside component for ClientCard access
-const getTierColor = (tier) => {
-  const colors = {
-    platinum: 'bg-purple-100 text-purple-800 border-purple-200',
-    gold: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    silver: 'bg-gray-100 text-gray-800 border-gray-200',
-    bronze: 'bg-orange-100 text-orange-800 border-orange-200'
+// Modern Helper Functions with Enhanced Styling
+const getTierConfig = (tier) => {
+  const configs = {
+    platinum: {
+      color: "from-purple-600 via-pink-500 to-purple-600",
+      bg: "bg-gradient-to-r from-purple-50 to-pink-50",
+      text: "text-purple-700",
+      border: "border-purple-300",
+      icon: Trophy,
+      glow: "shadow-lg shadow-purple-500/30",
+      metallic: "bg-gradient-to-br from-purple-400 via-pink-300 to-purple-500",
+    },
+    gold: {
+      color: "from-yellow-500 via-amber-400 to-yellow-600",
+      bg: "bg-gradient-to-r from-yellow-50 to-amber-50",
+      text: "text-yellow-700",
+      border: "border-yellow-300",
+      icon: Award,
+      glow: "shadow-lg shadow-yellow-500/30",
+      metallic: "bg-gradient-to-br from-yellow-400 via-amber-300 to-yellow-500",
+    },
+    silver: {
+      color: "from-gray-400 via-slate-300 to-gray-500",
+      bg: "bg-gradient-to-r from-gray-50 to-slate-50",
+      text: "text-gray-700",
+      border: "border-gray-300",
+      icon: Medal,
+      glow: "shadow-lg shadow-gray-500/30",
+      metallic: "bg-gradient-to-br from-gray-300 via-slate-200 to-gray-400",
+    },
+    bronze: {
+      color: "from-orange-500 via-amber-500 to-orange-600",
+      bg: "bg-gradient-to-r from-orange-50 to-amber-50",
+      text: "text-orange-700",
+      border: "border-orange-300",
+      icon: Medal,
+      glow: "shadow-lg shadow-orange-500/30",
+      metallic: "bg-gradient-to-br from-orange-400 via-amber-300 to-orange-500",
+    },
   };
-  return colors[tier] || colors.bronze;
+  return configs[tier] || configs.bronze;
 };
 
-const getTierGradient = (tier) => {
-  const gradients = {
-    platinum: 'from-purple-400 to-purple-600',
-    gold: 'from-yellow-400 to-yellow-600',
-    silver: 'from-gray-400 to-gray-600',
-    bronze: 'from-orange-400 to-orange-600'
+const getStatusConfig = (status) => {
+  const configs = {
+    active: {
+      bg: "bg-gradient-to-r from-emerald-50 to-green-50",
+      text: "text-emerald-700",
+      border: "border-emerald-300",
+      dot: "bg-emerald-500 animate-pulse",
+      gradient: "from-emerald-500 to-green-500",
+    },
+    inactive: {
+      bg: "bg-gradient-to-r from-gray-50 to-slate-50",
+      text: "text-gray-600",
+      border: "border-gray-300",
+      dot: "bg-gray-400",
+      gradient: "from-gray-400 to-slate-400",
+    },
+    prospect: {
+      bg: "bg-gradient-to-r from-blue-50 to-cyan-50",
+      text: "text-blue-700",
+      border: "border-blue-300",
+      dot: "bg-blue-500 animate-pulse",
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    blacklisted: {
+      bg: "bg-gradient-to-r from-red-50 to-rose-50",
+      text: "text-red-700",
+      border: "border-red-300",
+      dot: "bg-red-500",
+      gradient: "from-red-500 to-rose-500",
+    },
   };
-  return gradients[tier] || gradients.bronze;
-};
-
-const getTierIcon = (tier) => {
-  const icons = {
-    platinum: Trophy,
-    gold: Award,
-    silver: Medal,
-    bronze: Medal
-  };
-  return icons[tier] || Medal;
-};
-
-const getStatusColor = (status) => {
-  const colors = {
-    active: 'bg-green-100 text-green-800 border-green-200',
-    inactive: 'bg-gray-100 text-gray-800 border-gray-200',
-    prospect: 'bg-blue-100 text-blue-800 border-blue-200',
-    blacklisted: 'bg-red-100 text-red-800 border-red-200'
-  };
-  return colors[status] || colors.active;
+  return configs[status] || configs.active;
 };
 
 export default function RecruiterClients() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterTier, setFilterTier] = useState('all');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterTier, setFilterTier] = useState("all");
+  const [viewMode, setViewMode] = useState("grid");
 
   useEffect(() => {
     loadClients();
@@ -88,253 +120,254 @@ export default function RecruiterClients() {
   const loadClients = async () => {
     setLoading(true);
     try {
-      // For demo purposes, using mock data since API might not be fully implemented
       const mockClients = [
         {
-          id: '1',
-          name: 'TechCorp Solutions',
-          industry: 'Information Technology',
-          website: 'https://techcorp.com',
+          id: "1",
+          name: "TechCorp Solutions",
+          industry: "Information Technology",
+          website: "https://techcorp.com",
           primaryContact: {
-            name: 'Sarah Johnson',
-            designation: 'HR Director',
-            email: 'sarah.johnson@techcorp.com',
-            phone: '+91 98765 43210'
+            name: "Sarah Johnson",
+            designation: "HR Director",
+            email: "sarah.johnson@techcorp.com",
+            phone: "+91 98765 43210",
           },
           companyDetails: {
-            size: 'large',
+            size: "large",
             location: {
-              city: 'Bangalore',
-              state: 'Karnataka',
-              country: 'India'
-            }
+              city: "Bangalore",
+              state: "Karnataka",
+              country: "India",
+            },
           },
-          status: 'active',
-          tier: 'platinum',
+          status: "active",
+          tier: "platinum",
           metrics: {
             totalJobsPosted: 45,
             activeJobs: 8,
             candidatesHired: 32,
             averageTimeToHire: 21,
-            offerAcceptanceRate: 85
+            offerAcceptanceRate: 85,
           },
-          lastContactDate: new Date('2024-01-15'),
-          nextFollowUpDate: new Date('2024-02-01')
+          lastContactDate: new Date("2024-01-15"),
+          nextFollowUpDate: new Date("2024-02-01"),
         },
         {
-          id: '2',
-          name: 'InnovateLabs Pvt Ltd',
-          industry: 'Software Development',
-          website: 'https://innovatelabs.in',
+          id: "2",
+          name: "InnovateLabs Pvt Ltd",
+          industry: "Software Development",
+          website: "https://innovatelabs.in",
           primaryContact: {
-            name: 'Rajesh Kumar',
-            designation: 'Talent Acquisition Manager',
-            email: 'rajesh.kumar@innovatelabs.in',
-            phone: '+91 87654 32109'
+            name: "Rajesh Kumar",
+            designation: "Talent Acquisition Manager",
+            email: "rajesh.kumar@innovatelabs.in",
+            phone: "+91 87654 32109",
           },
           companyDetails: {
-            size: 'medium',
+            size: "medium",
             location: {
-              city: 'Pune',
-              state: 'Maharashtra',
-              country: 'India'
-            }
+              city: "Pune",
+              state: "Maharashtra",
+              country: "India",
+            },
           },
-          status: 'active',
-          tier: 'gold',
+          status: "active",
+          tier: "gold",
           metrics: {
             totalJobsPosted: 28,
             activeJobs: 5,
             candidatesHired: 19,
             averageTimeToHire: 18,
-            offerAcceptanceRate: 78
+            offerAcceptanceRate: 78,
           },
-          lastContactDate: new Date('2024-01-20'),
-          nextFollowUpDate: new Date('2024-01-28')
+          lastContactDate: new Date("2024-01-20"),
+          nextFollowUpDate: new Date("2024-01-28"),
         },
         {
-          id: '3',
-          name: 'Global Finance Corp',
-          industry: 'Financial Services',
-          website: 'https://globalfinance.com',
+          id: "3",
+          name: "Global Finance Corp",
+          industry: "Financial Services",
+          website: "https://globalfinance.com",
           primaryContact: {
-            name: 'Priya Sharma',
-            designation: 'Head of Recruitment',
-            email: 'priya.sharma@globalfinance.com',
-            phone: '+91 76543 21098'
+            name: "Priya Sharma",
+            designation: "Head of Recruitment",
+            email: "priya.sharma@globalfinance.com",
+            phone: "+91 76543 21098",
           },
           companyDetails: {
-            size: 'enterprise',
+            size: "enterprise",
             location: {
-              city: 'Mumbai',
-              state: 'Maharashtra',
-              country: 'India'
-            }
+              city: "Mumbai",
+              state: "Maharashtra",
+              country: "India",
+            },
           },
-          status: 'active',
-          tier: 'silver',
+          status: "active",
+          tier: "silver",
           metrics: {
             totalJobsPosted: 67,
             activeJobs: 12,
             candidatesHired: 48,
             averageTimeToHire: 25,
-            offerAcceptanceRate: 72
+            offerAcceptanceRate: 72,
           },
-          lastContactDate: new Date('2024-01-10'),
-          nextFollowUpDate: new Date('2024-02-05')
-        }
+          lastContactDate: new Date("2024-01-10"),
+          nextFollowUpDate: new Date("2024-02-05"),
+        },
       ];
 
       setClients(mockClients);
     } catch (error) {
-      console.error('Error loading clients:', error);
+      console.error("Error loading clients:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.primaryContact.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === 'all' || client.status === filterStatus;
-    const matchesTier = filterTier === 'all' || client.tier === filterTier;
-    
-    return matchesSearch && matchesStatus && matchesTier;
-  });
+  const filteredClients = useMemo(() => {
+    return clients.filter((client) => {
+      const matchesSearch =
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.primaryContact.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
 
-  const totalActiveJobs = clients.reduce((sum, client) => sum + client.metrics.activeJobs, 0);
-  const totalHired = clients.reduce((sum, client) => sum + client.metrics.candidatesHired, 0);
-  const avgAcceptanceRate = clients.length > 0 
-    ? Math.round(clients.reduce((sum, client) => sum + client.metrics.offerAcceptanceRate, 0) / clients.length)
-    : 0;
+      const matchesStatus =
+        filterStatus === "all" || client.status === filterStatus;
+      const matchesTier = filterTier === "all" || client.tier === filterTier;
+
+      return matchesSearch && matchesStatus && matchesTier;
+    });
+  }, [clients, searchTerm, filterStatus, filterTier]);
+
+  const stats = useMemo(
+    () => ({
+      totalClients: clients.length,
+      totalActiveJobs: clients.reduce(
+        (sum, client) => sum + client.metrics.activeJobs,
+        0
+      ),
+      totalHired: clients.reduce(
+        (sum, client) => sum + client.metrics.candidatesHired,
+        0
+      ),
+      avgAcceptanceRate:
+        clients.length > 0
+          ? Math.round(
+              clients.reduce(
+                (sum, client) => sum + client.metrics.offerAcceptanceRate,
+                0
+              ) / clients.length
+            )
+          : 0,
+    }),
+    [clients]
+  );
+
+  const hasActiveFilters =
+    searchTerm || filterStatus !== "all" || filterTier !== "all";
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50 flex items-center justify-center">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"></div>
+          <Sparkles className="w-6 h-6 text-violet-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Header with Glassmorphism */}
-      <div className="backdrop-blur-xl bg-white/90 border-b border-white/20 shadow-xl shadow-black/5">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Modern Header with Glassmorphism - Matching Companies Page */}
+      <div className="backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-lg shadow-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* Header Content */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center space-x-5">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <Building2 className="w-8 h-8 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-1">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   Client Management
                 </h1>
-                <p className="text-gray-600 text-base font-medium">Manage relationships and track recruitment performance</p>
+                <p className="text-gray-600 text-sm">
+                  Manage relationships and track recruitment performance
+                </p>
               </div>
             </div>
 
             <div className="flex items-center space-x-3">
-              <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 backdrop-blur-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 px-5 py-3 rounded-xl flex items-center space-x-2">
-                <Download className="w-5 h-5" />
+              <button className="border-gray-200 text-gray-700 hover:bg-gray-50 backdrop-blur-sm px-4 py-2 border rounded-xl font-medium transition-colors flex items-center space-x-2">
+                <Download className="w-4 h-4" />
                 <span>Export</span>
               </button>
               <Link
                 to="/app/recruiter/clients/add"
-                className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 font-semibold px-6 py-3 rounded-xl text-white flex items-center space-x-2"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg px-4 py-2 rounded-xl text-white font-semibold transition-all flex items-center space-x-2"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 <span>Add Client</span>
               </Link>
             </div>
           </div>
 
-          {/* Enhanced Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <div className="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-blue-700 text-sm font-bold uppercase tracking-wide">Total Clients</p>
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-                    <Building2 className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-4xl font-extrabold text-gray-900 mb-2">{clients.length}</p>
-                <p className="text-green-600 text-sm font-semibold flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  Active partnerships
-                </p>
-              </div>
-            </div>
-
-            <div className="relative bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-2 border-emerald-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-emerald-700 text-sm font-bold uppercase tracking-wide">Active Jobs</p>
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl flex items-center justify-center shadow-lg">
-                    <Briefcase className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-4xl font-extrabold text-gray-900 mb-2">{totalActiveJobs}</p>
-                <p className="text-gray-600 text-sm font-semibold">Open positions</p>
-              </div>
-            </div>
-
-            <div className="relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-purple-700 text-sm font-bold uppercase tracking-wide">Total Hired</p>
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-4xl font-extrabold text-gray-900 mb-2">{totalHired}</p>
-                <p className="text-gray-600 text-sm font-semibold">Successful placements</p>
-              </div>
-            </div>
-
-            <div className="relative bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border-2 border-orange-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-orange-700 text-sm font-bold uppercase tracking-wide">Acceptance Rate</p>
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center shadow-lg">
-                    <Target className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-4xl font-extrabold text-gray-900 mb-2">{avgAcceptanceRate}%</p>
-                <p className="text-gray-600 text-sm font-semibold">Average offer rate</p>
-              </div>
-            </div>
+          {/* Enhanced Stats Cards - Matching Companies Page */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+            <StatCard
+              icon={Building2}
+              value={stats.totalClients}
+              label="Total Clients"
+              gradient="from-violet-500 to-purple-500"
+              bgColor="bg-violet-50"
+            />
+            <StatCard
+              icon={Briefcase}
+              value={stats.totalActiveJobs}
+              label="Active Jobs"
+              gradient="from-blue-500 to-cyan-500"
+              bgColor="bg-blue-50"
+            />
+            <StatCard
+              icon={Users}
+              value={stats.totalHired}
+              label="Total Hired"
+              gradient="from-emerald-500 to-teal-500"
+              bgColor="bg-emerald-50"
+            />
+            <StatCard
+              icon={Target}
+              value={`${stats.avgAcceptanceRate}%`}
+              label="Acceptance Rate"
+              gradient="from-amber-500 to-orange-500"
+              bgColor="bg-amber-50"
+            />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">{/* Content continues below */}
-
-        {/* Enhanced Search and Filters */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200 shadow-xl p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-            {/* Enhanced Search */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Compact Search and Filters */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+            {/* Compact Search */}
             <div className="flex-1">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 w-5 h-5 transition-colors" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-violet-500 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search clients by name, industry, or contact..."
+                  placeholder="Search clients..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 font-medium shadow-sm hover:shadow-md"
+                  className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent focus:bg-white transition-all placeholder-gray-400 text-gray-900 text-sm"
                 />
                 {searchTerm && (
                   <button
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -342,59 +375,53 @@ export default function RecruiterClients() {
               </div>
             </div>
 
-            {/* Filter Controls */}
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <label className="sr-only">Status Filter</label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-3.5 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium shadow-sm hover:shadow-md appearance-none cursor-pointer pr-10"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="prospect">Prospect</option>
-                  <option value="blacklisted">Blacklisted</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
+            {/* Modern Filter Controls */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all font-medium cursor-pointer text-gray-700 hover:bg-white"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="prospect">Prospect</option>
+                <option value="blacklisted">Blacklisted</option>
+              </select>
 
-              <div className="relative">
-                <label className="sr-only">Tier Filter</label>
-                <select
-                  value={filterTier}
-                  onChange={(e) => setFilterTier(e.target.value)}
-                  className="px-4 py-3.5 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium shadow-sm hover:shadow-md appearance-none cursor-pointer pr-10"
-                >
-                  <option value="all">All Tiers</option>
-                  <option value="platinum">Platinum</option>
-                  <option value="gold">Gold</option>
-                  <option value="silver">Silver</option>
-                  <option value="bronze">Bronze</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
+              <select
+                value={filterTier}
+                onChange={(e) => setFilterTier(e.target.value)}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all font-medium cursor-pointer text-gray-700 hover:bg-white"
+              >
+                <option value="all">All Tiers</option>
+                <option value="platinum">Platinum</option>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="bronze">Bronze</option>
+              </select>
 
-              {/* Enhanced View Toggle */}
-              <div className="flex bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl p-1.5 shadow-inner">
+              {/* View Toggle */}
+              <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200">
                 <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2.5 rounded-lg transition-all duration-200 ${viewMode === 'grid'
-                    ? 'bg-white text-blue-600 shadow-lg scale-105'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-                    }`}
-                  title="Grid View"
+                  onClick={() => setViewMode("grid")}
+                  className={`p-2 rounded-lg transition-all ${
+                    viewMode === "grid"
+                      ? "bg-white text-violet-600 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                  aria-label="Grid view"
                 >
                   <Grid3X3 className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2.5 rounded-lg transition-all duration-200 ${viewMode === 'list'
-                    ? 'bg-white text-blue-600 shadow-lg scale-105'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-                    }`}
-                  title="List View"
+                  onClick={() => setViewMode("list")}
+                  className={`p-2 rounded-lg transition-all ${
+                    viewMode === "list"
+                      ? "bg-white text-violet-600 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                  aria-label="List view"
                 >
                   <List className="w-5 h-5" />
                 </button>
@@ -405,17 +432,25 @@ export default function RecruiterClients() {
 
         {/* Results Summary */}
         <div className="flex items-center justify-between mb-6">
-          <div className="text-sm font-semibold text-gray-700">
-            Showing <span className="text-blue-600">{filteredClients.length}</span> of <span className="text-gray-900">{clients.length}</span> clients
+          <div className="text-sm font-medium text-gray-600">
+            Showing{" "}
+            <span className="text-violet-600 font-semibold">
+              {filteredClients.length}
+            </span>{" "}
+            of{" "}
+            <span className="text-gray-900 font-semibold">
+              {stats.totalClients}
+            </span>{" "}
+            clients
           </div>
-          {(searchTerm || filterStatus !== 'all' || filterTier !== 'all') && (
+          {hasActiveFilters && (
             <button
               onClick={() => {
-                setSearchTerm('');
-                setFilterStatus('all');
-                setFilterTier('all');
+                setSearchTerm("");
+                setFilterStatus("all");
+                setFilterTier("all");
               }}
-              className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center space-x-1"
+              className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center space-x-1 hover:underline transition-all"
             >
               <X className="w-4 h-4" />
               <span>Clear Filters</span>
@@ -423,61 +458,69 @@ export default function RecruiterClients() {
           )}
         </div>
 
-      {/* Clients Grid/List */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredClients.map((client) => (
-            <ClientCard key={client.id} client={client} />
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Client
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Performance
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredClients.map((client) => (
-                  <ClientRow key={client.id} client={client} />
-                ))}
-              </tbody>
-            </table>
+        {/* Clients Grid/List */}
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredClients.map((client) => (
+              <ClientCard key={client.id} client={client} />
+            ))}
           </div>
-        </div>
-      )}
-
-        {filteredClients.length === 0 && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-16 text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Building2 className="w-12 h-12 text-blue-600" />
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Client
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Performance
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {filteredClients.map((client) => (
+                    <ClientRow key={client.id} client={client} />
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No clients found</h3>
-            <p className="text-gray-600 text-base mb-6 max-w-md mx-auto">
-              {searchTerm || filterStatus !== 'all' || filterTier !== 'all'
-                ? 'Try adjusting your search or filters to find what you\'re looking for.'
-                : 'Get started by adding your first client to begin managing recruitment relationships.'}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {filteredClients.length === 0 && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
+            <div className="relative inline-block mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+                <Building2 className="w-10 h-10 text-gray-400" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-violet-100 rounded-full flex items-center justify-center">
+                <Search className="w-4 h-4 text-violet-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              No clients found
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              {hasActiveFilters
+                ? "Try adjusting your search or filters to find what you're looking for."
+                : "Get started by adding your first client to begin tracking relationships."}
             </p>
-            {!(searchTerm || filterStatus !== 'all' || filterTier !== 'all') && (
+            {!hasActiveFilters && (
               <Link
                 to="/app/recruiter/clients/add"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 hover:-translate-y-0.5"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Add Your First Client
@@ -490,158 +533,210 @@ export default function RecruiterClients() {
   );
 }
 
+function StatCard({ icon: Icon, value, label, gradient, bgColor }) {
+  // Extract color from gradient for consistent styling
+  const iconColor =
+    gradient.includes("violet") || gradient.includes("purple")
+      ? "text-violet-600"
+      : gradient.includes("blue") || gradient.includes("cyan")
+      ? "text-blue-600"
+      : gradient.includes("emerald") || gradient.includes("teal")
+      ? "text-emerald-600"
+      : "text-orange-600";
+
+  return (
+    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between">
+      <div>
+        <p className={`${iconColor} text-sm font-medium`}>{label}</p>
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        <p className="text-green-600 text-xs flex items-center mt-1">
+          <TrendingUp className="w-3 h-3 mr-1" />
+          Active
+        </p>
+      </div>
+      <div
+        className={`w-10 h-10 ${bgColor} rounded-xl flex items-center justify-center`}
+      >
+        <Icon className={`w-5 h-5 ${iconColor}`} />
+      </div>
+    </div>
+  );
+}
+
 function ClientCard({ client }) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const TierIconComponent = getTierIcon(client.tier);
-  
+  const tierConfig = getTierConfig(client.tier);
+  const statusConfig = getStatusConfig(client.status);
+  const TierIcon = tierConfig.icon;
+
   return (
-    <div className="group bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-transparent hover:border-blue-200 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 overflow-hidden">
-      {/* Tier Indicator Bar */}
-      <div className={`h-1.5 bg-gradient-to-r ${getTierGradient(client.tier)}`} />
-      
-      <div className="p-6">
-        {/* Enhanced Header */}
+    <div className="group relative bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 p-4 overflow-hidden">
+      {/* Decorative gradient */}
+      <div
+        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${tierConfig.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`}
+      ></div>
+
+      <div className="relative">
+        {/* Compact Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start space-x-4 flex-1">
+          <div className="flex items-start space-x-3 flex-1">
             <div className="relative">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-white">
-                <Building2 className="w-7 h-7 text-blue-600" />
+              <div className="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Building2 className="w-5 h-5 text-gray-600" />
               </div>
-              {/* Tier Badge on Avatar */}
-              <div className={`absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r ${getTierGradient(client.tier)} rounded-full flex items-center justify-center text-white shadow-lg`}>
-                <TierIconComponent className="w-3 h-3" />
+              <div
+                className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-r ${tierConfig.color} rounded-md flex items-center justify-center shadow-md ${tierConfig.glow}`}
+              >
+                <TierIcon className="w-2.5 h-2.5 text-white" />
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+              <h3 className="text-base font-bold text-gray-900 mb-1 truncate group-hover:text-violet-600 transition-colors">
                 {client.name}
               </h3>
-              <p className="text-sm text-gray-600 flex items-center mt-1">
-                <Briefcase className="w-3 h-3 mr-1" />
+              <p className="text-xs text-gray-600 mb-2 truncate">
                 {client.industry}
               </p>
+
+              {/* Compact Status Badges */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 ${statusConfig.bg} ${statusConfig.text} rounded-md text-xs font-medium border ${statusConfig.border}`}
+                >
+                  <span
+                    className={`w-1 h-1 ${statusConfig.dot} rounded-full mr-1`}
+                  ></span>
+                  {client.status}
+                </span>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 ${tierConfig.bg} ${tierConfig.text} rounded-md text-xs font-medium border ${tierConfig.border}`}
+                >
+                  <TierIcon className="w-2.5 h-2.5 mr-1" />
+                  {client.tier}
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="relative">
-            <button 
+            <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110"
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
+              aria-label="More options"
             >
               <MoreVertical className="w-5 h-5" />
             </button>
-            
+
             {showDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-20 animate-scale-in">
-                <Link
-                  to={`/app/recruiter/clients/${client.id}`}
-                  className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                >
-                  <Eye className="w-4 h-4 mr-3" />
-                  View Details
-                </Link>
-                <button className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
-                  <Edit className="w-4 h-4 mr-3" />
-                  Edit Client
-                </button>
-                <button className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
-                  <MessageSquare className="w-4 h-4 mr-3" />
-                  Send Message
-                </button>
-                <div className="border-t border-gray-100 my-2"></div>
-                <button 
-                  onClick={() => window.location.href = `mailto:${client.primaryContact.email}`}
-                  className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                >
-                  <Mail className="w-4 h-4 mr-3" />
-                  Email Contact
-                </button>
-                <button 
-                  onClick={() => window.location.href = `tel:${client.primaryContact.phone}`}
-                  className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-                >
-                  <Phone className="w-4 h-4 mr-3" />
-                  Call Contact
-                </button>
-              </div>
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowDropdown(false)}
+                ></div>
+                <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <Link
+                    to={`/app/recruiter/clients/${client.id}`}
+                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <Eye className="w-4 h-4 mr-3 text-gray-400" />
+                    View Details
+                  </Link>
+                  <button className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    <Edit className="w-4 h-4 mr-3 text-gray-400" />
+                    Edit Client
+                  </button>
+                  <button className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    <MessageSquare className="w-4 h-4 mr-3 text-gray-400" />
+                    Send Message
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
 
-        {/* Status & Tier Badges */}
-        <div className="flex items-center space-x-2 mb-4">
-          <span className={`px-3 py-1.5 text-xs font-bold rounded-full border-2 ${getStatusColor(client.status)} flex items-center space-x-1`}>
-            <Activity className="w-3 h-3" />
-            <span>{client.status}</span>
-          </span>
-          <span className={`px-3 py-1.5 text-xs font-bold rounded-full border-2 ${getTierColor(client.tier)} flex items-center space-x-1`}>
-            <TierIconComponent className="w-3 h-3" />
-            <span>{client.tier}</span>
-          </span>
-        </div>
-
-        {/* Contact Info with Icons */}
-        <div className="space-y-2.5 mb-4 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-4">
-          <div className="flex items-center text-sm text-gray-700">
-            <Phone className="w-4 h-4 mr-2.5 text-green-500" />
-            <span className="truncate">{client.primaryContact.phone}</span>
+        {/* Contact Info */}
+        <div className="space-y-3 mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center text-sm text-gray-600 hover:text-violet-600 transition-colors group/item">
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-violet-50 transition-colors">
+              <Phone className="w-4 h-4 text-gray-400 group-hover/item:text-violet-600" />
+            </div>
+            <span className="font-medium truncate">
+              {client.primaryContact.phone}
+            </span>
           </div>
-          <div className="flex items-center text-sm text-gray-700">
-            <Mail className="w-4 h-4 mr-2.5 text-blue-500" />
-            <span className="truncate">{client.primaryContact.email}</span>
+          <div className="flex items-center text-sm text-gray-600 hover:text-violet-600 transition-colors group/item">
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-violet-50 transition-colors">
+              <Mail className="w-4 h-4 text-gray-400 group-hover/item:text-violet-600" />
+            </div>
+            <span className="font-medium truncate">
+              {client.primaryContact.email}
+            </span>
           </div>
-          <div className="flex items-center text-sm text-gray-700">
-            <MapPin className="w-4 h-4 mr-2.5 text-red-500" />
-            <span className="truncate">{client.companyDetails.location.city}, {client.companyDetails.location.state}</span>
-          </div>
-        </div>
-
-        {/* Enhanced Metrics */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 text-center border border-blue-200">
-            <div className="text-2xl font-extrabold text-blue-600">{client.metrics.activeJobs}</div>
-            <div className="text-xs font-semibold text-gray-600 mt-1">Active Jobs</div>
-          </div>
-          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-3 text-center border border-emerald-200">
-            <div className="text-2xl font-extrabold text-emerald-600">{client.metrics.candidatesHired}</div>
-            <div className="text-xs font-semibold text-gray-600 mt-1">Hired</div>
+          <div className="flex items-center text-sm text-gray-600 hover:text-violet-600 transition-colors group/item">
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center mr-3 group-hover/item:bg-violet-50 transition-colors">
+              <MapPin className="w-4 h-4 text-gray-400 group-hover/item:text-violet-600" />
+            </div>
+            <span className="font-medium truncate">
+              {client.companyDetails.location.city},{" "}
+              {client.companyDetails.location.state}
+            </span>
           </div>
         </div>
 
-        {/* Performance Badge */}
-        <div className="flex items-center justify-between mb-4 bg-yellow-50 rounded-xl p-3 border border-yellow-200">
-          <span className="text-xs font-semibold text-gray-700">Offer Acceptance</span>
-          <div className="flex items-center text-sm font-bold text-yellow-700">
-            <Star className="w-4 h-4 mr-1 text-yellow-500 fill-current" />
-            {client.metrics.offerAcceptanceRate}%
+        {/* Metrics */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="text-center p-3 bg-gray-50 rounded-xl hover:bg-violet-50 transition-colors group/metric">
+            <div className="text-2xl font-bold text-gray-900 mb-1 group-hover/metric:text-violet-600 transition-colors">
+              {client.metrics.activeJobs}
+            </div>
+            <div className="text-xs text-gray-600 font-medium">Active Jobs</div>
+          </div>
+          <div className="text-center p-3 bg-gray-50 rounded-xl hover:bg-emerald-50 transition-colors group/metric">
+            <div className="text-2xl font-bold text-gray-900 mb-1 group-hover/metric:text-emerald-600 transition-colors">
+              {client.metrics.candidatesHired}
+            </div>
+            <div className="text-xs text-gray-600 font-medium">Hired</div>
+          </div>
+          <div className="text-center p-3 bg-gray-50 rounded-xl hover:bg-amber-50 transition-colors group/metric">
+            <div className="text-2xl font-bold text-gray-900 mb-1 group-hover/metric:text-amber-600 transition-colors">
+              {client.metrics.offerAcceptanceRate}%
+            </div>
+            <div className="text-xs text-gray-600 font-medium">Accept Rate</div>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex items-center space-x-2">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => window.location.href = `mailto:${client.primaryContact.email}`}
-            className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+            onClick={() =>
+              (window.location.href = `mailto:${client.primaryContact.email}`)
+            }
+            className="flex-1 p-3 bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-xl transition-all flex items-center justify-center group/btn"
             title="Send Email"
           >
             <Mail className="w-4 h-4" />
           </button>
           <button
-            onClick={() => window.location.href = `tel:${client.primaryContact.phone}`}
-            className="p-2.5 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
+            onClick={() =>
+              (window.location.href = `tel:${client.primaryContact.phone}`)
+            }
+            className="flex-1 p-3 bg-gray-50 hover:bg-emerald-50 text-gray-600 hover:text-emerald-600 rounded-xl transition-all flex items-center justify-center group/btn"
             title="Call"
           >
             <Phone className="w-4 h-4" />
           </button>
-          <button className="p-2.5 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 hover:scale-110" title="Schedule Meeting">
+          <button
+            className="flex-1 p-3 bg-gray-50 hover:bg-purple-50 text-gray-600 hover:text-purple-600 rounded-xl transition-all flex items-center justify-center group/btn"
+            title="Schedule Meeting"
+          >
             <Calendar className="w-4 h-4" />
           </button>
           <Link
             to={`/app/recruiter/clients/${client.id}`}
-            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-center flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+            className="flex-[2] px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all text-center text-sm shadow-lg shadow-violet-500/20 hover:shadow-xl hover:shadow-violet-500/30 hover:-translate-y-0.5"
           >
-            <Eye className="w-4 h-4" />
-            <span>View Details</span>
+            View Details
           </Link>
         </div>
       </div>
@@ -650,61 +745,97 @@ function ClientCard({ client }) {
 }
 
 function ClientRow({ client }) {
+  const tierConfig = getTierConfig(client.tier);
+  const statusConfig = getStatusConfig(client.status);
+  const TierIcon = tierConfig.icon;
+
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-            <Building2 className="w-5 h-5 text-blue-600" />
+          <div className="relative">
+            <div className="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center mr-3">
+              <Building2 className="w-5 h-5 text-gray-600" />
+            </div>
+            <div
+              className={`absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r ${tierConfig.color} rounded flex items-center justify-center`}
+            >
+              <TierIcon className="w-2 h-2 text-white" />
+            </div>
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-900">{client.name}</div>
+            <div className="text-sm font-semibold text-gray-900">
+              {client.name}
+            </div>
             <div className="text-sm text-gray-500">{client.industry}</div>
           </div>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{client.primaryContact.name}</div>
-        <div className="text-sm text-gray-500">{client.primaryContact.email}</div>
+        <div className="text-sm font-medium text-gray-900">
+          {client.primaryContact.name}
+        </div>
+        <div className="text-sm text-gray-500">
+          {client.primaryContact.email}
+        </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center space-x-2">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(client.status)}`}>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center px-2.5 py-1 ${statusConfig.bg} ${statusConfig.text} rounded-lg text-xs font-medium border ${statusConfig.border}`}
+          >
+            <span
+              className={`w-1.5 h-1.5 ${statusConfig.dot} rounded-full mr-1.5`}
+            ></span>
             {client.status}
           </span>
-          <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getTierColor(client.tier)}`}>
+          <span
+            className={`inline-flex items-center px-2.5 py-1 ${tierConfig.bg} ${tierConfig.text} rounded-lg text-xs font-medium border ${tierConfig.border}`}
+          >
+            <TierIcon className="w-3 h-3 mr-1" />
             {client.tier}
           </span>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center space-x-4 text-sm text-gray-900">
-          <div className="flex items-center">
-            <Briefcase className="w-4 h-4 mr-1 text-gray-400" />
-            {client.metrics.activeJobs}
+        <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center text-gray-600">
+            <Briefcase className="w-4 h-4 mr-1.5 text-gray-400" />
+            <span className="font-medium">{client.metrics.activeJobs}</span>
           </div>
-          <div className="flex items-center">
-            <Users className="w-4 h-4 mr-1 text-gray-400" />
-            {client.metrics.candidatesHired}
+          <div className="flex items-center text-gray-600">
+            <Users className="w-4 h-4 mr-1.5 text-gray-400" />
+            <span className="font-medium">
+              {client.metrics.candidatesHired}
+            </span>
           </div>
-          <div className="flex items-center">
-            <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
-            {client.metrics.offerAcceptanceRate}%
+          <div className="flex items-center text-gray-600">
+            <Star className="w-4 h-4 mr-1.5 text-yellow-400 fill-current" />
+            <span className="font-medium">
+              {client.metrics.offerAcceptanceRate}%
+            </span>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <div className="flex items-center space-x-2">
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <div className="flex items-center justify-end gap-2">
           <Link
             to={`/app/recruiter/clients/${client.id}`}
-            className="text-blue-600 hover:text-blue-900"
+            className="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-all"
+            title="View Details"
           >
             <Eye className="w-4 h-4" />
           </Link>
-          <button className="text-gray-400 hover:text-gray-600">
+          <button
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+            title="Edit"
+          >
             <Edit className="w-4 h-4" />
           </button>
-          <button className="text-gray-400 hover:text-gray-600">
+          <button
+            className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+            title="Message"
+          >
             <MessageSquare className="w-4 h-4" />
           </button>
         </div>
