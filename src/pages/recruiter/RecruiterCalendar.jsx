@@ -118,18 +118,18 @@ const MonthView = ({ currentDate, selectedDate, interviews, onDateClick, onInter
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="h-full">
+    <div className="w-full pb-2">
       {/* Days of Week Header */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {daysOfWeek.map((day) => (
-          <div key={day} className="p-3 text-center text-sm font-medium text-slate-500 bg-slate-50 rounded-lg">
+          <div key={day} className="p-2 text-center text-sm font-medium text-slate-500 bg-slate-50 rounded-lg">
             {day}
           </div>
         ))}
       </div>
 
-      {/* Calendar Days */}
-      <div className="grid grid-cols-7 gap-1 h-full">
+      {/* Calendar Days - 6-row grid for all month lengths */}
+      <div className="grid grid-cols-7 gap-1" style={{ gridTemplateRows: 'repeat(6, 1fr)', height: 'auto', overflow: 'visible' }}>
         {getDaysInMonth(currentDate).map((date, index) => {
           const dayInterviews = getInterviewsForDate(date);
 
@@ -137,13 +137,14 @@ const MonthView = ({ currentDate, selectedDate, interviews, onDateClick, onInter
             <div
               key={index}
               className={`
-                min-h-[160px] p-2 border border-slate-200 rounded-lg cursor-pointer
+                min-h-[110px] h-auto p-2 border border-slate-200 rounded-lg cursor-pointer
                 transition-all duration-200 hover:shadow-md hover:scale-[1.02]
                 ${date ? 'hover:border-blue-200' : ''}
                 ${isToday(date) ? 'bg-blue-50 border-blue-200' : 'bg-white'}
                 ${isSelected(date) ? 'ring-2 ring-purple-200 bg-purple-50' : ''}
                 ${!date ? 'cursor-default hover:bg-transparent hover:shadow-none hover:scale-100 opacity-50' : ''}
               `}
+              style={{ overflow: 'visible' }}
               onClick={() => date && onDateClick(date)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, date)}
@@ -867,9 +868,9 @@ const RecruiterCalendar = () => {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Calendar */}
           <div className="xl:col-span-3">
-            <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl overflow-hidden">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-xl" style={{ overflow: 'visible' }}>
               {/* Calendar Header */}
-              <div className="p-6 border-b border-slate-200/50 bg-gradient-to-r from-slate-50 to-blue-50">
+              <div className="p-4 border-b border-slate-200/50 bg-gradient-to-r from-slate-50 to-blue-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <h2 className="text-xl font-semibold text-slate-900">
@@ -920,8 +921,8 @@ const RecruiterCalendar = () => {
                 </div>
               </div>
 
-              {/* Calendar Content */}
-              <div className="p-6" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+              {/* Calendar Content - Fixed height removed, auto sizing */}
+              <div className="p-4 pb-4" style={{ height: 'auto', overflow: 'visible', minHeight: '480px' }}>
                 {viewMode === 'month' && (
                   <MonthView
                     currentDate={currentDate}

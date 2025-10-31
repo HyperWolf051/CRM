@@ -441,8 +441,8 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Content Row - Wider Calendar (Day 4 Optimization) */}
-          <div className="lg:col-span-8 xl:col-span-11">
+          {/* Content Row - Wider Calendar with proper height */}
+          <div className="lg:col-span-8 xl:col-span-11" style={{ minHeight: '700px' }}>
             <InteractiveCalendar
               events={calendarEvents}
               onEventClick={handleEventClick}

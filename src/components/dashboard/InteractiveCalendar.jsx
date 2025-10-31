@@ -108,7 +108,7 @@ const InteractiveCalendar = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-5 pb-8 shadow-sm border border-gray-200" style={{ minHeight: '650px' }}>
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <CalendarIcon className="w-5 h-5 mr-2 text-blue-600" />
@@ -139,8 +139,8 @@ const InteractiveCalendar = ({
         </div>
       </div>
       
-      {/* Calendar Grid - Optimized for wider layout */}
-      <div className="grid grid-cols-7 gap-2 mb-4">
+      {/* Calendar Grid - Optimized for wider layout with extra bottom margin */}
+      <div className="grid grid-cols-7 gap-2 mb-6">
         {/* Day Headers */}
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 bg-gray-50 rounded">
@@ -148,7 +148,7 @@ const InteractiveCalendar = ({
           </div>
         ))}
         
-        {/* Calendar Days */}
+        {/* Calendar Days - Significantly increased height to prevent bottom cropping */}
         {getDaysInMonth(currentDate).map((date, index) => {
           const dayEvents = getEventsForDate(date, events);
           const isToday = isDateToday(date);
@@ -157,7 +157,7 @@ const InteractiveCalendar = ({
           return (
             <div
               key={index}
-              className={`min-h-[90px] p-2 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 ${
+              className={`min-h-[140px] p-2 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 ${
                 isToday ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
               } ${isHovered ? 'shadow-md scale-105' : ''}`}
               onClick={() => {
