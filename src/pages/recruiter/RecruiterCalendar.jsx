@@ -168,7 +168,15 @@ const MonthView = ({ currentDate, selectedDate, interviews, onDateClick, onInter
                           key={interview.id}
                           draggable
                           onDragStart={(e) => handleDragStart(e, interview)}
-                          onClick={(e) => {
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`${interview.candidateName} interview. Press Enter to view details`}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onInterviewClick(interview);
+                            }
+                          }}                          onClick={(e) => {
                             e.stopPropagation();
                             onInterviewClick(interview);
                           }}

@@ -180,26 +180,26 @@ export function useInterviews(filters = {}) {
         setLoading(true);
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 300));
-        
+
         // Apply filters
         let filteredInterviews = [...mockInterviews];
-        
+
         if (filters.type && filters.type !== 'all') {
           filteredInterviews = filteredInterviews.filter(interview => interview.type === filters.type);
         }
-        
+
         if (filters.status && filters.status !== 'all') {
           filteredInterviews = filteredInterviews.filter(interview => interview.status === filters.status);
         }
-        
+
         if (filters.priority && filters.priority !== 'all') {
           filteredInterviews = filteredInterviews.filter(interview => interview.priority === filters.priority);
         }
-        
+
         if (filters.interviewer && filters.interviewer !== 'all') {
           filteredInterviews = filteredInterviews.filter(interview => interview.interviewer.id === filters.interviewer);
         }
-        
+
         if (filters.dateRange) {
           const { start, end } = filters.dateRange;
           filteredInterviews = filteredInterviews.filter(interview => {
@@ -207,7 +207,7 @@ export function useInterviews(filters = {}) {
             return interviewDate >= start && interviewDate <= end;
           });
         }
-        
+
         setInterviews(filteredInterviews);
       } catch (err) {
         setError(err.message);
@@ -225,18 +225,18 @@ export function useInterviews(filters = {}) {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
-      
-      setInterviews(prev => prev.map(interview => 
-        interview.id === interviewId 
-          ? { 
-              ...interview, 
-              scheduledDate: newDateTime,
-              updatedAt: new Date(),
-              status: 'rescheduled'
-            }
+
+      setInterviews(prev => prev.map(interview =>
+        interview.id === interviewId
+          ? {
+            ...interview,
+            scheduledDate: newDateTime,
+            updatedAt: new Date(),
+            status: 'rescheduled'
+          }
           : interview
       ));
-      
+
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -252,9 +252,9 @@ export function useInterviews(filters = {}) {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       const newInterview = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         ...interviewData,
         status: 'scheduled',
         createdAt: new Date(),
@@ -266,7 +266,6 @@ export function useInterviews(filters = {}) {
           ]
         }
       };
-      
       setInterviews(prev => [...prev, newInterview]);
       return { success: true, interview: newInterview };
     } catch (err) {
@@ -283,17 +282,17 @@ export function useInterviews(filters = {}) {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
-      
-      setInterviews(prev => prev.map(interview => 
-        interview.id === interviewId 
-          ? { 
-              ...interview, 
-              ...updates,
-              updatedAt: new Date()
-            }
+
+      setInterviews(prev => prev.map(interview =>
+        interview.id === interviewId
+          ? {
+            ...interview,
+            ...updates,
+            updatedAt: new Date()
+          }
           : interview
       ));
-      
+
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -309,18 +308,18 @@ export function useInterviews(filters = {}) {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
-      
-      setInterviews(prev => prev.map(interview => 
-        interview.id === interviewId 
-          ? { 
-              ...interview, 
-              status: 'cancelled',
-              cancellationReason: reason,
-              updatedAt: new Date()
-            }
+
+      setInterviews(prev => prev.map(interview =>
+        interview.id === interviewId
+          ? {
+            ...interview,
+            status: 'cancelled',
+            cancellationReason: reason,
+            updatedAt: new Date()
+          }
           : interview
       ));
-      
+
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -332,7 +331,7 @@ export function useInterviews(filters = {}) {
 
   // Get interviews for a specific date
   const getInterviewsForDate = useCallback((date) => {
-    return interviews.filter(interview => 
+    return interviews.filter(interview =>
       interview.scheduledDate.toDateString() === date.toDateString()
     );
   }, [interviews]);
@@ -349,7 +348,7 @@ export function useInterviews(filters = {}) {
   // Get today's interviews
   const getTodaysInterviews = useCallback(() => {
     const today = new Date();
-    return interviews.filter(interview => 
+    return interviews.filter(interview =>
       interview.scheduledDate.toDateString() === today.toDateString()
     ).sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
   }, [interviews]);
@@ -369,10 +368,10 @@ export function useInterviews(filters = {}) {
       scheduled: interviews.filter(i => i.status === 'scheduled').length,
       completed: interviews.filter(i => i.status === 'completed').length,
       cancelled: interviews.filter(i => i.status === 'cancelled').length,
-      today: interviews.filter(i => 
+      today: interviews.filter(i =>
         i.scheduledDate >= today && i.scheduledDate < tomorrow
       ).length,
-      thisWeek: interviews.filter(i => 
+      thisWeek: interviews.filter(i =>
         i.scheduledDate >= thisWeek && i.scheduledDate < new Date(thisWeek.getTime() + 7 * 24 * 60 * 60 * 1000)
       ).length,
       byType: {
@@ -414,16 +413,14 @@ export function useInterviewReminders() {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const newReminder = {
-        id: Date.now().toString(),
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         interviewId,
         scheduledFor: reminderTime,
         sent: false,
         createdAt: new Date()
-      };
-      
-      setReminders(prev => [...prev, newReminder]);
+      }; setReminders(prev => [...prev, newReminder]);
       return { success: true, reminder: newReminder };
     } catch (err) {
       return { success: false, error: err.message };
@@ -437,13 +434,13 @@ export function useInterviewReminders() {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      setReminders(prev => prev.map(reminder => 
-        reminder.id === reminderId 
+
+      setReminders(prev => prev.map(reminder =>
+        reminder.id === reminderId
           ? { ...reminder, sent: true, sentAt: new Date() }
           : reminder
       ));
-      
+
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
@@ -470,14 +467,13 @@ export function useInterviewFeedback() {
       setLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
-      
+
       const newFeedback = {
-        id: Date.now().toString(),
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         interviewId,
         ...feedbackData,
         submittedAt: new Date()
       };
-      
       setFeedback(prev => [...prev, newFeedback]);
       return { success: true, feedback: newFeedback };
     } catch (err) {
@@ -491,6 +487,23 @@ export function useInterviewFeedback() {
     return feedback.filter(f => f.interviewId === interviewId);
   }, [feedback]);
 
+<<<<<<< Updated upstream
+=======
+  const updateInterviewWithFeedback = useCallback(async (interviewId, feedbackData) => {
+    try {
+      setLoading(true);
+      // Simulate API call to update interview with feedback
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+>>>>>>> Stashed changes
   return {
     feedback,
     loading,
