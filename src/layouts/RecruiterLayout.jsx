@@ -2,7 +2,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import RecruiterTopbar from '@/components/recruitment/RecruiterTopbar';
 import PageTransition from '@/components/PageTransition';
-import InterviewReminderSystem from '@/components/recruitment/InterviewReminderSystem';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcut';
 
 // Map routes to page titles for recruiter section
@@ -130,9 +129,6 @@ export default function RecruiterLayout() {
           </div>
         </main>
       </div>
-      
-      {/* Interview Reminder System - Global overlay */}
-      <InterviewReminderSystem />
     </div>
   );
 }
