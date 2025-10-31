@@ -139,27 +139,31 @@ export default function RecruiterDashboard() {
         />
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions with Enhanced Hover Animations */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             onClick={() => window.location.href = '/app/recruiter/candidates/add'}
-            className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
-            <Users className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700">Add Candidate</span>
+            className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-blue-400 hover:shadow-lg">
+            <Users className="w-5 h-5 text-blue-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Add Candidate</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
           </button>
-          <button className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors">
-            <Briefcase className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-gray-700">Post Job</span>
+          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-green-400 hover:shadow-lg">
+            <Briefcase className="w-5 h-5 text-green-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Post Job</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
           </button>
-          <button className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors">
-            <Calendar className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">Schedule Interview</span>
+          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-purple-400 hover:shadow-lg">
+            <Calendar className="w-5 h-5 text-purple-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Schedule Interview</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
           </button>
-          <button className="flex items-center justify-center space-x-2 p-4 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors">
-            <TrendingUp className="w-5 h-5 text-amber-600" />
-            <span className="text-sm font-medium text-gray-700">View Reports</span>
+          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-amber-400 hover:shadow-lg">
+            <TrendingUp className="w-5 h-5 text-amber-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">View Reports</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
           </button>
         </div>
       </div>

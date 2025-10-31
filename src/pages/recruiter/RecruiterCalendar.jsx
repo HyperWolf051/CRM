@@ -137,7 +137,7 @@ const MonthView = ({ currentDate, selectedDate, interviews, onDateClick, onInter
             <div
               key={index}
               className={`
-                min-h-[120px] p-2 border border-slate-200 rounded-lg cursor-pointer
+                min-h-[160px] p-2 border border-slate-200 rounded-lg cursor-pointer
                 transition-all duration-200 hover:shadow-md hover:scale-[1.02]
                 ${date ? 'hover:border-blue-200' : ''}
                 ${isToday(date) ? 'bg-blue-50 border-blue-200' : 'bg-white'}
