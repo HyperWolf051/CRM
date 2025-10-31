@@ -1,1 +1,0 @@
-import{j as r}from"./index-QKcSTkRp.js";const d=({children:d,className:o="",padding:s="md",...a})=>{const e={sm:"p-4",md:"p-6",lg:"p-8"},n=e[s]||e.md;return r.jsx("div",{className:`bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-150 hover:shadow-md hover:border-gray-300 ${n} ${o}`,...a,children:d})};export{d as C};
