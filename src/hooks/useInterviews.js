@@ -491,10 +491,28 @@ export function useInterviewFeedback() {
     return feedback.filter(f => f.interviewId === interviewId);
   }, [feedback]);
 
+  const updateInterviewWithFeedback = useCallback(async (interviewId, feedbackData) => {
+    try {
+      setLoading(true);
+      // Simulate API call to update interview with feedback
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // This would typically update the interview record with the feedback
+      console.log('Interview feedback updated:', { interviewId, feedbackData });
+      
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     feedback,
     loading,
     submitFeedback,
-    getFeedbackForInterview
+    getFeedbackForInterview,
+    updateInterviewWithFeedback
   };
 }

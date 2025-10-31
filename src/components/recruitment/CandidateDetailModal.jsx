@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import { CandidateAPI, InterviewAPI } from '@/services/api';
 import { ProfileTab, ApplicationTab, DocumentsTab, NotesTab } from './CandidateDetailTabs';
 import WorkflowManagement from './WorkflowManagement';
+import InterviewHistoryTracker from './InterviewHistoryTracker';
 
 // Helper function to get stage display info
 const getStageInfo = (stage) => {
@@ -351,6 +352,7 @@ const CandidateDetailModal = ({
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'application', label: 'Application', icon: Briefcase },
     { id: 'workflow', label: 'Workflow', icon: Clock },
+    { id: 'interviews', label: 'Interview History', icon: Calendar },
     { id: 'documents', label: 'Documents', icon: FileText },
     { id: 'notes', label: 'Notes', icon: MessageSquare }
   ];
@@ -493,6 +495,13 @@ const CandidateDetailModal = ({
                 onCandidateUpdate={handleCandidateUpdate}
                 onInterviewSchedule={handleInterviewSchedule}
                 currentUser={currentUser}
+              />
+            )}
+            {activeTab === 'interviews' && (
+              <InterviewHistoryTracker 
+                candidateId={candidate.id}
+                showFilters={false}
+                maxItems={null}
               />
             )}
             {activeTab === 'documents' && (
