@@ -108,7 +108,24 @@ export const businessSectors = {
         name: 'Candidates',
         href: '/app/recruiter/candidates',
         icon: Users,
-        color: 'from-green-500 to-green-600'
+        color: 'from-green-500 to-green-600',
+        submenu: [
+          {
+            name: 'All Candidates',
+            href: '/app/recruiter/candidates',
+            description: 'View and manage all candidates'
+          },
+          {
+            name: 'Add Candidate',
+            href: '/app/recruiter/candidates/add',
+            description: 'Add a new candidate'
+          },
+          {
+            name: 'Duplicate Management',
+            href: '/app/recruiter/candidates/duplicates',
+            description: 'Manage duplicate candidates'
+          }
+        ]
       },
       {
         name: 'Jobs',

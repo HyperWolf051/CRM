@@ -621,6 +621,141 @@ export interface ClientRequirement {
   deadline?: Date;
 }
 
+// Job Offer Management Types
+export interface JobOffer {
+  id: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone: string;
+  candidateAvatar?: string;
+  jobId: string;
+  jobTitle: string;
+  clientName: string;
+  
+  offerDetails: {
+    position: string;
+    department: string;
+    startDate: Date;
+    salary: {
+      base: number;
+      currency: string;
+      frequency: 'annual' | 'monthly';
+    };
+    benefits: {
+      healthInsurance: boolean;
+      dentalInsurance: boolean;
+      retirement401k: boolean;
+      paidTimeOff: number;
+      flexibleSchedule: boolean;
+      remoteWork: boolean;
+      stockOptions?: {
+        granted: boolean;
+        vesting: string;
+      };
+    };
+    bonuses?: {
+      signing: number;
+      performance: number;
+      annual: number;
+    };
+  };
+  
+  status: 'draft' | 'sent' | 'under-review' | 'negotiating' | 'accepted' | 'declined' | 'expired' | 'withdrawn';
+  
+  timeline: {
+    createdAt: Date;
+    sentAt?: Date;
+    expiryDate?: Date;
+    respondedAt?: Date;
+    acceptedAt?: Date;
+    declinedAt?: Date;
+  };
+  
+  negotiations: OfferNegotiation[];
+  
+  documents: {
+    offerLetter?: string; // URL to PDF
+    contract?: string;
+    additionalDocs?: string[];
+  };
+  
+  approvals: {
+    hr: { approved: boolean; approvedBy?: string; approvedAt?: Date; };
+    manager: { approved: boolean; approvedBy?: string; approvedAt?: Date; };
+    finance?: { approved: boolean; approvedBy?: string; approvedAt?: Date; };
+  };
+  
+  createdBy: string;
+  createdByName: string;
+  updatedAt: Date;
+  notes?: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+}
+
+export interface OfferNegotiation {
+  id: string;
+  initiatedBy: 'candidate' | 'company';
+  type: 'salary' | 'benefits' | 'start-date' | 'other';
+  originalValue: any;
+  proposedValue: any;
+  status: 'pending' | 'accepted' | 'rejected' | 'counter-proposed';
+  notes?: string;
+  createdAt: Date;
+  resolvedAt?: Date;
+}
+
+export type OfferStatus = 'draft' | 'sent' | 'under-review' | 'negotiating' | 'accepted' | 'declined' | 'expired' | 'withdrawn';
+
+export interface OfferFilters {
+  status?: OfferStatus[];
+  position?: string[];
+  client?: string[];
+  salaryRange?: {
+    min: number;
+    max: number;
+  };
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  priority?: string[];
+  createdBy?: string[];
+}
+
+export interface OfferFormData {
+  candidateId: string;
+  jobId: string;
+  position: string;
+  department: string;
+  startDate: Date;
+  salary: {
+    base: number;
+    currency: string;
+    frequency: 'annual' | 'monthly';
+  };
+  benefits: {
+    healthInsurance: boolean;
+    dentalInsurance: boolean;
+    retirement401k: boolean;
+    paidTimeOff: number;
+    flexibleSchedule: boolean;
+    remoteWork: boolean;
+    stockOptions?: {
+      granted: boolean;
+      vesting: string;
+    };
+  };
+  bonuses?: {
+    signing: number;
+    performance: number;
+    annual: number;
+  };
+  expiryDate?: Date;
+  notes?: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+}
+
 // Metrics for dashboard
 export interface RecruitmentMetrics {
   totalCandidates: number;

@@ -6,10 +6,13 @@
  */
 export const formatCurrency = (amount, currency = 'INR') => {
   if (amount === null || amount === undefined || isNaN(amount)) {
-    return '₹0.00';
+    const defaultSymbol = currency === 'USD' ? '$0.00' : '₹0.00';
+    return defaultSymbol;
   }
   
-  return new Intl.NumberFormat('en-IN', {
+  const locale = currency === 'USD' ? 'en-US' : 'en-IN';
+  
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,

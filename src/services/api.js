@@ -360,6 +360,75 @@ export const CandidateAPI = {
     } catch (error) {
       return handleApiError(error);
     }
+  },
+
+  // Check for duplicate candidates
+  checkDuplicates: async (candidateData) => {
+    try {
+      const response = await api.post('/candidates/check-duplicates', candidateData);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Merge candidates
+  merge: async (primaryId, duplicateId, mergeDecisions) => {
+    try {
+      const response = await api.post('/candidates/merge', {
+        primaryCandidateId: primaryId,
+        duplicateCandidateId: duplicateId,
+        mergeDecisions: mergeDecisions
+      });
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get duplicate groups for bulk management
+  getDuplicateGroups: async (filters = {}) => {
+    try {
+      const response = await api.get('/candidates/duplicate-groups', { params: filters });
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Resolve duplicate group
+  resolveDuplicateGroup: async (groupId, resolution) => {
+    try {
+      const response = await api.post(`/candidates/duplicate-groups/${groupId}/resolve`, resolution);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get duplicate audit trail
+  getDuplicateAudit: async (candidateId) => {
+    try {
+      const response = await api.get(`/candidates/${candidateId}/duplicate-audit`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
   }
 };
 

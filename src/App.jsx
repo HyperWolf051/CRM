@@ -44,6 +44,8 @@ const RecruiterAddClient = lazy(() => import('@/pages/recruiter/RecruiterAddClie
 const RecruiterCalendar = lazy(() => import('@/pages/recruiter/RecruiterCalendar'));
 const RecruiterScheduleInterview = lazy(() => import('@/pages/recruiter/RecruiterScheduleInterview'));
 const RecruiterInterviews = lazy(() => import('@/pages/recruiter/RecruiterInterviews'));
+const RecruiterOffers = lazy(() => import('@/pages/recruiter/RecruiterOffers'));
+const RecruiterDuplicateManagement = lazy(() => import('@/pages/recruiter/RecruiterDuplicateManagement'));
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -132,12 +134,13 @@ function App() {
                   <Route path="dashboard" element={<RecruiterDashboard />} />
                   <Route path="candidates" element={<RecruiterCandidates />} />
                   <Route path="candidates/add" element={<RecruiterAddCandidate />} />
+                  <Route path="candidates/duplicates" element={<RecruiterDuplicateManagement />} />
                   <Route path="clients" element={<RecruiterClients />} />
                   <Route path="clients/add" element={<RecruiterAddClient />} />
                   <Route path="clients/:id" element={<RecruiterClientDetail />} />
                   <Route path="jobs" element={<ComingSoon title="Jobs" description="Job posting and management" />} />
                   <Route path="interviews" element={<RecruiterInterviews />} />
-                  <Route path="offers" element={<ComingSoon title="Offers" description="Job offer management system" />} />
+                  <Route path="offers" element={<RecruiterOffers />} />
                   <Route path="calendar" element={<RecruiterCalendar />} />
                   <Route path="calendar/schedule" element={<RecruiterScheduleInterview />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />

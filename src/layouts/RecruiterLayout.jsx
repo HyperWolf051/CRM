@@ -10,6 +10,7 @@ const recruiterPageTitles = {
   '/app/recruiter/dashboard': 'Recruitment Dashboard',
   '/app/recruiter/candidates': 'Candidates',
   '/app/recruiter/candidates/add': 'Add Candidate',
+  '/app/recruiter/candidates/duplicates': 'Duplicate Management',
   '/app/recruiter/jobs': 'Jobs & Requirements',
   '/app/recruiter/jobs/add': 'Post New Job',
   '/app/recruiter/interviews': 'Interviews',

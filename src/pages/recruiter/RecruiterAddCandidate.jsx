@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { CandidateAPI } from '@/services/api';
+import { useDuplicateDetection } from '@/hooks/useDuplicateDetection';
+import { candidateUtils } from '@/utils/candidateUtils';
+import DuplicateDetectionModal from '@/components/recruitment/DuplicateDetectionModal';
+import MergePreviewModal from '@/components/recruitment/MergePreviewModal';
+import { duplicateDetectionUtils } from '@/utils/duplicateDetection';
 
 const RecruiterAddCandidate = () => {
   const navigate = useNavigate();
@@ -28,6 +33,20 @@ const RecruiterAddCandidate = () => {
     overallStatus: 'new'
   });
 
+  // Duplicate detection state
+  const {
+    isLoading: isDuplicateLoading,
+    duplicateResult,
+    checkDuplicates,
+    mergeCandidates,
+    clearDuplicateResult
+  } = useDuplicateDetection();
+
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [selectedDuplicate, setSelectedDuplicate] = useState(null);
+  const [mergePreview, setMergePreview] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -39,13 +58,40 @@ const RecruiterAddCandidate = () => {
     try {
       setIsLoading(true);
       
-      // Prepare candidate data for API
+      // Prepare candidate data for duplicate checking
       const candidateData = {
         ...candidate,
+        interestedFor: candidate.position, // Map position to interestedFor
         skills: candidate.skills ? candidate.skills.split(',').map(s => s.trim()) : []
       };
       
-      const result = await CandidateAPI.create(candidateData);
+      // Check for duplicates first
+      const duplicateCheck = await checkDuplicates(candidateData);
+      
+      if (duplicateCheck.hasMatches && duplicateCheck.matches.length > 0) {
+        // Show duplicate detection modal
+        setShowDuplicateModal(true);
+        setIsLoading(false);
+        return;
+      }
+      
+      // No duplicates found, proceed with creation
+      await createCandidate(candidateData);
+      
+    } catch (err) {
+      console.error('Error adding candidate:', err);
+      alert('Failed to add candidate. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const createCandidate = async (candidateData) => {
+    try {
+      // Create candidate using utility function for proper structure
+      const currentUser = { id: 'current-user', name: 'Current User' }; // Should come from auth context
+      const newCandidate = candidateUtils.createNewCandidate(candidateData, currentUser.id, currentUser.name);
+      
+      const result = await CandidateAPI.create(newCandidate);
       
       if (result.success) {
         alert('Candidate added successfully!');
@@ -54,11 +100,86 @@ const RecruiterAddCandidate = () => {
         alert('Failed to add candidate: ' + result.message);
       }
     } catch (err) {
-      console.error('Error adding candidate:', err);
+      console.error('Error creating candidate:', err);
       alert('Failed to add candidate. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle duplicate detection modal actions
+  const handleMergeCandidate = (duplicateId, duplicateCandidate) => {
+    setSelectedDuplicate(duplicateCandidate);
+    
+    // Generate merge preview
+    const candidateData = {
+      ...candidate,
+      interestedFor: candidate.position,
+      skills: candidate.skills ? candidate.skills.split(',').map(s => s.trim()) : []
+    };
+    
+    const currentUser = { id: 'current-user', name: 'Current User' };
+    const newCandidate = candidateUtils.createNewCandidate(candidateData, currentUser.id, currentUser.name);
+    
+    const preview = duplicateDetectionUtils.generateMergePreview(duplicateCandidate, newCandidate);
+    setMergePreview(preview);
+    setShowDuplicateModal(false);
+    setShowMergeModal(true);
+  };
+
+  const handleCreateNewAnyway = async () => {
+    setShowDuplicateModal(false);
+    
+    const candidateData = {
+      ...candidate,
+      interestedFor: candidate.position,
+      skills: candidate.skills ? candidate.skills.split(',').map(s => s.trim()) : []
+    };
+    
+    await createCandidate(candidateData);
+  };
+
+  const handleLinkRelated = async (candidateIds) => {
+    // For now, just create the candidate anyway
+    // In a full implementation, you would link the candidates
+    console.log('Linking candidates as related:', candidateIds);
+    await handleCreateNewAnyway();
+  };
+
+  const handleConfirmMerge = async (mergeDecisions, preservedData) => {
+    try {
+      setIsLoading(true);
+      
+      const result = await mergeCandidates(
+        mergePreview.primaryCandidate,
+        mergePreview.duplicateCandidate,
+        mergeDecisions
+      );
+      
+      if (result.success) {
+        alert('Candidates merged successfully!');
+        navigate('/app/recruiter/candidates');
+      } else {
+        alert('Failed to merge candidates: ' + result.error);
+      }
+    } catch (err) {
+      console.error('Error merging candidates:', err);
+      alert('Failed to merge candidates. Please try again.');
+    } finally {
+      setIsLoading(false);
+      setShowMergeModal(false);
+    }
+  };
+
+  const handleCloseDuplicateModal = () => {
+    setShowDuplicateModal(false);
+    clearDuplicateResult();
+  };
+
+  const handleCloseMergeModal = () => {
+    setShowMergeModal(false);
+    setMergePreview(null);
+    setSelectedDuplicate(null);
   };
 
   const handleCancel = () => {
@@ -366,6 +487,30 @@ const RecruiterAddCandidate = () => {
           </button>
         </div>
       </form>
+
+      {/* Duplicate Detection Modal */}
+      <DuplicateDetectionModal
+        isOpen={showDuplicateModal}
+        onClose={handleCloseDuplicateModal}
+        newCandidate={{
+          ...candidate,
+          interestedFor: candidate.position
+        }}
+        duplicates={duplicateResult?.matches || []}
+        onMerge={handleMergeCandidate}
+        onCreateNew={handleCreateNewAnyway}
+        onLinkRelated={handleLinkRelated}
+        isLoading={isDuplicateLoading || isLoading}
+      />
+
+      {/* Merge Preview Modal */}
+      <MergePreviewModal
+        isOpen={showMergeModal}
+        onClose={handleCloseMergeModal}
+        mergePreview={mergePreview}
+        onConfirmMerge={handleConfirmMerge}
+        isLoading={isLoading}
+      />
     </div>
   );
 };
