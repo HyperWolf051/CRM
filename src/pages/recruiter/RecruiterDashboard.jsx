@@ -102,14 +102,14 @@ export default function RecruiterDashboard() {
         />
       </div>
 
-      {/* Main Content Grid */}
+      {/* Main Content Grid - Fixed Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pipeline Chart - Takes 2 columns */}
         <div className="lg:col-span-2">
           <PipelineChart data={pipelineData} loading={pipelineLoading} />
         </div>
 
-        {/* Recent Activity Widgets */}
+        {/* Recent Activity Widgets - Properly Aligned */}
         <div className="space-y-6">
           {/* Recent Candidates Widget */}
           <RecentCandidatesWidget
@@ -126,45 +126,51 @@ export default function RecruiterDashboard() {
             loading={activityLoading}
             onJoinInterview={handleJoinInterview}
             onRescheduleInterview={handleRescheduleInterview}
+            onViewAllInterviews={() => navigate('/app/recruiter/calendar')}
           />
         </div>
       </div>
 
-      {/* Activity Timeline - Full Width */}
-      <div className="mt-6">
-        <ActivityTimelineWidget
-          activities={recentActivities}
-          loading={activityLoading}
-          maxItems={6}
-        />
-      </div>
+      {/* Activity Timeline & Quick Actions - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Activity Timeline - Takes 2 columns */}
+        <div className="lg:col-span-2">
+          <ActivityTimelineWidget
+            activities={recentActivities}
+            loading={activityLoading}
+            maxItems={6}
+          />
+        </div>
 
-      {/* Quick Actions with Enhanced Hover Animations */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
-            onClick={() => window.location.href = '/app/recruiter/candidates/add'}
-            className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-blue-400 hover:shadow-lg">
-            <Users className="w-5 h-5 text-blue-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
-            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Add Candidate</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-          </button>
-          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-green-400 hover:shadow-lg">
-            <Briefcase className="w-5 h-5 text-green-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
-            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Post Job</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-          </button>
-          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-purple-400 hover:shadow-lg">
-            <Calendar className="w-5 h-5 text-purple-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
-            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Schedule Interview</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-          </button>
-          <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-amber-400 hover:shadow-lg">
-            <TrendingUp className="w-5 h-5 text-amber-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
-            <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">View Reports</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-          </button>
+        {/* Quick Actions - Takes 1 column */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 gap-3">
+            <button
+              onClick={() => window.location.href = '/app/recruiter/candidates/add'}
+              className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-blue-400 hover:shadow-lg">
+              <Users className="w-5 h-5 text-blue-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+              <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Add Candidate</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+            </button>
+            <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-green-400 hover:shadow-lg">
+              <Briefcase className="w-5 h-5 text-green-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+              <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Post Job</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+            </button>
+            <button 
+              onClick={() => navigate('/app/recruiter/calendar')}
+              className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-purple-400 hover:shadow-lg">
+              <Calendar className="w-5 h-5 text-purple-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+              <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">Schedule Interview</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+            </button>
+            <button className="relative flex items-center justify-center space-x-2 p-4 border-2 border-gray-200 rounded-lg overflow-hidden group transition-all duration-300 hover:border-amber-400 hover:shadow-lg">
+              <TrendingUp className="w-5 h-5 text-amber-600 relative z-10 transition-colors duration-300 group-hover:text-white" />
+              <span className="text-sm font-medium text-gray-700 relative z-10 transition-colors duration-300 group-hover:text-white">View Reports</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

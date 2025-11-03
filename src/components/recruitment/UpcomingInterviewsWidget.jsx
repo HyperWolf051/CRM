@@ -5,7 +5,8 @@ export default function UpcomingInterviewsWidget({
   interviews = [], 
   loading = false,
   onJoinInterview,
-  onRescheduleInterview 
+  onRescheduleInterview,
+  onViewAllInterviews
 }) {
   const [hoveredInterview, setHoveredInterview] = useState(null);
 
@@ -216,7 +217,10 @@ export default function UpcomingInterviewsWidget({
       {/* Quick action to view all interviews */}
       {interviews.length > 0 && (
         <div className="mt-4 pt-3 border-t border-gray-100">
-          <button className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center justify-center space-x-1">
+          <button 
+            onClick={() => onViewAllInterviews?.()}
+            className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center justify-center space-x-1 hover:bg-blue-50 py-2 rounded-lg"
+          >
             <span>View All Interviews</span>
             <ExternalLink className="w-3 h-3" />
           </button>
