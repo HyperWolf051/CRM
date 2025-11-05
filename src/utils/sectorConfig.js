@@ -158,6 +158,12 @@ export const businessSectors = {
         color: 'from-pink-500 to-rose-600'
       },
       {
+        name: 'Automation',
+        href: '/app/recruiter/automation',
+        icon: Zap,
+        color: 'from-yellow-500 to-orange-600'
+      },
+      {
         name: 'Analytics',
         href: '/app/recruiter/analytics',
         icon: TrendingUp,

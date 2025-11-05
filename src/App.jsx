@@ -46,6 +46,7 @@ const RecruiterScheduleInterview = lazy(() => import('@/pages/recruiter/Recruite
 const RecruiterInterviews = lazy(() => import('@/pages/recruiter/RecruiterInterviews'));
 const RecruiterOffers = lazy(() => import('@/pages/recruiter/RecruiterOffers'));
 const RecruiterDuplicateManagement = lazy(() => import('@/pages/recruiter/RecruiterDuplicateManagement'));
+const RecruiterWorkflowAutomation = lazy(() => import('@/pages/recruiter/RecruiterWorkflowAutomation'));
 
 // Components (keep these as regular imports since they're used immediately)
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -143,6 +144,7 @@ function App() {
                   <Route path="offers" element={<RecruiterOffers />} />
                   <Route path="calendar" element={<RecruiterCalendar />} />
                   <Route path="calendar/schedule" element={<RecruiterScheduleInterview />} />
+                  <Route path="automation" element={<RecruiterWorkflowAutomation />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" description="Recruitment analytics dashboard" />} />
                   <Route path="reports" element={<ComingSoon title="Reports" description="Daily reporting system" />} />
                   <Route path="csv-import" element={<CSVImport />} />
