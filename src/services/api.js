@@ -659,6 +659,171 @@ export const ClientAPI = {
   }
 };
 
+// Offers API
+export const OfferAPI = {
+  // Get all offers
+  getAll: async () => {
+    try {
+      const response = await api.get('/offers');
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offer by ID
+  getById: async (id) => {
+    try {
+      const response = await api.get(`/offers/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Create new offer
+  create: async (data) => {
+    try {
+      // Send all provided data as the backend will handle validation
+      const response = await api.post('/offers', data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Update offer
+  update: async (id, data) => {
+    try {
+      const response = await api.put(`/offers/${id}`, data);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Delete offer
+  delete: async (id) => {
+    try {
+      const response = await api.delete(`/offers/${id}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offers by candidate ID
+  getByCandidateId: async (candidateId) => {
+    try {
+      const response = await api.get(`/offers/candidate/${candidateId}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offers by job posting ID
+  getByJobId: async (jobId) => {
+    try {
+      const response = await api.get(`/offers/job/${jobId}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offers by employer ID
+  getByEmployerId: async (employerId) => {
+    try {
+      const response = await api.get(`/offers/employer/${employerId}`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Update offer status (accept, reject, pending, etc.)
+  updateStatus: async (id, status, notes = '') => {
+    try {
+      const response = await api.patch(`/offers/${id}/status`, {
+        status,
+        notes
+      });
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Send offer to candidate
+  sendOffer: async (id, deliveryMethod = 'email') => {
+    try {
+      const response = await api.post(`/offers/${id}/send`, {
+        deliveryMethod
+      });
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offer statistics
+  getStatistics: async (filters = {}) => {
+    try {
+      const response = await api.get('/offers/statistics', { params: filters });
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  // Get offer history/audit trail
+  getHistory: async (id) => {
+    try {
+      const response = await api.get(`/offers/${id}/history`);
+      return {
+        success: true,
+        data: extractResponseData(response)
+      };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+};
+
 // Authentication API
 export const AuthAPI = {
   // Login with email and password
