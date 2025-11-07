@@ -20,6 +20,7 @@ const recruiterPageTitles = {
   '/app/recruiter/clients': 'Client Management',
   '/app/recruiter/clients/add': 'Add New Client',
   '/app/recruiter/calendar': 'Interview Calendar',
+  '/app/recruiter/communication': 'Communication & Collaboration',
   '/app/recruiter/automation': 'Workflow Automation',
   '/app/recruiter/analytics': 'Recruitment Analytics',
   '/app/recruiter/reports': 'Daily Reports',
