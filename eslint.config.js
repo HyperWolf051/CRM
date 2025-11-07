@@ -143,8 +143,7 @@ export default [js.configs.recommended, react.configs.flat.recommended, {
     'no-irregular-whitespace': 'warn',
     'no-obj-calls': 'error',
     'no-sparse-arrays': 'warn',
-    'no-undef': 'off', // Handled by globals
-    'use-isnan': 'error',
+    'no-undef': 'error',    'use-isnan': 'error',
     'valid-typeof': 'error',
 
     // Additional relaxed rules
