@@ -10,3 +10,6 @@ export {
   useJobs 
 } from './useRecruitment';
 export { useLastPageMemory } from './useLastPageMemory';
+
+// Change Tracking Hooks
+export { useChangeTracking, useChangeHistory } from './useChangeTracking';
