@@ -11,6 +11,8 @@ import Button from '@/components/ui/Button';
 import { CandidateAPI, InterviewAPI } from '@/services/api';
 import { ProfileTab, ApplicationTab, DocumentsTab, NotesTab } from './CandidateDetailTabs';
 import WorkflowManagement from './WorkflowManagement';
+import ChangeHistoryTimeline from './ChangeHistoryTimeline';
+import DataPrivacyManager from './DataPrivacyManager';
 
 // Helper function to get stage display info
 const getStageInfo = (stage) => {
@@ -352,7 +354,9 @@ const CandidateDetailModal = ({
     { id: 'application', label: 'Application', icon: Briefcase },
     { id: 'workflow', label: 'Workflow', icon: Clock },
     { id: 'documents', label: 'Documents', icon: FileText },
-    { id: 'notes', label: 'Notes', icon: MessageSquare }
+    { id: 'notes', label: 'Notes', icon: MessageSquare },
+    { id: 'history', label: 'Change History', icon: Clock },
+    { id: 'privacy', label: 'Privacy', icon: Eye }
   ];
 
   return (
@@ -508,6 +512,21 @@ const CandidateDetailModal = ({
                 newNote={newNote}
                 setNewNote={setNewNote}
                 onAddNote={handleAddNote}
+              />
+            )}
+            {activeTab === 'history' && (
+              <ChangeHistoryTimeline 
+                candidate={candidate}
+                showFilters={true}
+                showStatistics={true}
+                groupByDate={true}
+                maxItems={50}
+              />
+            )}
+            {activeTab === 'privacy' && (
+              <DataPrivacyManager 
+                candidate={candidate}
+                onUpdate={loadCandidate}
               />
             )}
           </div>
