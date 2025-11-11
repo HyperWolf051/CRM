@@ -17,7 +17,8 @@ import {
   MapPin,
   Stethoscope,
   GraduationCap,
-  MessageCircle
+  MessageCircle,
+  Plug
 } from 'lucide-react';
 
 // Define business sectors and their navigation configurations
@@ -175,6 +176,12 @@ export const businessSectors = {
         href: '/app/recruiter/analytics',
         icon: TrendingUp,
         color: 'from-indigo-500 to-indigo-600'
+      },
+      {
+        name: 'Integrations',
+        href: '/app/recruiter/integrations',
+        icon: Plug,
+        color: 'from-violet-500 to-purple-600'
       },
       {
         name: 'Reports',
