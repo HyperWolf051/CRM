@@ -23,6 +23,7 @@ const recruiterPageTitles = {
   '/app/recruiter/communication': 'Communication & Collaboration',
   '/app/recruiter/automation': 'Workflow Automation',
   '/app/recruiter/analytics': 'Recruitment Analytics',
+  '/app/recruiter/integrations': 'Integrations & API',
   '/app/recruiter/reports': 'Daily Reports',
   '/app/recruiter/settings': 'Recruitment Settings',
 };
