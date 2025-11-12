@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { devConsole } from '@/utils/console-wrapper';
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7244/api/v1';
@@ -76,7 +77,17 @@ api.interceptors.request.use(
 // Response interceptor for handling common errors and data extraction
 api.interceptors.response.use(
   (response) => {
-    // Extract data from common response structures
+    // Skip data extraction for auth endpoints - they have a specific structure
+    const isAuthEndpoint = response.config.url?.includes('/auth/');
+    
+    if (isAuthEndpoint) {
+      // For auth endpoints, preserve the original response structure
+      // Expected format: { token: "...", user: {...} }
+      devConsole.log('🔐 Auth endpoint detected, preserving response structure');
+      return response;
+    }
+    
+    // Extract data from common response structures for non-auth endpoints
     // Handle different response formats: { data: [...] }, { result: [...] }, or direct array
     if (response.data) {
       // If response has nested data structure, extract it
@@ -833,11 +844,23 @@ export const AuthAPI = {
         email,
         password
       });
+      
+      // DEBUG: Log the raw response to understand the structure
+      devConsole.log('🔍 Raw login response:', response);
+      devConsole.log('🔍 Response data:', response.data);
+      
+      // For auth endpoints, we need to preserve the original structure
+      // because we expect { token, user } at the top level
+      const responseData = response.data;
+      
+      devConsole.log('🔍 Extracted data:', responseData);
+      
       return {
         success: true,
-        data: extractResponseData(response)
+        data: responseData
       };
     } catch (error) {
+      devConsole.error('❌ Login error:', error);
       return handleApiError(error);
     }
   },
@@ -846,9 +869,10 @@ export const AuthAPI = {
   register: async (userData) => {
     try {
       const response = await api.post('/auth/register', userData);
+      // Auth endpoints preserve original structure
       return {
         success: true,
-        data: extractResponseData(response)
+        data: response.data
       };
     } catch (error) {
       return handleApiError(error);
@@ -861,7 +885,7 @@ export const AuthAPI = {
       const response = await api.post('/auth/logout');
       return {
         success: true,
-        data: extractResponseData(response)
+        data: response.data
       };
     } catch (error) {
       return handleApiError(error);
@@ -872,9 +896,11 @@ export const AuthAPI = {
   me: async () => {
     try {
       const response = await api.get('/auth/me');
+      // For /me endpoint, the user data might be at the top level or nested
+      // Return the user data directly
       return {
         success: true,
-        data: extractResponseData(response)
+        data: response.data.user || response.data
       };
     } catch (error) {
       return handleApiError(error);
@@ -887,7 +913,7 @@ export const AuthAPI = {
       const response = await api.post('/auth/refresh');
       return {
         success: true,
-        data: extractResponseData(response)
+        data: response.data
       };
     } catch (error) {
       return handleApiError(error);

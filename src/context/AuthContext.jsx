@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }) => {
               };
             } else {
               // Fallback for old tokens or unknown format
-              console.warn('Unknown token format, defaulting to user role:', storedToken);
+              devConsole.warn('Unknown token format, defaulting to user role:', storedToken);
               demoUser = {
                 id: 'demo-user-user',
                 name: 'Sales User',
@@ -232,8 +232,30 @@ export const AuthProvider = ({ children }) => {
 
     // Real API login
     try {
+      devConsole.log('🔐 Attempting real API login...');
       const response = await AuthAPI.login(email, password);
+      
+      devConsole.log('📦 Login response:', response);
+      devConsole.log('📦 Response success:', response.success);
+      devConsole.log('📦 Response data:', response.data);
+      
+      // Check if login was successful
+      if (!response.success) {
+        devConsole.error('❌ Login failed:', response.message);
+        return { success: false, error: response.message || 'Login failed' };
+      }
+      
+      // Extract token and user from response
       const { token: authToken, user: userData } = response.data;
+      
+      devConsole.log('🎫 Extracted token:', authToken ? '✓ Present' : '✗ Missing');
+      devConsole.log('👤 Extracted user:', userData ? '✓ Present' : '✗ Missing');
+      
+      // Validate we have the required data
+      if (!authToken || !userData) {
+        devConsole.error('❌ Missing token or user data in response');
+        return { success: false, error: 'Invalid response from server' };
+      }
       
       // Store token in localStorage
       localStorage.setItem('authToken', authToken);
@@ -242,6 +264,8 @@ export const AuthProvider = ({ children }) => {
       setToken(authToken);
       setUser(userData);
       setIsAuthenticated(true);
+      
+      devConsole.log('✅ Login successful, state updated');
       
       // Check for stored last page and validate permissions
       const storageKey = generateLastPageStorageKey(userData.id);
@@ -326,8 +350,24 @@ export const AuthProvider = ({ children }) => {
   // Register method
   const register = useCallback(async (name, email, password) => {
     try {
+      devConsole.log('📝 Attempting registration...');
       const response = await AuthAPI.register({ name, email, password });
+      
+      devConsole.log('📦 Register response:', response);
+      
+      // Check if registration was successful
+      if (!response.success) {
+        devConsole.error('❌ Registration failed:', response.message);
+        return { success: false, error: response.message || 'Registration failed' };
+      }
+      
       const { token: authToken, user: userData } = response.data;
+      
+      // Validate we have the required data
+      if (!authToken || !userData) {
+        devConsole.error('❌ Missing token or user data in registration response');
+        return { success: false, error: 'Invalid response from server' };
+      }
       
       // Store token in localStorage
       localStorage.setItem('authToken', authToken);
@@ -337,8 +377,10 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       setIsAuthenticated(true);
       
+      devConsole.log('✅ Registration successful');
       return { success: true };
     } catch (error) {
+      devConsole.error('❌ Registration error:', error);
       const message = error.response?.data?.message || 'Registration failed. Please try again.';
       return { success: false, error: message };
     }
@@ -395,7 +437,7 @@ export const AuthProvider = ({ children }) => {
   const clearAuthOnNextReload = useCallback(() => {
     if (import.meta.env.DEV) {
       sessionStorage.setItem('__dev_clear_auth__', 'true');
-      console.log('🔄 Auth will be cleared on next page reload');
+      devConsole.log('🔄 Auth will be cleared on next page reload');
       window.location.reload();
     }
   }, []);
@@ -404,7 +446,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (import.meta.env.DEV && typeof window !== 'undefined') {
       window.clearAuth = clearAuthOnNextReload;
-      console.log('🛠️ Development helper available: window.clearAuth() to clear authentication');
+      devConsole.log('🛠️ Development helper available: window.clearAuth() to clear authentication');
     }
   }, [clearAuthOnNextReload]);
 
