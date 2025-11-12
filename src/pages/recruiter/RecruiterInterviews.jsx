@@ -125,39 +125,40 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
 
   return (
     <div className={`
-      bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-200
+      bg-white rounded-xl border border-slate-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-200
       ${isToday ? 'ring-2 ring-blue-200 bg-blue-50/30' : ''}
       ${isPast && interview.status === 'scheduled' ? 'border-orange-200 bg-orange-50/30' : ''}
     `}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg ${typeConfig.bgColor}`}>
+      <div className="flex items-start justify-between mb-4 gap-2">
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+          <div className={`p-2 rounded-lg ${typeConfig.bgColor} flex-shrink-0`}>
             {React.createElement(typeConfig.icon, { 
-              className: `w-5 h-5 ${typeConfig.textColor}` 
+              className: `w-4 h-4 sm:w-5 sm:h-5 ${typeConfig.textColor}` 
             })}
           </div>
-          <div>
-            <h3 className="font-semibold text-slate-900 text-lg">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-slate-900 text-base sm:text-lg truncate">
               {interview.candidateName}
             </h3>
-            <p className="text-sm text-slate-600 flex items-center space-x-1">
-              <Briefcase className="w-3 h-3" />
-              <span>{interview.jobTitle}</span>
+            <p className="text-xs sm:text-sm text-slate-600 flex items-center space-x-1 truncate">
+              <Briefcase className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{interview.jobTitle}</span>
             </p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${priorityConfig.color}`}>
+        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${priorityConfig.color} hidden sm:inline-flex`}>
             {priorityConfig.name}
           </span>
           <div className="relative">
             <button
               onClick={() => setShowActions(!showActions)}
-              className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors touch-target"
+              aria-label="More actions"
             >
-              <MoreHorizontal className="w-4 h-4 text-slate-500" />
+              <MoreHorizontal className="w-5 h-5 sm:w-4 sm:h-4 text-slate-500" />
             </button>
             
             {showActions && (
@@ -200,44 +201,44 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
 
       {/* Interview Details */}
       <div className="space-y-3 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 text-sm text-slate-600">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:text-sm text-slate-600">
             <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 flex-shrink-0" />
               <span className={isToday ? 'font-medium text-blue-700' : ''}>{date}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <Clock className="w-4 h-4" />
+              <Clock className="w-4 h-4 flex-shrink-0" />
               <span className={isToday ? 'font-medium text-blue-700' : ''}>{time}</span>
             </div>
-            <div className="flex items-center space-x-1">
-              <MapPin className="w-4 h-4" />
-              <span className="truncate max-w-[120px]">{interview.location}</span>
+            <div className="flex items-center space-x-1 min-w-0">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate max-w-[150px] sm:max-w-[120px]">{interview.location}</span>
             </div>
           </div>
           
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color}`}>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color} self-start sm:self-auto`}>
             {statusConfig.name}
           </span>
         </div>
 
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-1 text-slate-600">
-            <User className="w-4 h-4" />
-            <span>{interview.interviewer.name}</span>
-            <span className="text-slate-400">•</span>
-            <span>{interview.interviewer.role}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+          <div className="flex items-center space-x-1 text-slate-600 min-w-0">
+            <User className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{interview.interviewer.name}</span>
+            <span className="text-slate-400 hidden sm:inline">•</span>
+            <span className="truncate hidden sm:inline">{interview.interviewer.role}</span>
           </div>
           
-          <div className="flex items-center space-x-1 text-slate-600">
-            <Building className="w-4 h-4" />
-            <span>{interview.client}</span>
+          <div className="flex items-center space-x-1 text-slate-600 min-w-0">
+            <Building className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{interview.client}</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-500">
-            Round {interview.round} • {interview.duration} minutes
+            Round {interview.round} • {interview.duration} min
           </span>
           <span className={`px-2 py-1 rounded text-xs font-medium ${typeConfig.color} text-white`}>
             {typeConfig.name}
@@ -246,13 +247,13 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {interview.status === 'scheduled' && (
           <>
             {interview.type === 'video' && interview.meetingLink && (
               <button
                 onClick={() => onJoin(interview)}
-                className="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                className="flex-1 px-4 py-3 sm:py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 touch-target"
               >
                 <Video className="w-4 h-4" />
                 <span>Join</span>
@@ -260,7 +261,7 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
             )}
             <button
               onClick={() => onReschedule(interview)}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              className="flex-1 px-4 py-3 sm:py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 touch-target"
             >
               <Edit className="w-4 h-4" />
               <span>Reschedule</span>
@@ -270,7 +271,7 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
         
         <button
           onClick={() => onAddNotes(interview)}
-          className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors flex items-center space-x-2"
+          className="flex-1 sm:flex-initial px-4 py-3 sm:py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center space-x-2 touch-target"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Notes</span>
@@ -278,9 +279,10 @@ const InterviewCard = ({ interview, onJoin, onReschedule, onAddNotes, onUpdateSt
         
         <button
           onClick={() => onUpdateStatus(interview)}
-          className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors"
+          className="flex-1 sm:flex-initial px-4 py-3 sm:py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors touch-target"
         >
-          Update Status
+          <span className="hidden sm:inline">Update Status</span>
+          <span className="sm:hidden">Status</span>
         </button>
       </div>
 
@@ -594,20 +596,20 @@ const RecruiterInterviews = () => {
   }
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="space-y-6">
+    <div className="min-h-full bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Interviews
             </h1>
-            <p className="text-slate-600 mt-1">Manage and track candidate interviews</p>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">Manage and track candidate interviews</p>
           </div>
 
           <button
             onClick={handleScheduleInterview}
-            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl touch-target"
           >
             <Plus className="w-5 h-5" />
             <span>Schedule Interview</span>
@@ -615,51 +617,51 @@ const RecruiterInterviews = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Total Interviews</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-600">Total</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900">{stats.total}</p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-blue-600" />
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Today</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.today}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-600">Today</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900">{stats.today}</p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
-                <Clock className="w-6 h-6 text-green-600" />
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">This Week</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.thisWeek}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-600">This Week</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900">{stats.thisWeek}</p>
               </div>
               <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="w-6 h-6 text-purple-600" />
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/50 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Completed</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.completed}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-600">Done</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900">{stats.completed}</p>
               </div>
               <div className="p-2 bg-emerald-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
               </div>
             </div>
           </div>
@@ -687,7 +689,7 @@ const RecruiterInterviews = () => {
 
         {/* Interviews Grid */}
         {filteredInterviews.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {filteredInterviews.map(interview => (
               <InterviewCard
                 key={interview.id}

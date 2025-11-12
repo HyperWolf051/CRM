@@ -191,12 +191,12 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
   const urgentNotifications = notifications.filter(n => n.urgent).length;
 
   return (
-    <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 shadow-sm relative">
-      <div className="flex items-center justify-between">
+    <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/50 px-4 sm:px-6 py-3 sm:py-4 shadow-sm relative">
+      <div className="flex items-center justify-between gap-3">
         {/* Left Side - Breadcrumbs and Search */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-3 sm:space-x-6 flex-1 min-w-0">
           {/* Breadcrumbs */}
-          <nav className="flex items-center space-x-2 text-sm">
+          <nav className="hidden lg:flex items-center space-x-2 text-sm">
             {getBreadcrumbs().map((crumb, index) => (
               <div key={crumb.path} className="flex items-center space-x-2">
                 {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -206,7 +206,7 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
                     index === getBreadcrumbs().length - 1
                       ? 'text-gray-900 font-medium'
                       : 'text-gray-500 hover:text-gray-700'
-                  } transition-colors`}
+                  } transition-colors whitespace-nowrap`}
                 >
                   {crumb.label}
                 </button>
@@ -215,7 +215,7 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
           </nav>
 
           {/* Search Bar */}
-          <div className="relative hidden md:block" ref={searchRef}>
+          <div className="relative hidden md:block flex-1 max-w-md" ref={searchRef}>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-slate-400" />
             </div>
@@ -225,7 +225,7 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               onFocus={() => searchQuery.length > 2 && setShowSearchResults(true)}
-              className="w-80 pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200/50 rounded-xl
                          text-sm placeholder-slate-400
                          focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300
                          hover:bg-white/80 hover:border-slate-300/50
@@ -296,14 +296,15 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
         </div>
 
         {/* Right Side - Actions */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
           {/* Quick Actions */}
           <div className="relative" ref={quickActionsRef}>
             <button
               onClick={() => setShowQuickActions(!showQuickActions)}
-              className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-target"
+              aria-label="Quick actions"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline text-sm font-medium">Quick Actions</span>
             </button>
             
@@ -339,11 +340,12 @@ export default function RecruiterTopbar({ title = 'Recruitment Dashboard' }) {
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+              aria-label="Notifications"
             >
               <Bell className="w-5 h-5" />
               {urgentNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                   {urgentNotifications}
                 </span>
               )}

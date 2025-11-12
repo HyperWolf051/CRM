@@ -192,16 +192,16 @@ export default function RecruiterOffers() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Job Offers</h1>
-          <p className="text-gray-600">Manage and track job offers throughout the negotiation process</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Job Offers</h1>
+          <p className="text-sm sm:text-base text-gray-600">Manage and track job offers throughout the negotiation process</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="w-full sm:w-auto flex items-center justify-center space-x-2 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-target"
         >
           <Plus className="w-4 h-4" />
           <span>Create Offer</span>
@@ -209,18 +209,18 @@ export default function RecruiterOffers() {
       </div>
 
       {/* Pipeline Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {pipelineSummary.map((item) => {
           const Icon = item.icon;
           return (
-            <div key={item.status} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={item.status} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{item.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{item.count}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">{item.label}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{item.count}</p>
                 </div>
-                <div className={`w-12 h-12 rounded-lg ${item.color} flex items-center justify-center`}>
-                  <Icon className="w-6 h-6 text-white" />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${item.color} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
             </div>
@@ -244,55 +244,57 @@ export default function RecruiterOffers() {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search offers by candidate, position, or client..."
+              placeholder="Search offers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
 
-          {/* Filter Toggle */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors ${
-              showFilters 
-                ? 'bg-blue-50 border-blue-200 text-blue-700' 
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
-          </button>
+          <div className="flex gap-2 sm:gap-3">
+            {/* Filter Toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-3 sm:py-2 border rounded-lg transition-colors touch-target ${
+                showFilters 
+                  ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">Filters</span>
+            </button>
 
-          {/* View Mode Toggle */}
-          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`px-3 py-2 text-sm ${
-                viewMode === 'cards' 
-                  ? 'bg-blue-50 text-blue-700' 
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Cards
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`px-3 py-2 text-sm border-l border-gray-300 ${
-                viewMode === 'table' 
-                  ? 'bg-blue-50 text-blue-700' 
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Table
-            </button>
+            {/* View Mode Toggle */}
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`px-4 py-3 sm:py-2 text-sm touch-target ${
+                  viewMode === 'cards' 
+                    ? 'bg-blue-50 text-blue-700' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Cards
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`px-4 py-3 sm:py-2 text-sm border-l border-gray-300 touch-target ${
+                  viewMode === 'table' 
+                    ? 'bg-blue-50 text-blue-700' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
 
@@ -361,7 +363,7 @@ export default function RecruiterOffers() {
           )}
         </div>
       ) : viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredOffers.map((offer) => (
             <OfferCard
               key={offer.id}
@@ -378,37 +380,37 @@ export default function RecruiterOffers() {
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="w-full min-w-[800px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-4 sm:px-6 py-3 text-left">
                     <input
                       type="checkbox"
                       checked={selectedOffers.length === filteredOffers.length}
                       onChange={handleSelectAll}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
                     />
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Candidate
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Position
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Client
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Salary
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -416,46 +418,46 @@ export default function RecruiterOffers() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOffers.map((offer) => (
                   <tr key={offer.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <input
                         type="checkbox"
                         checked={selectedOffers.includes(offer.id)}
                         onChange={() => handleSelectOffer(offer.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
                       />
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                           <User className="w-4 h-4 text-blue-600" />
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{offer.candidateName}</div>
-                          <div className="text-sm text-gray-500">{offer.candidateEmail}</div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{offer.candidateName}</div>
+                          <div className="text-sm text-gray-500 truncate">{offer.candidateEmail}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{offer.offerDetails.position}</div>
-                      <div className="text-sm text-gray-500">{offer.offerDetails.department}</div>
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="text-sm text-gray-900 truncate">{offer.offerDetails.position}</div>
+                      <div className="text-sm text-gray-500 truncate">{offer.offerDetails.department}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <Building2 className="w-4 h-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">{offer.clientName}</span>
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="flex items-center min-w-0">
+                        <Building2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                        <span className="text-sm text-gray-900 truncate">{offer.clientName}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center">
-                        <DollarSign className="w-4 h-4 text-green-600 mr-1" />
-                        <span className="text-sm font-medium text-gray-900">
+                        <DollarSign className="w-4 h-4 text-green-600 mr-1 flex-shrink-0" />
+                        <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
                           {offer.offerDetails.salary.base.toLocaleString()} {offer.offerDetails.salary.currency}
                         </span>
                       </div>
                       <div className="text-xs text-gray-500">{offer.offerDetails.salary.frequency}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    <td className="px-4 sm:px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                         offer.status === 'accepted' ? 'bg-green-100 text-green-800' :
                         offer.status === 'declined' ? 'bg-red-100 text-red-800' :
                         offer.status === 'negotiating' ? 'bg-amber-100 text-amber-800' :
@@ -465,25 +467,27 @@ export default function RecruiterOffers() {
                         {offer.status.charAt(0).toUpperCase() + offer.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="w-4 h-4 mr-1" />
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="flex items-center text-sm text-gray-500 whitespace-nowrap">
+                        <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
                         {new Date(offer.timeline.createdAt).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleViewOffer(offer.id)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 hover:text-blue-800 p-2 touch-target"
+                          aria-label="View offer"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => {/* Handle edit */}}
-                          className="text-gray-600 hover:text-gray-800"
+                          className="text-gray-600 hover:text-gray-800 p-2 touch-target"
+                          aria-label="Edit offer"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-5 h-5" />
                         </button>
                       </div>
                     </td>
