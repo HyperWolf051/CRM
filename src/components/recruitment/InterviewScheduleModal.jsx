@@ -239,16 +239,17 @@ const InterviewScheduleModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/50 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99999] flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white/95 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-slate-200/50 shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
               {existingInterview ? 'Edit Interview' : 'Schedule Interview'}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+              className="touch-target p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+              aria-label="Close modal"
             >
               <Plus className="w-5 h-5 text-slate-500 rotate-45" />
             </button>

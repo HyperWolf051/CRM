@@ -7,6 +7,9 @@
 /* Import layout fixes */
 @import "./styles/layout-fixes.css";
 
+/* Import minimal human-crafted theme */
+@import "./styles/minimal-human-theme.css";
+
 /* CSS Custom Properties for Theme Configuration */
 :root {
   /* Custom color palette */
